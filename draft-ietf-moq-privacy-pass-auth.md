@@ -10,11 +10,11 @@ keyword:
 - media over quic
 - privacy-pass
 venue:
-  group: MoQ
-  type: Working Group
+  group: "Media Over QUIC"
+  type: "Working Group"
   home: https://datatracker.ietf.org/wg/moq/
-  mail: moq@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/moq/
+  mail: "moq@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/moq/"
   repo: https://github.com/moq-wg/moq-transport
 
 stand_alone: yes
@@ -55,12 +55,12 @@ informative:
 
 --- abstract
 
-This document specifies the use of Privacy Pass architecture and issuance 
-protocols for authorization in Media over QUIC (MoQ) transport protocol. It 
-defines how Privacy Pass tokens can be integrated with MoQ's authorization 
-framework to provide privacy-preserving authentication for subscriptions, 
-fetches, publications, and relay operations while supporting fine-grained 
-access control through prefix-based track namespace and track name matching 
+This document specifies the use of Privacy Pass architecture and issuance
+protocols for authorization in Media over QUIC (MoQ) transport protocol. It
+defines how Privacy Pass tokens can be integrated with MoQ's authorization
+framework to provide privacy-preserving authentication for subscriptions,
+fetches, publications, and relay operations while supporting fine-grained
+access control through prefix-based track namespace and track name matching
 rules.
 
 
@@ -80,21 +80,21 @@ broadcasts, and other latency-sensitive use cases. MoQ includes mechanisms for
 authorization through tokens that can be used to control access to media
 streams, interactive sessions, and relay operations.
 
-Traditional authorization mechanisms often lack the privacy protection needed 
-for modern media distribution scenarios, where users' viewing patterns and 
-content preferences should remain private while still enabling fine-grained 
+Traditional authorization mechanisms often lack the privacy protection needed
+for modern media distribution scenarios, where users' viewing patterns and
+content preferences should remain private while still enabling fine-grained
 access control, namespace restrictions, and operational constraints.
 
-Privacy Pass {{RFC9576}} provides a privacy-preserving authorization 
-architecture that enables anonymous authentication through unlinkable tokens. 
-The Privacy Pass architecture consists of four entities: Client, Origin, Issuer, 
-and Attester, which work together to provide token-based authorization without 
-compromising user privacy. The issuance protocols {{RFC9578}} define how these 
+Privacy Pass {{RFC9576}} provides a privacy-preserving authorization
+architecture that enables anonymous authentication through unlinkable tokens.
+The Privacy Pass architecture consists of four entities: Client, Origin, Issuer,
+and Attester, which work together to provide token-based authorization without
+compromising user privacy. The issuance protocols {{RFC9578}} define how these
 tokens are created and verified.
 
-This document defines how Privacy Pass tokens can be integrated with MoQ's 
-authorization framework to provide comprehensive access control for media 
-streaming, real-time communication, and interactive content services while 
+This document defines how Privacy Pass tokens can be integrated with MoQ's
+authorization framework to provide comprehensive access control for media
+streaming, real-time communication, and interactive content services while
 preserving user privacy through unlinkable authentication tokens.
 
 ## Requirements Language
@@ -103,31 +103,31 @@ preserving user privacy through unlinkable authentication tokens.
 
 # Privacy Pass Architecture for MoQ
 
-The Privacy Pass MoQ integration involves the following entities and their 
+The Privacy Pass MoQ integration involves the following entities and their
 interactions:
 
-- **Client**: The MoQ client requesting access to media content. The client is 
-responsible for obtaining Privacy Pass tokens through the attestation and 
+- **Client**: The MoQ client requesting access to media content. The client is
+responsible for obtaining Privacy Pass tokens through the attestation and
 issuance process, and presenting these tokens when requesting MoQ operations.
 
-- **MoQ Relay/Origin**: The MoQ relay server or origin that forwards media 
-content and requires authorization. The relay validates Privacy Pass tokens, 
-enforces access policies, and forwards authorized requests to origins or other 
-relays. Relays maintain configuration for trusted issuers and validate token 
+- **MoQ Relay/Origin**: The MoQ relay server or origin that forwards media
+content and requires authorization. The relay validates Privacy Pass tokens,
+enforces access policies, and forwards authorized requests to origins or other
+relays. Relays maintain configuration for trusted issuers and validate token
 signatures and metadata.
 
-- **Privacy Pass Issuer**: The entity that issues Privacy Pass tokens to clients 
-after successful attestation. The issuer operates the token issuance protocol, 
-manages cryptographic keys, and may implement rate limiting. The issuer creates 
+- **Privacy Pass Issuer**: The entity that issues Privacy Pass tokens to clients
+after successful attestation. The issuer operates the token issuance protocol,
+manages cryptographic keys, and may implement rate limiting. The issuer creates
 tokens with appropriate MoQ-specific metadata.
 
-- **Privacy Pass Attester**: The entity that attests to properties of clients 
-for the purposes of token issuance. The attester verifies client credentials, 
-subscription status, or other eligibility criteria. Common attestation methods 
-include username/password, OAuth, device certificates, or other authentication 
+- **Privacy Pass Attester**: The entity that attests to properties of clients
+for the purposes of token issuance. The attester verifies client credentials,
+subscription status, or other eligibility criteria. Common attestation methods
+include username/password, OAuth, device certificates, or other authentication
 mechanisms.
 
-In the below deployment, the MoQ relay and Privacy Pass issuer are operated 
+In the below deployment, the MoQ relay and Privacy Pass issuer are operated
 by different entities to enhance privacy through separation of concerns:
 
 ~~~ascii
@@ -142,17 +142,17 @@ by different entities to enhance privacy through separation of concerns:
    |    |──────────(2)──────────────────────────────────
    |                                                    |
    |                                                    ▼
-   |                                             ┌─────────────┐                               
+   |                                             ┌─────────────┐
    |                                             │ Privacy Pass│
    |(3)                                          │  Issuer     │
-   |                                             │ (Separate)  │        
-   |                                             └─────────────┘                              
-   │                                            
-   ▼                                             
-┌─────────────┐           
+   |                                             │ (Separate)  │
+   |                                             └─────────────┘
+   │
+   ▼
+┌─────────────┐
 │ MoQ Relay   │
-└─────────────┘                           
-                          
+└─────────────┘
+
 (1) Client attestation with separate Attester
 (2) Token issuance from separate Issuer to Client
 (3) Client requests media access with token from relay
@@ -160,7 +160,7 @@ by different entities to enhance privacy through separation of concerns:
 ~~~
 
 However, in certain deployments the MoQ relay and Privacy Pass issuer may be
-operated by the same entity to simplify key management and policy coordination. 
+operated by the same entity to simplify key management and policy coordination.
 The details of such an intgrated architecture is TBD.
 
 
@@ -180,27 +180,27 @@ before issuing tokens
 
 # Privacy Pass Token Integration
 
-This section describes how Privacy Pass tokens are integrated into the MoQ 
-transport protocol to provide privacy-preserving authorization for various 
+This section describes how Privacy Pass tokens are integrated into the MoQ
+transport protocol to provide privacy-preserving authorization for various
 media operations.
 
 ## Token Types for MoQ Authorization
 
-This specification uses the existing Privacy Pass token types defined in 
+This specification uses the existing Privacy Pass token types defined in
 {{RFC9578}}:
 
-- **Token Type 0x0001 (VOPRF(P-384, SHA-384))**: Privately verifiable tokens 
-using Verifiable Oblivious Pseudorandom Function for deployments requiring 
+- **Token Type 0x0001 (VOPRF(P-384, SHA-384))**: Privately verifiable tokens
+using Verifiable Oblivious Pseudorandom Function for deployments requiring
 issuer-only validation capability.
 
-- **Token Type 0x0002 (Blind RSA (2048-bit))**: Publicly verifiable tokens 
-using blind RSA signatures for deployments requiring distributed validation 
+- **Token Type 0x0002 (Blind RSA (2048-bit))**: Publicly verifiable tokens
+using blind RSA signatures for deployments requiring distributed validation
 across multiple relays.
 
 ## Token Structure
 
-Privacy Pass tokens used in MoQ MUST follow the structure defined in 
-{{RFC9577}} for the PrivateToken HTTP authentication scheme. The token 
+Privacy Pass tokens used in MoQ MUST follow the structure defined in
+{{RFC9577}} for the PrivateToken HTTP authentication scheme. The token
 structure includes:
 
 - **Token Type**: 2-byte identifier specifying the issuance protocol used
@@ -211,7 +211,7 @@ structure includes:
 
 ### Token Challenge Structure for MoQ
 
-MoQ-specific TokenChallenge structures use the default format defined in 
+MoQ-specific TokenChallenge structures use the default format defined in
 {{RFC9577}} with MoQ-specific parameters in the origin_info field:
 
 ~~~
@@ -223,14 +223,14 @@ struct {
 } TokenChallenge;
 ~~~
 
-For MoQ usage, the origin_info field contains MoQ-specific authorization scope 
+For MoQ usage, the origin_info field contains MoQ-specific authorization scope
 information encoded as a UTF-8 string with the following format:
 
 TODO: Degfine origin_info to be binary format
 
 ~~~~
 moq-scope = operation ":" namespace-pattern [":" track-pattern]
-operation = "subscribe" / "fetch" / "publish" / "announce"  
+operation = "subscribe" / "fetch" / "publish" / "announce"
 namespace-pattern = exact-match / prefix-match
 track-pattern = exact-match / prefix-match
 exact-match = namespace/name-string
@@ -239,23 +239,23 @@ prefix-match = namespace/name-string"*"
 
 Examples:
 
-- `subscribe:sports.example.com/live/*` - Subscribe to any track under live 
+- `subscribe:sports.example.com/live/*` - Subscribe to any track under live
   sports
 - `fetch:vod.example.com/movies/action*` - Fetch video-on-demand action content
-- `publish:meetings.example.com/meeting/m123/audio/opus48000` - Publish content 
+- `publish:meetings.example.com/meeting/m123/audio/opus48000` - Publish content
   for meeting m123
 
 ## Track Namespace and Track Name Matching Rules
 
-This specification defines prefix-based matching rules for track namespaces 
-and track names to enable fine-grained access control while maintaining 
+This specification defines prefix-based matching rules for track namespaces
+and track names to enable fine-grained access control while maintaining
 privacy.
 
 ### Namespace Matching
 
 Track namespace matching supports three modes:
 
-**Exact Match**: 
+**Exact Match**:
 
 - Pattern: `"example.com/live/sports/soccer"`
 
@@ -263,14 +263,14 @@ Track namespace matching supports three modes:
 
 **Prefix Match**:
 
-- Pattern: `"example.com/live/sports/*"`  
+- Pattern: `"example.com/live/sports/*"`
 
 - Matches: Any namespace starting with `example.com/live/sports/`
 
-- Examples: `example.com/live/sports/soccer`, 
+- Examples: `example.com/live/sports/soccer`,
   `example.com/live/sports/tennis`
 
-### Track Name Matching  
+### Track Name Matching
 
 Track name matching within authorized namespaces follows the same pattern:
 
@@ -290,14 +290,14 @@ Track name matching within authorized namespaces follows the same pattern:
 
 ### Matching Algorithm
 
-When a MoQ relay receives a request with a Privacy Pass token, it performs the 
-following validation steps to determine whether to authorize the requested 
+When a MoQ relay receives a request with a Privacy Pass token, it performs the
+following validation steps to determine whether to authorize the requested
 operation:
 
-1. Extract the Privacy Pass token from the MoQ control 
+1. Extract the Privacy Pass token from the MoQ control
 message (SETUP, SUBSCRIBE, FETCH, PUBLISH, or ANNOUNCE)
 
-2. Verify the token signature using the appropriate 
+2. Verify the token signature using the appropriate
 issuer public key based on the token type:
 
    - For Token Type 0x0001 (VOPRF): Use the issuer's private validation key
@@ -308,18 +308,18 @@ issuer public key based on the token type:
    - Token nonce uniqueness within the issuer's replay window
    - Token expiration timestamp (if present in token metadata)
 
-4. Extract the MoQ-specific authorization scope from the token's origin_info 
+4. Extract the MoQ-specific authorization scope from the token's origin_info
 field:
 
    - Authorized operation type (subscribe, fetch, publish, announce)
    - Namespace pattern (exact match or prefix match)
    - Track name pattern (exact match or prefix match, optional)
 
-5. Verify that the requested MoQ operation matches the operation specified 
+5. Verify that the requested MoQ operation matches the operation specified
 in the token scope:
 
    - SUBSCRIBE operations require "subscribe" scope
-   - FETCH operations require "fetch" scope  
+   - FETCH operations require "fetch" scope
    - PUBLISH operations require "publish" scope
    - ANNOUNCE operations require "announce" scope
 
@@ -328,7 +328,7 @@ in the token scope:
     - If Exact Match, the requested namespace/name MUST exactly equal the pattern
     - If Prefix Match, the requested namespace/name MUST start with the pattern prefix
 
-Access is granded to the requested resource if and only if ALL of the following 
+Access is granded to the requested resource if and only if ALL of the following
 conditions are met:
 
    - Token signature verification succeeds
@@ -343,12 +343,12 @@ else, authorzation error is returned to the requesting client.
 
 ## Token in MOQ Messages
 
-Privacy Pass tokens are provided to MoQ relays using the existing MoQ 
+Privacy Pass tokens are provided to MoQ relays using the existing MoQ
 authorization framework with the following adaptations:
 
 ### SETUP Message Authorization
 
-For connection-level authorization, Privacy Pass tokens are included in the 
+For connection-level authorization, Privacy Pass tokens are included in the
 SETUP message's authorization parameter:
 
 ~~~
@@ -370,13 +370,13 @@ struct {
 
 ### MoQ Operation-Level Authorization
 
-For individual MoQ operation authorization, tokens are included in 
+For individual MoQ operation authorization, tokens are included in
 operation-specific control messages:
 
 ~~~
 SUBSCRIBE {
     Track_Namespace = "sports.example.com/live/soccer",
-    Track_Name = "video", 
+    Track_Name = "video",
     Parameters = [
         {
             Type = AUTHORIZATION,
@@ -388,10 +388,10 @@ SUBSCRIBE {
 
 # Example Authorization Flow
 
-Below shows an example deployment scenarios where the relay has been 
-configured with the necessary validation keys and content policies, the 
-relay can verify Privacy Pass tokens locally and deliver media directly 
-without contacting the Origin. 
+Below shows an example deployment scenarios where the relay has been
+configured with the necessary validation keys and content policies, the
+relay can verify Privacy Pass tokens locally and deliver media directly
+without contacting the Origin.
 
 ~~~~~ascii
                     Direct Relay Authorization Flow
@@ -408,11 +408,11 @@ without contacting the Origin.
      |  (3) Attestation Request        |                |
      |---------------------------------|--------------->|
      |  (4) Attestation                |                |
-     |<-------------------------------------------------|            
+     |<-------------------------------------------------|
      |  (5) Token Request              |                |
-     |-------------------------------->|                | 
+     |-------------------------------->|                |
      |  (6) Token                      |                |
-     |<--------------------------------|                |                   
+     |<--------------------------------|                |
      |            |                    |                |
      |  (7) SUBSCRIBE with Token       |                |
      |----------->|                    |                |
@@ -429,7 +429,7 @@ without contacting the Origin.
 
 # Security Considerations
 
-TODO: Add considerations for the security and privacy of the Privacy Pass 
+TODO: Add considerations for the security and privacy of the Privacy Pass
 tokens.
 
 # IANA Considerations
