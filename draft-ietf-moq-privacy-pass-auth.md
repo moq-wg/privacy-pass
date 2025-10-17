@@ -3,7 +3,7 @@ title: "Privacy Pass Authentication for Media over QUIC (MoQ)"
 abbrev: "Privacy Pass MoQ Auth"
 category: std
 
-docname: draft-jennings-moq-privacy-pass-auth-latest
+docname: draft-ietf-moq-privacy-pass-auth-latest
 submissiontype: IETF
 ipr: trust200902
 consensus: true
@@ -13,13 +13,13 @@ workgroup: "Media Over QUIC"
 keyword:
 - media over quic
 venue:
-  group: MoQ
-  type: Working Group
+  group: "Media Over QUIC"
+  type: "Working Group"
   home: https://datatracker.ietf.org/wg/moq/
-  mail: moq@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/moq/
-  github: suhasHere/moq-privacy-pass
-  latest: https://suhasHere.github.io/moq-privacy-pass/draft-jennings-moq-privacy-pass-auth.html
+  mail: "moq@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/moq/"
+  repo: https://github.com/moq-wg/privacy-pass
+  latest: https://moq-wg.github.io/privacy-pass/draft-ietf-moq-privacy-pass-auth.html
 
 author:
  -
