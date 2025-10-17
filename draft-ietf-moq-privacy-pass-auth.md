@@ -2,24 +2,24 @@
 title: "Privacy Pass Authentication for Media over QUIC (MoQ)"
 abbrev: "Privacy Pass MoQ Auth"
 category: std
+
 docname: draft-ietf-moq-privacy-pass-auth-latest
+submissiontype: IETF
 ipr: trust200902
+consensus: true
+v: 3
 area: "Web and Internet Transport"
 workgroup: "Media Over QUIC"
 keyword:
 - media over quic
-- privacy-pass
 venue:
   group: "Media Over QUIC"
   type: "Working Group"
   home: https://datatracker.ietf.org/wg/moq/
   mail: "moq@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/moq/"
-  repo: https://github.com/moq-wg/moq-transport
-
-stand_alone: yes
-smart_quotes: no
-pi: [toc, sortrefs, symrefs, docmapping]
+  repo: https://github.com/moq-wg/privacy-pass
+  latest: https://moq-wg.github.io/privacy-pass/draft-ietf-moq-privacy-pass-auth.html
 
 author:
  -
@@ -31,27 +31,19 @@ author:
     organization: "Cisco"
     email: "fluffy@iii.ca"
 
+
 normative:
-  RFC9576:
-    title: "The Privacy Pass Architecture"
-    target: https://www.rfc-editor.org/rfc/rfc9576.txt
-  RFC9577:
-    title: "The Privacy Pass HTTP Authentication Scheme"
-    target: https://www.rfc-editor.org/rfc/rfc9577.txt
-  RFC9578:
-    title: "Privacy Pass Issuance Protocols"
-    target: https://www.rfc-editor.org/rfc/rfc9578.txt
-  MoQ-TRANSPORT:
-    title: "Media over QUIC Transport"
-    target: https://www.ietf.org/archive/id/draft-ietf-moq-transport-12.txt
+  MoQ-TRANSPORT: I-D.draft-ietf-moq-transport
   RFC2119:
-    title: "Key words for use in RFCs to Indicate Requirement Levels"
-    target: https://www.rfc-editor.org/rfc/rfc2119.txt
+  RFC9576:
+  RFC9577:
+  RFC9578:
 
 informative:
   RFC9458:
-    title: "Oblivious HTTP"
-    target: https://www.rfc-editor.org/rfc/rfc9458.txt
+  PRIVACYPASS-IANA:
+    title: Privacy Pass IANA
+    target: https://www.iana.org/assignments/privacy-pass/privacy-pass.xhtml
 
 --- abstract
 
@@ -62,10 +54,6 @@ framework to provide privacy-preserving authentication for subscriptions,
 fetches, publications, and relay operations while supporting fine-grained
 access control through prefix-based track namespace and track name matching
 rules.
-
-
-
-Issues and PRs can be made against https://github.com/suhasHere/moq-privacy-pass.
 
 
 --- middle
@@ -103,6 +91,7 @@ preserving user privacy through unlinkable authentication tokens.
 
 # Privacy Pass Architecture for MoQ
 
+Privacy Pass Terminology defined in {{Section 2 of RFC9576}} is reused here.
 The Privacy Pass MoQ integration involves the following entities and their
 interactions:
 
@@ -118,8 +107,8 @@ signatures and metadata.
 
 - **Privacy Pass Issuer**: The entity that issues Privacy Pass tokens to clients
 after successful attestation. The issuer operates the token issuance protocol,
-manages cryptographic keys, and may implement rate limiting. The issuer creates
-tokens with appropriate MoQ-specific metadata.
+manages cryptographic keys. The issuer creates tokens with appropriate
+MoQ-specific metadata.
 
 - **Privacy Pass Attester**: The entity that attests to properties of clients
 for the purposes of token issuance. The attester verifies client credentials,
@@ -128,49 +117,36 @@ include username/password, OAuth, device certificates, or other authentication
 mechanisms.
 
 In the below deployment, the MoQ relay and Privacy Pass issuer are operated
-by different entities to enhance privacy through separation of concerns:
+by different entities to enhance privacy through separation of concerns.
+This corresponds to {{Section 4.4 of RFC9576}}.
 
-~~~ascii
-                 Separated Issuer and Relay Architecture
-
-┌─────────────┐                               ┌─────────────┐
-│   Client    │                               │Privacy Pass │
-│             │──────────(1)─────────────────►│  Attester   │
-└─────────────┘                               │ (3rd Party) │
-   |    │                                     └─────────────┘
-   |    │
-   |    |──────────(2)──────────────────────────────────
-   |                                                    |
-   |                                                    ▼
-   |                                             ┌─────────────┐
-   |                                             │ Privacy Pass│
-   |(3)                                          │  Issuer     │
-   |                                             │ (Separate)  │
-   |                                             └─────────────┘
-   │
-   ▼
-┌─────────────┐
-│ MoQ Relay   │
-└─────────────┘
-
-(1) Client attestation with separate Attester
-(2) Token issuance from separate Issuer to Client
-(3) Client requests media access with token from relay
-
+~~~aasvg
++-----------+            +--------+         +----------+ +--------+
+| MoQ Relay |            | Client |         | Attester | | Issuer |
++-----+-----+            +---+----+         +----+-----+ +---+----+
+      |                      |                   |           |
+      |<------ Request ------+                   |           |
+      +--- TokenChallenge -->|                   |           |
+      |                      |<== Attestation ==>|           |
+      |                      |                   |           |
+      |                      +--------- TokenRequest ------->|
+      |                      |<-------- TokenResponse -------+
+      |<--- Request+Token ---+                   |           |
+      |                      |                   |           |
 ~~~
+{: #fig-overview title="Separated Issuer and Relay Architecture"}
 
 However, in certain deployments the MoQ relay and Privacy Pass issuer may be
 operated by the same entity to simplify key management and policy coordination.
-The details of such an intgrated architecture is TBD.
-
+This is the Privacy Pass deployment described in {{Section 4.2 of RFC9576}}.
 
 ## Trust Model
 
 The architecture assumes the following trust relationships based on
-the Privacy Pass architecture [RFC9576]:
+{{Section 3 of RFC9576}}:
 
-*  Clients trust issuers not to collude with attester
-ot break unlinkability guarantees
+*  Issuer and attesters do not collude to guarantee
+unlinkability properties
 
 *  Relays trust issuers to properly validate client eligibility
 before issuing tokens
@@ -200,7 +176,7 @@ across multiple relays.
 ## Token Structure
 
 Privacy Pass tokens used in MoQ MUST follow the structure defined in
-{{RFC9577}} for the PrivateToken HTTP authentication scheme. The token
+{{Section 2.2 of RFC9577}} for the PrivateToken HTTP authentication scheme. The token
 structure includes:
 
 - **Token Type**: 2-byte identifier specifying the issuance protocol used
@@ -212,7 +188,7 @@ structure includes:
 ### Token Challenge Structure for MoQ
 
 MoQ-specific TokenChallenge structures use the default format defined in
-{{RFC9577}} with MoQ-specific parameters in the origin_info field:
+{{Section 2.1 of RFC9577}} with MoQ-specific parameters in the origin_info field:
 
 ~~~
 struct {
@@ -300,8 +276,8 @@ message (SETUP, SUBSCRIBE, FETCH, PUBLISH, or ANNOUNCE)
 2. Verify the token signature using the appropriate
 issuer public key based on the token type:
 
-   - For Token Type 0x0001 (VOPRF): Use the issuer's private validation key
-   - For Token Type 0x0002 (Blind RSA): Use the issuer's public verification key
+   - For Token Type 0x0001 (VOPRF(P-384, SHA-384)): Use the issuer's private validation key
+   - For Token Type 0x0002 (Blind RSA(2048 bits)): Use the issuer's public verification key
 
 3. Validate that the token has not been replayed by checking:
 
@@ -391,40 +367,28 @@ SUBSCRIBE {
 Below shows an example deployment scenarios where the relay has been
 configured with the necessary validation keys and content policies, the
 relay can verify Privacy Pass tokens locally and deliver media directly
-without contacting the Origin.
+without contacting the Issuer. This uses token with public verifiability.
 
-~~~~~ascii
-                    Direct Relay Authorization Flow
-
-   Client      MoQ Relay             Issuer          Attester
-     |            |                    |                |
-     |            |                    |                |
-     | (1) Request Service Access      |                |
-     |----------->|                    |                |
-     |            |                    |                |
-     |  (2) Challenge (TokenChallenge) |                |
-     |<-----------|                    |                |
-     |            |                    |                |
-     |  (3) Attestation Request        |                |
-     |---------------------------------|--------------->|
-     |  (4) Attestation                |                |
-     |<-------------------------------------------------|
-     |  (5) Token Request              |                |
-     |-------------------------------->|                |
-     |  (6) Token                      |                |
-     |<--------------------------------|                |
-     |            |                    |                |
-     |  (7) SUBSCRIBE with Token       |                |
-     |----------->|                    |                |
-     |            |                    |                |
-     |            |  (8) Local Token Validation         |
-     |            |     (No external call)              |
-     |            |                    |                |
-     |            |                    |                |
-     |  (9) SUBSCRIBE_OK + Media       |                |
-     |<-----------|                    |                |
-     |            |                    |                |
+~~~~~aasvg
++-----------+                +--------+         +----------+ +--------+
+| MoQ Relay |                | Client |         | Attester | | Issuer |
++-----+-----+                +---+----+         +----+-----+ +---+----+
+      |                          |                   |           |
+      |<- Request Service Access +                   |           |
+      +--- TokenChallenge ------>|                   |           |
+      |                          |<== Attestation ==>|           |
+      |                          |                   |           |
+      |                          +--------- TokenRequest ------->|
+      |                          |<-------- TokenResponse -------+
+      |                          |                   |           |
+      |<---- SUBSCRIBE+Token ----+                   |           |
+ .----+-----------.              |                   |           |
+| Local validation |             |                   |           |
+ `----+-----------'              |                   |           |
+      +-- SUBSCRIBE_OK+Media --->|                   |           |
+      |                          |                   |           |
 ~~~~~
+{: #direct-relay-authorization-flow title="Direct Relay Authorization Flow"}
 
 
 # Security Considerations
@@ -432,9 +396,22 @@ without contacting the Origin.
 TODO: Add considerations for the security and privacy of the Privacy Pass
 tokens.
 
+* Token Replay
+* Token harvest
+* Key rotation
+* Use of TLS
+
 # IANA Considerations
 
 TODO
 
+* Register namespace?
+* New registry for auth_scheme with 0x01 as the first registered auth_scheme
+
 
 --- back
+
+# Acknowledgments
+{:numbered="false"}
+
+TODO acknowledge.
