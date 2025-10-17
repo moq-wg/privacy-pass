@@ -6,12 +6,12 @@ category: std
 docname: draft-ietf-moq-privacy-pass-auth-latest
 submissiontype: IETF
 ipr: trust200902
-consensus: true
 v: 3
 area: "Web and Internet Transport"
 workgroup: "Media Over QUIC"
 keyword:
 - media over quic
+- privacy-pass
 venue:
   group: "Media Over QUIC"
   type: "Working Group"
