@@ -1,0 +1,110 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2025-10-19T00:56:52.906929+00:00",
+  "repo": "moq-wg/privacy-pass",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOQDQvX86uUddS",
+      "title": "Improving integration with privacy pass basic tokens",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/1",
+      "state": "MERGED",
+      "author": "thibmeu",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Align diagrams with privacy pass rfcs, and improve the integration to match existing RFCs",
+      "createdAt": "2025-10-17T14:04:39Z",
+      "updatedAt": "2025-10-17T14:20:23Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "a91a60077a79fa7ecc2bdbaa021fc1ff1ef061bd",
+      "headRepository": "thibmeu/privacy-pass",
+      "headRefName": "main",
+      "headRefOid": "d7900bf045b66fe8eb59df0949498d04efaaa0aa",
+      "closedAt": "2025-10-17T14:20:23Z",
+      "mergedAt": "2025-10-17T14:20:23Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "88b70aeabd71ed6fea834b849818c0a9633e7836"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOQDQvX87Htccc",
+          "commit": {
+            "abbreviatedOid": "d7900bf"
+          },
+          "author": "fluffy",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "LGTM ",
+          "createdAt": "2025-10-17T14:15:44Z",
+          "updatedAt": "2025-10-17T14:15:44Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOQDQvX87HtfSa",
+          "commit": {
+            "abbreviatedOid": "d7900bf"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-10-17T14:18:50Z",
+          "updatedAt": "2025-10-17T14:18:50Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
