@@ -479,7 +479,6 @@ TODO
 --- back
 
 # Acknowledgments
-{:numbered="false"}
 
 TODO acknowledge.
 
