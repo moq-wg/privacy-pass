@@ -30,6 +30,11 @@ author:
     name: "Cullen Jennings"
     organization: "Cisco"
     email: "fluffy@iii.ca"
+ -
+    name: "Thibault Meunier"
+    organization: "Cloudflare Inc."
+    email: "ot-ietf@thibault.uk"
+ 
 
 
 normative:
@@ -477,3 +482,13 @@ TODO
 {:numbered="false"}
 
 TODO acknowledge.
+
+# Change Log
+
+RFC Editor's Note: Please remove this section prior to publication of 
+a final version of this document.
+
+## Since draft-ietf-moq-privacy-pass-auth-00
+
+* Add Thibault Meunier as Coauthor
+* Add support for Reverse flow to be deploy and scale friendly way to get tokens
