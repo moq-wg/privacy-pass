@@ -5,7 +5,7 @@
 Media Over QUIC                                            S. Nandakumar
 Internet-Draft                                               C. Jennings
 Intended status: Standards Track                                   Cisco
-Expires: 20 April 2026                                   17 October 2025
+Expires: 23 April 2026                                   20 October 2025
 
 
          Privacy Pass Authentication for Media over QUIC (MoQ)
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 April 2026.
+   This Internet-Draft will expire on 23 April 2026.
 
 Copyright Notice
 
@@ -75,7 +75,9 @@ Table of Contents
    1.  Introduction
      1.1.  Requirements Language
    2.  Privacy Pass Architecture for MoQ
-     2.1.  Trust Model
+     2.1.  Joint Attester and Issuer
+     2.2.  Shared Origin, Attester, Issuer with a Reverse Flow
+     2.3.  Trust Model
    3.  Privacy Pass Token Integration
      3.1.  Token Types for MoQ Authorization
      3.2.  Token Structure
@@ -164,6 +166,8 @@ Table of Contents
       criteria.  Common attestation methods include username/password,
       OAuth, device certificates, or other authentication mechanisms.
 
+2.1.  Joint Attester and Issuer
+
    In the below deployment, the MoQ relay and Privacy Pass issuer are
    operated by different entities to enhance privacy through separation
    of concerns.  This corresponds to Section 4.4 of [RFC9576].
@@ -183,12 +187,58 @@ Table of Contents
 
              Figure 1: Separated Issuer and Relay Architecture
 
-   However, in certain deployments the MoQ relay and Privacy Pass issuer
-   may be operated by the same entity to simplify key management and
-   policy coordination.  This is the Privacy Pass deployment described
-   in Section 4.2 of [RFC9576].
+   In certain deployments the MoQ relay and Privacy Pass issuer may be
+   operated by the same entity to simplify key management and policy
+   coordination.  This is the Privacy Pass deployment described in
+   Section 4.2 of [RFC9576].
 
-2.1.  Trust Model
+2.2.  Shared Origin, Attester, Issuer with a Reverse Flow
+
+   The flow described above can be used to bootstrap a shared origin-
+   attester-issuer flow, as described in Section 4.2 of [RFC9576].  The
+   MoQ relay plays all role, allowing it to use privately verifiable
+   token types registered in [PRIVACYPASS-IANA].
+
+   In this scenario, the MoQ relay origin would accept tokens signed by
+   two issuers:
+
+   1.  Type 0x0002 token signed by the bootstrap issuer from Section 2.1
+
+   2.  Type 0x0001, 0x0005, or 0xE5AC tokens signed by its own issuer.
+
+   With [PRIVACYPASS-ARC], the flow would look as follow
+
++----------------------------------.                          +--------------------------.
+|  +---------------+ +-----------+  |         +--------+      |  +----------+ +--------+  |
+|  | Origin Issuer | | MoQ Relay |  |         | Client |      |  | Attester | | Issuer |  |
+|  +---+-----------+ +-----+-----+  |         +---+----+      |  +----+-----+ +---+----+  |
+ `-----|-------------------|-------'              |            `------|-----------|------'
+       |                   |                      |<-------- TokenResponse -------+
+       |                   |<---- Request    -----+                   |           |
+       |                   |     +Token           |                   |           |
+       |                   |     +TokenRequestO   |                   |           |
+       |<- TokenRequestO --+                      |                   |           |
+       +- TokenResponseO ->|                      |                   |           |
+       |                   +----- Response     -->|                   |           |
+       |                   |     +TokenResponseO  |                   |           |
+       |                   |                      |                   |           |
+
+   TokenRequestO and TokenResponseO are part of a reverse flow.  The
+   client request a new token/credential to the origin.  It allows the
+   client to exchange its initial 0x0002 Token against a privately
+   verifiable token issued by the origin.
+
+   TokenRequestO should correspond to the associated privately
+   verifiable token definition.  These are listed in Section 3.1.
+
+   All privately verifiable scheme allow to amortise token issuance
+   cost, making them more compelling in a streaming case.  This is
+   specified in Section 5 of [PRIVACYPASS-BATCHED].
+
+   When using 0xE5AC, TokenRequestO is a CredentialRequest defined in
+   Section 7.1 of [PRIVACYPASS-ARC].
+
+2.3.  Trust Model
 
    The architecture assumes the following trust relationships based on
    Section 3 of [RFC9576]:
@@ -209,16 +259,29 @@ Table of Contents
 
 3.1.  Token Types for MoQ Authorization
 
-   This specification uses the existing Privacy Pass token types defined
-   in [RFC9578]:
+   This specification uses the below existing Privacy Pass token types:
 
-   *  *Token Type 0x0001 (VOPRF(P-384, SHA-384))*: Privately verifiable
-      tokens using Verifiable Oblivious Pseudorandom Function for
-      deployments requiring issuer-only validation capability.
+   *Publicly verifiable token types*
 
-   *  *Token Type 0x0002 (Blind RSA (2048-bit))*: Publicly verifiable
-      tokens using blind RSA signatures for deployments requiring
+   *  0x0002 (Blind RSA (2048-bit)): Defined in Section 6 of [RFC9578].
+      Uses blind RSA signatures ([RFC9474]) for deployments requiring
       distributed validation across multiple relays.
+
+   *Privately verifiable token types*
+
+   *  0x0001 (VOPRF(P-384, SHA-384)): Defined in Section 6 of [RFC9578].
+      Uses VOPRF ([RFC9497]) for deployments where the origin is the
+      issuer.  Issuance can be batched as defined in Section 5 of
+      [PRIVACYPASS-BATCHED].
+
+   *  0x0005 (VOPRF(ristretto255, SHA-512)): Defined in Section 8.1 of
+      [PRIVACYPASS-BATCHED].  Uses VOPRF ([RFC9497]) for deployments
+      where the origin is the issuer.  Issuance can be batched as
+      defined in Section 5 of [PRIVACYPASS-BATCHED].
+
+   *  0xE5AC (ARC(P-256)): Anonymous Rate Limit Credentials Token using
+      [ARC].  Tokens are presented by clients based on an issued
+      credential and up to a presentation_limit.
 
 3.2.  Token Structure
 
@@ -256,7 +319,13 @@ Table of Contents
    authorization scope information encoded as a UTF-8 string with the
    following format:
 
-   TODO: Degfine origin_info to be binary format
+      TODO: Define origin_info to be binary format using TLS
+      presentation language For anonymous credentials, it would make a
+      lot more sense to use redemption_context instead of origin_info,
+      as redemption_context is decided upon at presentation time rather
+      than at issuance time.  Question that I don't have the answer yet:
+      are 32-bytes enough? we might need to say something like "first 2
+      bytes represent the type of rule, then data"
 
    moq-scope = operation ":" namespace-pattern [":" track-pattern]
    operation = "subscribe" / "fetch" / "publish" / "announce"
@@ -486,12 +555,25 @@ Table of Contents
 
 7.1.  Normative References
 
+   [ARC]      Yun, C. and C. A. Wood, "Anonymous Rate-Limited
+              Credentials", Work in Progress, Internet-Draft, draft-yun-
+              cfrg-arc-01, 6 August 2025,
+              <https://datatracker.ietf.org/doc/html/draft-yun-cfrg-arc-
+              01>.
+
    [MoQ-TRANSPORT]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
               Draft, draft-ietf-moq-transport-14, 2 September 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
               transport-14>.
+
+   [PRIVACYPASS-ARC]
+              Yun, C. and C. A. Wood, "Privacy Pass Issuance Protocol
+              for Anonymous Rate-Limited Credentials", Work in Progress,
+              Internet-Draft, draft-yun-privacypass-arc-01, 6 August
+              2025, <https://datatracker.ietf.org/doc/html/draft-yun-
+              privacypass-arc-01>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -501,6 +583,15 @@ Table of Contents
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC9474]  Denis, F., Jacobs, F., and C. A. Wood, "RSA Blind
+              Signatures", RFC 9474, DOI 10.17487/RFC9474, October 2023,
+              <https://www.rfc-editor.org/rfc/rfc9474>.
+
+   [RFC9497]  Davidson, A., Faz-Hernandez, A., Sullivan, N., and C. A.
+              Wood, "Oblivious Pseudorandom Functions (OPRFs) Using
+              Prime-Order Groups", RFC 9497, DOI 10.17487/RFC9497,
+              December 2023, <https://www.rfc-editor.org/rfc/rfc9497>.
 
    [RFC9576]  Davidson, A., Iyengar, J., and C. A. Wood, "The Privacy
               Pass Architecture", RFC 9576, DOI 10.17487/RFC9576, June
@@ -518,10 +609,20 @@ Table of Contents
 
 7.2.  Informative References
 
+   [PRIVACYPASS-BATCHED]
+              Robert, R., Wood, C. A., and T. Meunier, "Batched Token
+              Issuance Protocol", Work in Progress, Internet-Draft,
+              draft-ietf-privacypass-batched-tokens-05, 3 July 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              privacypass-batched-tokens-05>.
+
    [PRIVACYPASS-IANA]
               "Privacy Pass IANA", n.d.,
               <https://www.iana.org/assignments/privacy-pass/privacy-
               pass.xhtml>.
+
+   [PRIVACYPASS-REVERSE-FLOW]
+              "*** BROKEN REFERENCE ***".
 
    [RFC9458]  Thomson, M. and C. A. Wood, "Oblivious HTTP", RFC 9458,
               DOI 10.17487/RFC9458, January 2024,
