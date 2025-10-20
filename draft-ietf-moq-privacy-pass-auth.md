@@ -6,12 +6,12 @@ category: std
 docname: draft-ietf-moq-privacy-pass-auth-latest
 submissiontype: IETF
 ipr: trust200902
-consensus: true
 v: 3
 area: "Web and Internet Transport"
 workgroup: "Media Over QUIC"
 keyword:
 - media over quic
+- privacy-pass
 venue:
   group: "Media Over QUIC"
   type: "Working Group"
@@ -33,17 +33,23 @@ author:
 
 
 normative:
+  ARC: I-D.draft-yun-cfrg-arc
   MoQ-TRANSPORT: I-D.draft-ietf-moq-transport
+  PRIVACYPASS-ARC: I-D.draft-yun-privacypass-arc
   RFC2119:
+  RFC9474:
+  RFC9497:
   RFC9576:
   RFC9577:
   RFC9578:
 
 informative:
   RFC9458:
+  PRIVACYPASS-BATCHED: I-D.draft-ietf-privacypass-batched-tokens
   PRIVACYPASS-IANA:
     title: Privacy Pass IANA
     target: https://www.iana.org/assignments/privacy-pass/privacy-pass.xhtml
+  PRIVACYPASS-REVERSE-FLOW: I-D.draft-meunier-privacypass-reverse-flow-informational
 
 --- abstract
 
@@ -116,6 +122,8 @@ subscription status, or other eligibility criteria. Common attestation methods
 include username/password, OAuth, device certificates, or other authentication
 mechanisms.
 
+## Joint Attester and Issuer {#joint-issuer-attester}
+
 In the below deployment, the MoQ relay and Privacy Pass issuer are operated
 by different entities to enhance privacy through separation of concerns.
 This corresponds to {{Section 4.4 of RFC9576}}.
@@ -136,9 +144,52 @@ This corresponds to {{Section 4.4 of RFC9576}}.
 ~~~
 {: #fig-overview title="Separated Issuer and Relay Architecture"}
 
-However, in certain deployments the MoQ relay and Privacy Pass issuer may be
+In certain deployments the MoQ relay and Privacy Pass issuer may be
 operated by the same entity to simplify key management and policy coordination.
 This is the Privacy Pass deployment described in {{Section 4.2 of RFC9576}}.
+
+## Shared Origin, Attester, Issuer with a Reverse Flow
+
+The flow described above can be used to bootstrap a shared origin-attester-issuer flow,
+as described in {{Section 4.2 of RFC9576}}. The MoQ relay plays all role, allowing it
+to use privately verifiable token types registered in {{PRIVACYPASS-IANA}}.
+
+In this scenario, the MoQ relay origin would accept tokens signed by two issuers:
+
+1. Type `0x0002` token signed by the bootstrap issuer from {{joint-issuer-attester}}
+2. Type `0x0001`, `0x0005`, or `0xE5AC` tokens signed by its own issuer.
+
+With {{PRIVACYPASS-ARC}}, the flow would look as follow
+
+~~~aasvg
++----------------------------------.                          +--------------------------.
+|  +---------------+ +-----------+  |         +--------+      |  +----------+ +--------+  |
+|  | Origin Issuer | | MoQ Relay |  |         | Client |      |  | Attester | | Issuer |  |
+|  +---+-----------+ +-----+-----+  |         +---+----+      |  +----+-----+ +---+----+  |
+ `-----|-------------------|-------'              |            `------|-----------|------'
+       |                   |                      |<-------- TokenResponse -------+
+       |                   |<---- Request    -----+                   |           |
+       |                   |     +Token           |                   |           |
+       |                   |     +TokenRequestO   |                   |           |
+       |<- TokenRequestO --+                      |                   |           |
+       +- TokenResponseO ->|                      |                   |           |
+       |                   +----- Response     -->|                   |           |
+       |                   |     +TokenResponseO  |                   |           |
+       |                   |                      |                   |           |
+~~~
+
+`TokenRequestO` and `TokenResponseO` are part of a reverse flow. The client request a
+new token/credential to the origin. It allows the client to exchange
+its initial 0x0002 `Token` against a privately verifiable token
+issued by the origin.
+
+`TokenRequestO` should correspond to the associated privately verifiable token
+definition. These are listed in {{moq-token-types}}.
+
+All privately verifiable scheme allow to amortise token issuance cost, making them
+more compelling in a streaming case. This is specified in {{Section 5 of PRIVACYPASS-BATCHED}}.
+
+When using `0xE5AC`, `TokenRequestO` is a `CredentialRequest` defined in {{Section 7.1 of PRIVACYPASS-ARC}}.
 
 ## Trust Model
 
@@ -160,18 +211,24 @@ This section describes how Privacy Pass tokens are integrated into the MoQ
 transport protocol to provide privacy-preserving authorization for various
 media operations.
 
-## Token Types for MoQ Authorization
+## Token Types for MoQ Authorization {#moq-token-types}
 
-This specification uses the existing Privacy Pass token types defined in
-{{RFC9578}}:
+This specification uses the below existing Privacy Pass token types:
 
-- **Token Type 0x0001 (VOPRF(P-384, SHA-384))**: Privately verifiable tokens
-using Verifiable Oblivious Pseudorandom Function for deployments requiring
-issuer-only validation capability.
+**Publicly verifiable token types**
 
-- **Token Type 0x0002 (Blind RSA (2048-bit))**: Publicly verifiable tokens
-using blind RSA signatures for deployments requiring distributed validation
+- `0x0002 (Blind RSA (2048-bit))`: Defined in {{Section 6 of RFC9578}}. Uses
+blind RSA signatures ({{RFC9474}}) for deployments requiring distributed validation
 across multiple relays.
+
+**Privately verifiable token types**
+
+- `0x0001 (VOPRF(P-384, SHA-384))`: Defined in {{Section 6 of RFC9578}}. Uses VOPRF ({{RFC9497}}) for
+deployments where the origin is the issuer. Issuance can be batched as defined in {{Section 5 of PRIVACYPASS-BATCHED}}.
+- `0x0005 (VOPRF(ristretto255, SHA-512))`: Defined in {{Section 8.1 of PRIVACYPASS-BATCHED}}. Uses VOPRF ({{RFC9497}}) for
+deployments where the origin is the issuer. Issuance can be batched as defined in {{Section 5 of PRIVACYPASS-BATCHED}}.
+- `0xE5AC (ARC(P-256))`: Anonymous Rate Limit Credentials Token using {{ARC}}.
+Tokens are presented by clients based on an issued credential and up to a `presentation_limit`.
 
 ## Token Structure
 
@@ -202,7 +259,12 @@ struct {
 For MoQ usage, the origin_info field contains MoQ-specific authorization scope
 information encoded as a UTF-8 string with the following format:
 
-TODO: Degfine origin_info to be binary format
+> TODO: Define origin_info to be binary format using TLS presentation language
+> For anonymous credentials, it would make a lot more sense to use redemption_context
+> instead of origin_info, as redemption_context is decided upon at presentation time
+> rather than at issuance time.
+> Question that I don't have the answer yet: are 32-bytes enough? we might need to say
+> something like "first 2 bytes represent the type of rule, then data"
 
 ~~~~
 moq-scope = operation ":" namespace-pattern [":" track-pattern]
