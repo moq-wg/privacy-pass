@@ -38,6 +38,7 @@ normative:
   PRIVACYPASS-ARC: I-D.draft-yun-privacypass-arc
   RFC2119:
   RFC9474:
+  RFC9497:
   RFC9576:
   RFC9577:
   RFC9578:
@@ -158,7 +159,7 @@ In this scenario, the MoQ relay origin would accept tokens signed by two issuers
 1. Type `0x0002` token signed by the bootstrap issuer from {{joint-issuer-attester}}
 2. Type `0x0001`, `0x0005`, or `0xE5AC` tokens signed by its own issuer.
 
-With {{PRIVACYPASS_ARC}}, the flow would look as follow
+With {{PRIVACYPASS-ARC}}, the flow would look as follow
 
 ~~~aasvg
 +----------------------------------.                          +--------------------------.
@@ -183,7 +184,7 @@ its initial 0x0002 `Token` against a privately verifiable token
 issued by the origin.
 
 `TokenRequestO` should correspond to the associated privately verifiable token
-definition. These are listed in {{moq-token-type}}.
+definition. These are listed in {{moq-token-types}}.
 
 All privately verifiable scheme allow to amortise token issuance cost, making them
 more compelling in a streaming case. This is specified in {{Section 5 of PRIVACYPASS-BATCHED}}.
