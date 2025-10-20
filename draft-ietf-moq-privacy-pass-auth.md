@@ -34,7 +34,7 @@ author:
     name: "Thibault Meunier"
     organization: "Cloudflare Inc."
     email: "ot-ietf@thibault.uk"
- 
+
 
 
 normative:
@@ -485,7 +485,7 @@ TODO acknowledge.
 
 # Change Log
 
-RFC Editor's Note: Please remove this section prior to publication of 
+RFC Editor's Note: Please remove this section prior to publication of
 a final version of this document.
 
 ## Since draft-ietf-moq-privacy-pass-auth-00
