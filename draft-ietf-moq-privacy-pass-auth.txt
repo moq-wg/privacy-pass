@@ -5,7 +5,9 @@
 Media Over QUIC                                            S. Nandakumar
 Internet-Draft                                               C. Jennings
 Intended status: Standards Track                                   Cisco
-Expires: 23 April 2026                                   20 October 2025
+Expires: 23 April 2026                                        T. Meunier
+                                                         Cloudflare Inc.
+                                                         20 October 2025
 
 
          Privacy Pass Authentication for Media over QUIC (MoQ)
@@ -95,7 +97,9 @@ Table of Contents
    7.  References
      7.1.  Normative References
      7.2.  Informative References
-   Acknowledgments
+   Appendix A.  Acknowledgments
+   Appendix B.  Change Log
+     B.1.  Since draft-ietf-moq-privacy-pass-auth-00
    Authors' Addresses
 
 1.  Introduction
@@ -628,9 +632,21 @@ Table of Contents
               DOI 10.17487/RFC9458, January 2024,
               <https://www.rfc-editor.org/rfc/rfc9458>.
 
-Acknowledgments
+Appendix A.  Acknowledgments
 
    TODO acknowledge.
+
+Appendix B.  Change Log
+
+   RFC Editor's Note: Please remove this section prior to publication of
+   a final version of this document.
+
+B.1.  Since draft-ietf-moq-privacy-pass-auth-00
+
+   *  Add Thibault Meunier as Coauthor
+
+   *  Add support for Reverse flow to be deploy and scale friendly way
+      to get tokens
 
 Authors' Addresses
 
@@ -642,3 +658,8 @@ Authors' Addresses
    Cullen Jennings
    Cisco
    Email: fluffy@iii.ca
+
+
+   Thibault Meunier
+   Cloudflare Inc.
+   Email: ot-ietf@thibault.uk
