@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-30T00:54:12.656387+00:00",
+  "timestamp": "2025-11-02T00:56:01.809330+00:00",
   "repo": "moq-wg/privacy-pass",
   "labels": [
     {
@@ -47,9 +47,51 @@
       "name": "wontfix",
       "description": "This will not be worked on",
       "color": "ffffff"
+    },
+    {
+      "name": "Editorial",
+      "description": "",
+      "color": "517a7e"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOQDQvX87VQ13x",
+      "title": "Improve statement of what Token authorize user to do",
+      "url": "https://github.com/moq-wg/privacy-pass/issues/3",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "Editorial"
+      ],
+      "body": "In section 2: \n\n`Client: The MoQ client requesting access to media content.`\n\nI think this statement can be improved. Because I think the authorization is to either be allowed to subscribe or publish media content. ",
+      "createdAt": "2025-11-01T12:31:10Z",
+      "updatedAt": "2025-11-01T12:31:10Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOQDQvX87VQ3Qs",
+      "title": "Use of MoQ Origin",
+      "url": "https://github.com/moq-wg/privacy-pass/issues/4",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "Editorial"
+      ],
+      "body": "In Section 2 it is stated: \n\n`MoQ Relay/Origin: The MoQ relay server or origin that forwards media content and requires authorization.`\n\nSo I believe this needs improvement. First is the reference into the term for what we call the authority component of the MoQ URI. I do understand that this is referred to as Origin in many context, but it is not defined in MoQT, I think relay may work here as sole term. Secondly, I stumble a bit on \"requires authorization\". Maybe, \"and for which the endpoint has to prove it's authorization.\" Maybe you have an alternative that tries to be a bit crisper here? ",
+      "createdAt": "2025-11-01T12:39:16Z",
+      "updatedAt": "2025-11-01T12:39:16Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
