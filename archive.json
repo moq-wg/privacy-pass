@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-02T00:56:01.809330+00:00",
+  "timestamp": "2026-01-22T00:59:24.961653+00:00",
   "repo": "moq-wg/privacy-pass",
   "labels": [
     {
@@ -199,6 +199,46 @@
           "body": "",
           "createdAt": "2025-10-20T17:07:52Z",
           "updatedAt": "2025-10-20T17:07:52Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDOQDQvX86-LnGg",
+      "title": "No need to encode PrivateTokenAuth in base64url",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/5",
+      "state": "OPEN",
+      "author": "thibmeu",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "[AUTHORIZATION](https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.3.1.5) is a key value pair with an odd value = 0x3, which means its value is a sequence of [raw bytes](https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#name-key-value-pair-structure).\r\n\r\nOn the contrary to an HTTP header which has to be encoded, this is not the case here and we can use the raw value directly, which is more consistent with the byte definication of KV pair.",
+      "createdAt": "2026-01-20T10:33:15Z",
+      "updatedAt": "2026-01-20T15:12:07Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "53e719c719733a346c7d8c0a1f9e43f2fed699f2",
+      "headRepository": "thibmeu/privacy-pass",
+      "headRefName": "main",
+      "headRefOid": "acdeace86320d32a9732a4e895e8e1a15f1d1a49",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOQDQvX87bgZ0N",
+          "commit": {
+            "abbreviatedOid": "acdeace"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-01-20T15:12:07Z",
+          "updatedAt": "2026-01-20T15:12:07Z",
           "comments": []
         }
       ]
