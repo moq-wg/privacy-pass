@@ -1326,14 +1326,16 @@ The Privacy Pass MoQ integration involves the following entities and their
 interactions:<a href="#section-2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2-2.1">
-          <p id="section-2-2.1.1"><strong>Client</strong>: The MoQ client requesting access to media content. The client is
-responsible for obtaining Privacy Pass tokens through the attestation and
-issuance process, and presenting these tokens when requesting MoQ operations.<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.1.1"><strong>Client</strong>: The MoQ client requesting authorization to subscribe to, fetch,
+or publish media content. The client is responsible for obtaining Privacy Pass
+tokens through the attestation and issuance process, and presenting these
+tokens when requesting MoQ operations such as SUBSCRIBE, FETCH, PUBLISH, or
+ANNOUNCE.<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.2">
-          <p id="section-2-2.2.1"><strong>MoQ Relay/Origin</strong>: The MoQ relay server or origin that forwards media
-content and requires authorization. The relay validates Privacy Pass tokens,
-enforces access policies, and forwards authorized requests to origins or other
+          <p id="section-2-2.2.1"><strong>MoQ Relay</strong>: The MoQ relay server that forwards media content and verifies
+that clients are authorized. The relay validates Privacy Pass tokens presented
+by clients, enforces access policies, and forwards authorized requests to other
 relays. Relays maintain configuration for trusted issuers and validate token
 signatures and metadata.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
 </li>
