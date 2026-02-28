@@ -91,6 +91,7 @@ Table of Contents
      3.4.  Token in MOQ Messages
        3.4.1.  SETUP Message Authorization
        3.4.2.  MoQ Operation-Level Authorization
+       3.4.3.  Errors
    4.  Example Authorization Flow
    5.  Security Considerations
    6.  IANA Considerations
@@ -99,7 +100,8 @@ Table of Contents
      7.2.  Informative References
    Appendix A.  Acknowledgments
    Appendix B.  Change Log
-     B.1.  Since draft-ietf-moq-privacy-pass-auth-00
+     B.1.  Since draft-ietf-moq-privacy-pass-auth-01
+     B.2.  Since draft-ietf-moq-privacy-pass-auth-00
    Authors' Addresses
 
 1.  Introduction
@@ -210,7 +212,7 @@ Table of Contents
 
    2.  Type 0x0001, 0x0005, or 0xE5AC tokens signed by its own issuer.
 
-   With [PRIVACYPASS-ARC], the flow would look as follow
+   With [PRIVACYPASS-ARC], the flow would look as follows
 
 +----------------------------------.                          +--------------------------.
 |  +---------------+ +-----------+  |         +--------+      |  +----------+ +--------+  |
@@ -227,10 +229,11 @@ Table of Contents
        |                   |     +TokenResponseO  |                   |           |
        |                   |                      |                   |           |
 
-   TokenRequestO and TokenResponseO are part of a reverse flow.  The
-   client request a new token/credential to the origin.  It allows the
-   client to exchange its initial 0x0002 Token against a privately
-   verifiable token issued by the origin.
+   TokenRequestO and TokenResponseO are part of a reverse flow as
+   described in Section 6.3 of [PRIVACYPASS-REVERSE-FLOW].  The client
+   request a new token/credential to the origin.  It allows the client
+   to exchange its initial 0x0002 Token against a privately verifiable
+   token issued by the origin.
 
    TokenRequestO should correspond to the associated privately
    verifiable token definition.  These are listed in Section 3.1.
@@ -246,9 +249,6 @@ Table of Contents
 
    The architecture assumes the following trust relationships based on
    Section 3 of [RFC9576]:
-
-   *  Issuer and attesters do not collude to guarantee unlinkability
-      properties
 
    *  Relays trust issuers to properly validate client eligibility
       before issuing tokens
@@ -310,7 +310,7 @@ Table of Contents
 
    MoQ-specific TokenChallenge structures use the default format defined
    in Section 2.1 of [RFC9577] with MoQ-specific parameters in the
-   origin_info field:
+   origin_info field, reproduced thereafter for convenience:
 
    struct {
        uint16_t token_type;
@@ -405,8 +405,9 @@ Table of Contents
    2.  Verify the token signature using the appropriate issuer public
        key based on the token type:
 
-       *  For Token Type 0x0001 (VOPRF(P-384, SHA-384)): Use the
-          issuer's private validation key
+       *  For Token Type 0x0001 (VOPRF(P-384, SHA-384)) and 0x0005
+          (VOPRF(ristretto255, SHA-512)): Use the issuer's private
+          validation key
 
        *  For Token Type 0x0002 (Blind RSA(2048 bits)): Use the issuer's
           public verification key
@@ -451,7 +452,7 @@ Table of Contents
 
    *  Token signature verification succeeds
 
-   *  Token nonce has not been previously used (replay protection)
+   *  Token nonce has not been previously seen (replay protection)
 
    *  Token has not expired (if applicable)
 
@@ -460,9 +461,9 @@ Table of Contents
    *  Requested namespace matches token namespace pattern
 
    *  Requested track name matches token track name pattern (if
-      specified) specified)
+      specified)
 
-   else, authorzation error is returned to the requesting client.
+   else, authorization error is returned to the requesting client.
 
 3.4.  Token in MOQ Messages
 
@@ -472,22 +473,63 @@ Table of Contents
 3.4.1.  SETUP Message Authorization
 
    For connection-level authorization, Privacy Pass tokens are included
-   in the SETUP message's authorization parameter:
+   in the SETUP message's authorization parameter (Section 9.3.1.5 of
+   [MoQ-TRANSPORT]).
 
-   SETUP {
-       Version = 1,
-       Parameters = [
-           {
-               Type = AUTHORIZATION,
-               Value = PrivateTokenAuth
-           }
-       ]
-   }
+SETUP {
+    Version = 1,
+    Parameters = [
+        {
+            Type = AUTHORIZATION,
+            Value = PrivateTokenAuth
+        }
+    ]
+}
+
+type PrivateTokenAuth = ClientPrivateTokenAuth | ServerPrivateTokenAuth;
+
+   For CLIENT_SETUP, the authorization value uses
+   GenericBatchTokenRequest as defined in Section 6.1 of
+   [PRIVACYPASS-BATCHED] as follows:
 
    struct {
-       uint8_t auth_scheme = 0x01; // Privacy Pass
-       opaque token_data<1..2^16-1>;
-   } PrivateTokenAuth;
+       uint8_t auth_scheme = 0x01;
+       Token token;
+       GenericBatchTokenRequest token_requests;
+   } ClientPrivateTokenAuth;
+
+   For SERVER_SETUP, the authorization value uses
+   GenericBatchTokenResponse as defined in Section 6.2 of
+   [PRIVACYPASS-BATCHED] as follows:
+
+   struct {
+       uint8_t auth_scheme = 0x01;
+       Token token;
+       GenericBatchTokenResponse token_responses;
+   } ServerPrivateTokenAuth;
+
+   When batch issuance is not used, token_requests and token_responses
+   are empty (length = 0).
+
+   The Token structure is prepended by a two-byte token type identifier
+   as registered with IANA:
+
+struct {
+   uint16_t token_type; /* From the IANA Privacy Pass Token Types Registry */
+   select (token_type) { /* Rest of the token */
+     case (0x0001, 0x0002, 0x0005):
+         uint8_t nonce[32];
+         uint8_t challenge_digest[32];
+         uint8_t token_key_id[Nid];
+         uint8_t authenticator[Nk];
+     case (other): /* Other token types from the IANA Privacy Pass Token Types Registry */
+         opaque remainder<0..2^16-1>;
+   }
+} Token;
+
+   Where Nk is determined by token_type per the [PRIVACYPASS-IANA].
+
+   Unknown token types MUST be rejected.
 
 3.4.2.  MoQ Operation-Level Authorization
 
@@ -505,6 +547,24 @@ Table of Contents
        ]
    }
 
+3.4.3.  Errors
+
+   If the authentication fails for any reason, the server MUST send an
+   error.
+
+   If the error occurs during SETUP, the Relay MUST terminate the
+   connection with UNAUTHORIZED defined in Section 3.4 of
+   [MoQ-TRANSPORT].
+
+   If the error occurs over an establishhed connection, the Relay MUST
+   send a REQUEST_ERROR defined in Section 9.8 of [MoQ-TRANSPORT].
+
+   In both cases, the Relay SHOULD provide a reason/message set to a
+   TokenChallenge.
+
+      TODO: reason tends to be a string. should TokenChallenge be
+      encoded in base64, or even have a structure?
+
 4.  Example Authorization Flow
 
    Below shows an example deployment scenarios where the relay has been
@@ -513,25 +573,38 @@ Table of Contents
    directly without contacting the Issuer.  This uses token with public
    verifiability.
 
- +-----------+                +--------+         +----------+ +--------+
- | MoQ Relay |                | Client |         | Attester | | Issuer |
- +-----+-----+                +---+----+         +----+-----+ +---+----+
-       |                          |                   |           |
-       |<- Request Service Access +                   |           |
-       +--- TokenChallenge ------>|                   |           |
-       |                          |<== Attestation ==>|           |
-       |                          |                   |           |
-       |                          +--------- TokenRequest ------->|
-       |                          |<-------- TokenResponse -------+
-       |                          |                   |           |
-       |<---- SUBSCRIBE+Token ----+                   |           |
-  .----+-----------.              |                   |           |
- | Local validation |             |                   |           |
-  `----+-----------'              |                   |           |
-       +-- SUBSCRIBE_OK+Media --->|                   |           |
-       |                          |                   |           |
+         +-----------+                        +--------+         +----------+ +--------+
+         | MoQ Relay |                        | Client |         | Attester | | Issuer |
+         +-----+-----+                        +---+----+         +----+-----+ +---+----+
+               |                                  |                   |           |
+               |<--------------- CLIENT_SETUP[] --+                   |           |
+               |   UNAUTHORIZED [                 |                   |           |
+               +--   Reason=TokenChallenge ------>|                   |           |
+               |   ]                              |                   |           |
+               |                                  |<== Attestation ==>|           |
+               |                                  |                   |           |
+               |                                  +--------- TokenRequest ------->|
+               |                                  |<-------- TokenResponse -------+
+               |                                  |                   |           |
+               |                           FinalizeToken              |           |
+               |                                  |                   |           |
+               |            CLIENT_SETUP[{        |                   |           |
+               |<----------    AUTHORIZATION,   --+                   |           |
+               |               PrivateTokenAuth,  |                   |           |
+               |            }]                    |                   |           |
+               |                                  |                   |           |
+ .-------------+--.                               |                   |           |
+| Local validation |                              |                   |           |
+ `-------------+--'                               |                   |           |
+               |                                  |                   |           |
+               +-- SERVER_SETUP[{  -------------->|                   |           |
+               |     AUTHORIZATION,               |                   |           |
+               |     PrivateTokenAuth,            |                   |           |
+               |   }]                             |                   |           |
+               |                           FinalizeToken              |           |
+               |                                  |                   |           |
 
-               Figure 2: Direct Relay Authorization Flow
+              Figure 2: Direct Relay Authorization Flow
 
 5.  Security Considerations
 
@@ -559,11 +632,11 @@ Table of Contents
 
 7.1.  Normative References
 
-   [ARC]      Yun, C. and C. A. Wood, "Anonymous Rate-Limited
-              Credentials", Work in Progress, Internet-Draft, draft-yun-
-              cfrg-arc-01, 6 August 2025,
-              <https://datatracker.ietf.org/doc/html/draft-yun-cfrg-arc-
-              01>.
+   [ARC]      Yun, C., Wood, C. A., and A. F. Faz-Hernandez, "Anonymous
+              Rate-Limited Credentials Cryptography", Work in Progress,
+              Internet-Draft, draft-ietf-privacypass-arc-crypto-00, 3
+              February 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-privacypass-arc-crypto-00>.
 
    [MoQ-TRANSPORT]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
@@ -573,11 +646,12 @@ Table of Contents
               transport-16>.
 
    [PRIVACYPASS-ARC]
-              Yun, C. and C. A. Wood, "Privacy Pass Issuance Protocol
-              for Anonymous Rate-Limited Credentials", Work in Progress,
-              Internet-Draft, draft-yun-privacypass-arc-02, 20 October
-              2025, <https://datatracker.ietf.org/doc/html/draft-yun-
-              privacypass-arc-02>.
+              Yun, C., Wood, C. A., and A. F. Faz-Hernandez, "Privacy
+              Pass Issuance Protocol for Anonymous Rate-Limited
+              Credentials", Work in Progress, Internet-Draft, draft-
+              ietf-privacypass-arc-protocol-00, 4 February 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              privacypass-arc-protocol-00>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -626,7 +700,11 @@ Table of Contents
               pass.xhtml>.
 
    [PRIVACYPASS-REVERSE-FLOW]
-              "*** BROKEN REFERENCE ***".
+              Meunier, T., "Privacy Pass Reverse Flow", Work in
+              Progress, Internet-Draft, draft-meunier-privacypass-
+              reverse-flow-03, 16 February 2026,
+              <https://datatracker.ietf.org/doc/html/draft-meunier-
+              privacypass-reverse-flow-03>.
 
    [RFC9458]  Thomson, M. and C. A. Wood, "Oblivious HTTP", RFC 9458,
               DOI 10.17487/RFC9458, January 2024,
@@ -641,7 +719,19 @@ Appendix B.  Change Log
    RFC Editor's Note: Please remove this section prior to publication of
    a final version of this document.
 
-B.1.  Since draft-ietf-moq-privacy-pass-auth-00
+B.1.  Since draft-ietf-moq-privacy-pass-auth-01
+
+   *  Define error handling
+
+   *  Integrate privacy pass reverse flow within PrivateTokenAuth
+
+   *  MoQ definition now follow draft-ietf-moq-transport-16
+
+   *  Update dependencies
+
+   *  Removed b64 encoding given MoQ can use bytes directly
+
+B.2.  Since draft-ietf-moq-privacy-pass-auth-00
 
    *  Add Thibault Meunier as Coauthor
 
