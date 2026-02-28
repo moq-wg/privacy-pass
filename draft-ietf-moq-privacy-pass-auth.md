@@ -400,7 +400,7 @@ SETUP {
     Parameters = [
         {
             Type = AUTHORIZATION,
-            Value = base64url(PrivateTokenAuth)
+            Value = PrivateTokenAuth
         }
     ]
 }
@@ -423,7 +423,7 @@ SUBSCRIBE {
     Parameters = [
         {
             Type = AUTHORIZATION,
-            Value = base64url(PrivateTokenAuth)
+            Value = PrivateTokenAuth
         }
     ]
 }
