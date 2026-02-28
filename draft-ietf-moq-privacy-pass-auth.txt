@@ -5,9 +5,9 @@
 Media Over QUIC                                            S. Nandakumar
 Internet-Draft                                               C. Jennings
 Intended status: Standards Track                                   Cisco
-Expires: 23 April 2026                                        T. Meunier
+Expires: 1 September 2026                                     T. Meunier
                                                          Cloudflare Inc.
-                                                         20 October 2025
+                                                        28 February 2026
 
 
          Privacy Pass Authentication for Media over QUIC (MoQ)
@@ -56,11 +56,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 April 2026.
+   This Internet-Draft will expire on 1 September 2026.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -479,7 +479,7 @@ Table of Contents
        Parameters = [
            {
                Type = AUTHORIZATION,
-               Value = base64url(PrivateTokenAuth)
+               Value = PrivateTokenAuth
            }
        ]
    }
@@ -500,7 +500,7 @@ Table of Contents
        Parameters = [
            {
                Type = AUTHORIZATION,
-               Value = base64url(PrivateTokenAuth)
+               Value = PrivateTokenAuth
            }
        ]
    }
@@ -568,16 +568,16 @@ Table of Contents
    [MoQ-TRANSPORT]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
-              Draft, draft-ietf-moq-transport-14, 2 September 2025,
+              Draft, draft-ietf-moq-transport-16, 13 January 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
-              transport-14>.
+              transport-16>.
 
    [PRIVACYPASS-ARC]
               Yun, C. and C. A. Wood, "Privacy Pass Issuance Protocol
               for Anonymous Rate-Limited Credentials", Work in Progress,
-              Internet-Draft, draft-yun-privacypass-arc-01, 6 August
+              Internet-Draft, draft-yun-privacypass-arc-02, 20 October
               2025, <https://datatracker.ietf.org/doc/html/draft-yun-
-              privacypass-arc-01>.
+              privacypass-arc-02>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -616,9 +616,9 @@ Table of Contents
    [PRIVACYPASS-BATCHED]
               Robert, R., Wood, C. A., and T. Meunier, "Batched Token
               Issuance Protocol", Work in Progress, Internet-Draft,
-              draft-ietf-privacypass-batched-tokens-05, 3 July 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-
-              privacypass-batched-tokens-05>.
+              draft-ietf-privacypass-batched-tokens-07, 25 February
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              privacypass-batched-tokens-07>.
 
    [PRIVACYPASS-IANA]
               "Privacy Pass IANA", n.d.,
