@@ -38,9 +38,9 @@ author:
 
 
 normative:
-  ARC: I-D.draft-yun-cfrg-arc
+  ARC: I-D.draft-ietf-privacypass-arc-crypto
   MoQ-TRANSPORT: I-D.draft-ietf-moq-transport
-  PRIVACYPASS-ARC: I-D.draft-yun-privacypass-arc
+  PRIVACYPASS-ARC: I-D.draft-ietf-privacypass-arc-protocol
   RFC2119:
   RFC9474:
   RFC9497:
@@ -392,7 +392,7 @@ authorization framework with the following adaptations:
 ### SETUP Message Authorization
 
 For connection-level authorization, Privacy Pass tokens are included in the
-SETUP message's authorization parameter:
+SETUP message's authorization parameter ({{Section 9.3.1.5 of MoQ-TRANSPORT}}):
 
 ~~~
 SETUP {
@@ -456,7 +456,6 @@ without contacting the Issuer. This uses token with public verifiability.
       |                          |                   |           |
 ~~~~~
 {: #direct-relay-authorization-flow title="Direct Relay Authorization Flow"}
-
 
 # Security Considerations
 
