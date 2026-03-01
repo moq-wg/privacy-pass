@@ -296,7 +296,6 @@ Match rules for namespaces and track names support the following types:
 | MATCH_PREFIX | 1 | Value must start with the pattern |
 | MATCH_SUFFIX | 2 | Value must end with the pattern |
 | MATCH_CONTAINS | 3 | Value must contain the pattern as substring |
-| MATCH_ANY | 4 | All values match (pattern is ignored) |
 {: #match-types-table title="Match Type Values"}
 
 Track namespaces in MoQ are represented as ordered tuples of byte strings
@@ -332,7 +331,6 @@ enum {
     MATCH_PREFIX(1),
     MATCH_SUFFIX(2),
     MATCH_CONTAINS(3),
-    MATCH_ANY(4),
     (255)
 } MatchType;
 
@@ -420,7 +418,7 @@ MoQAuthScope {
         value = ["sports.example.com", "live"]
     },
     track_name_match = {
-        match_type = MATCH_ANY(4),
+        match_type = MATCH_PREFIX(1),
         value = ""
     }
 }
@@ -509,11 +507,8 @@ subsequence of tuple elements. The pattern tuple `["live", "sports"]` matches
 `["sports"]` does NOT match `["live-sports", "channel"]` since "sports" is a
 substring within an element, not a complete element.
 
-MATCH_ANY (4):
-
-All target values match regardless of the pattern value.
-This is used to grant access to all namespaces or all track names within
-other constraints.
+Note: To match all values, use MATCH_PREFIX with an empty pattern (`[]` for
+namespaces or `""` for track names). An empty pattern is a prefix of every value.
 
 ### Matching Algorithm {#matching-algorithm}
 
@@ -876,8 +871,7 @@ Pass Authorization" with the following initial contents:
 | 1 | MATCH_PREFIX | {{match-types}} |
 | 2 | MATCH_SUFFIX | {{match-types}} |
 | 3 | MATCH_CONTAINS | {{match-types}} |
-| 4 | MATCH_ANY | {{match-types}} |
-| 5-254 | Unassigned | |
+| 4-254 | Unassigned | |
 | 255 | Reserved | This document |
 {: #match-type-registry title="MoQ Match Types Registry"}
 
@@ -899,7 +893,7 @@ a final version of this document.
 
 * Replace text-based moq-scope with binary TLS presentation language structures
 * Add MoQ Actions registry aligned with MoQTransport control message types
-* Add Match Types registry with exact, prefix, suffix, contains, and any matching
+* Add Match Types registry with exact, prefix, suffix, and contains matching
 * Define MoQAuthorizationInfo structure for origin_info encoding
 * Define CompactMoQScope structure for redemption_context encoding
 * Add continuous authorization section using batched tokens
