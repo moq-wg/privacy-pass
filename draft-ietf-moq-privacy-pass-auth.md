@@ -299,8 +299,14 @@ Match rules for namespaces and track names support the following types:
 | MATCH_ANY | 4 | All values match (pattern is ignored) |
 {: #match-types-table title="Match Type Values"}
 
-No normalization is performed on namespace or track name values before matching.
-Comparisons are performed as byte-level operations on the entire value.
+Track namespaces in MoQ are represented as ordered tuples of byte strings
+(e.g., `["example.com", "live", "sports"]`). Match rules operate on these
+tuples at tuple element boundaries. The pattern in a MatchRule is also a
+tuple of byte strings, and matching is performed element-by-element.
+
+No normalization is performed on namespace tuple elements or track name values
+before matching. Comparisons are performed as byte-level operations on each
+tuple element.
 
 ### Authorization Scope Structure (origin_info) {#scope-origin-info}
 
@@ -331,14 +337,27 @@ enum {
 } MatchType;
 
 struct {
+    opaque element<0..2^16-1>;
+} TupleElement;
+
+struct {
+    TupleElement elements<0..2^16-1>;
+} NamespaceTuple;
+
+struct {
+    MatchType match_type;
+    NamespaceTuple value;
+} NamespaceMatchRule;
+
+struct {
     MatchType match_type;
     opaque value<0..2^16-1>;
-} MatchRule;
+} TrackNameMatchRule;
 
 struct {
     MoQAction actions<1..2^8-1>;
-    MatchRule namespace_match;
-    MatchRule track_name_match;
+    NamespaceMatchRule namespace_match;
+    TrackNameMatchRule track_name_match;
 } MoQAuthScope;
 
 struct {
@@ -397,7 +416,7 @@ MoQAuthScope {
     actions = [SUBSCRIBE(4)],
     namespace_match = {
         match_type = MATCH_PREFIX(1),
-        value = "sports.example.com/live/"
+        value = ["sports.example.com", "live"]
     },
     track_name_match = {
         match_type = MATCH_ANY(4),
@@ -406,20 +425,26 @@ MoQAuthScope {
 }
 ~~~
 
+This matches namespace tuples like `["sports.example.com", "live", "soccer"]`
+and `["sports.example.com", "live", "tennis", "finals"]`.
+
 **Publish to specific meeting track (exact match)**:
 ~~~
 MoQAuthScope {
     actions = [PUBLISH(6)],
     namespace_match = {
         match_type = MATCH_EXACT(0),
-        value = "meetings.example.com/meeting/m123"
+        value = ["meetings.example.com", "meeting", "m123"]
     },
     track_name_match = {
         match_type = MATCH_PREFIX(1),
-        value = "audio/"
+        value = "audio-"
     }
 }
 ~~~
+
+This matches only the exact namespace tuple `["meetings.example.com", "meeting", "m123"]`
+with track names starting with "audio-".
 
 **Fetch video-on-demand with suffix matching**:
 ~~~
@@ -427,7 +452,7 @@ MoQAuthScope {
     actions = [FETCH(7)],
     namespace_match = {
         match_type = MATCH_CONTAINS(3),
-        value = "movies"
+        value = ["vod", "movies"]
     },
     track_name_match = {
         match_type = MATCH_SUFFIX(2),
@@ -435,6 +460,9 @@ MoQAuthScope {
     }
 }
 ~~~
+
+This matches namespace tuples containing the contiguous subsequence
+`["vod", "movies"]`, such as `["example.com", "vod", "movies", "action"]`.
 
 ## Track Namespace and Track Name Matching Rules
 
@@ -444,23 +472,31 @@ and track name matching use the same `MatchRule` structure and algorithm.
 
 ### Match Rule Evaluation
 
-Given a `MatchRule` and a target value (namespace or track name), the match
-succeeds according to the following rules:
+Given a `MatchRule` and a target value (namespace tuple or track name), the
+match succeeds according to the following rules. For namespace matching, both
+the pattern and target are tuples of byte strings; matching operates at tuple
+element boundaries.
 
-**MATCH_EXACT (0)**: The target value MUST be byte-for-byte identical to the
-pattern value.
+**MATCH_EXACT (0)**: The target MUST be identical to the pattern. For namespace
+tuples, this means the same number of elements with each element byte-for-byte
+identical. The pattern tuple `["example.com", "live"]` matches only
+`["example.com", "live"]`, not `["example.com", "live", "sports"]`.
 
-**MATCH_PREFIX (1)**: The target value MUST start with the pattern value. The
-pattern `"example.com/live/"` matches `"example.com/live/sports"` and
-`"example.com/live/news/breaking"` but not `"example.com/vod/movies"`.
+**MATCH_PREFIX (1)**: The target MUST start with the pattern at tuple element
+boundaries. The pattern tuple `["example.com", "live"]` matches
+`["example.com", "live", "sports"]` and `["example.com", "live", "news", "breaking"]`
+but not `["example.com", "vod"]`. Note that `["example.com", "liv"]` does NOT
+match `["example.com", "live"]` since matching is at element boundaries.
 
-**MATCH_SUFFIX (2)**: The target value MUST end with the pattern value. The
-pattern `"/audio"` matches `"meeting123/audio"` and `"conference/room1/audio"`
-but not `"audio/opus"`.
+**MATCH_SUFFIX (2)**: The target MUST end with the pattern at tuple element
+boundaries. The pattern tuple `["audio"]` matches `["meeting123", "audio"]` and
+`["conference", "room1", "audio"]` but not `["audio", "opus"]`.
 
-**MATCH_CONTAINS (3)**: The target value MUST contain the pattern value as a
-substring. The pattern `"sports"` matches `"live/sports/soccer"`,
-`"sports-news"`, and `"all-sports-channel"`.
+**MATCH_CONTAINS (3)**: The target MUST contain the pattern as a contiguous
+subsequence of tuple elements. The pattern tuple `["live", "sports"]` matches
+`["example.com", "live", "sports", "soccer"]` but the single-element pattern
+`["sports"]` does NOT match `["live-sports", "channel"]` since "sports" is a
+substring within an element, not a complete element.
 
 **MATCH_ANY (4)**: All target values match regardless of the pattern value.
 This is used to grant access to all namespaces or all track names within
