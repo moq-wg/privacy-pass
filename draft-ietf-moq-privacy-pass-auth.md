@@ -183,38 +183,41 @@ allows a client to exchange a publicly verifiable token for privately verifiable
 tokens (or credentials) issued directly by the MoQ relay.
 
 ~~~aasvg
-+---------------------------------------.                      +--------------------------.
-|  +---------------+ +---------------+   |      +--------+     |  +----------+ +--------+  |
-|  | Origin Issuer | |   MoQ Relay   |   |      | Client |     |  | Attester | | Issuer |  |
-|  +-------+-------+ +-------+-------+   |      +----+---+     |  +-----+----+ +----+---+  |
- `---------|-----------------|----------'            |          `-------|----------|------'
-           |                 |                       |                  |          |
-           |                 |   Phase 1: Bootstrap Token Acquisition  |          |
-           |                 |                       |                  |          |
-           |                 |<-- CLIENT_SETUP[] ---+                  |          |
-           |                 +-- UNAUTHORIZED ------>|                  |          |
-           |                 |   [TokenChallenge]    |                  |          |
-           |                 |                       |<== Attestation ==>          |
-           |                 |                       +------- TokenRequest ------->|
-           |                 |                       |<------ TokenResponse -------+
-           |                 |                       |                  |          |
-           |                 |   Phase 2: Token Exchange via Reverse Flow         |
-           |                 |                       |                  |          |
-           |                 |<-- CLIENT_SETUP ------+                  |          |
-           |                 |    [Token +           |                  |          |
-           |                 |     CredentialRequest]|                  |          |
-           |<-CredentialReq--+                       |                  |          |
-           +--CredentialRes->|                       |                  |          |
-           |                 +--- SERVER_SETUP ----->|                  |          |
-           |                 |    [CredentialResponse]                  |          |
-           |                 |                       |                  |          |
-           |                 |   Phase 3: Normal Operations with Derived Tokens   |
-           |                 |                       |                  |          |
-           |                 |<-- SUBSCRIBE ---------+                  |          |
-           |                 |    [Token from        |                  |          |
-           |                 |     credential]       |                  |          |
-           |                 +--- SUBSCRIBE_OK ----->|                  |          |
-           |                 |                       |                  |          |
++---------------+  +------------+        +--------+        +----------+  +--------+
+| Origin Issuer |  |  MoQ Relay |        | Client |        | Attester |  | Issuer |
++-------+-------+  +------+-----+        +----+---+        +-----+----+  +----+---+
+        |                 |                   |                  |           |
+        |                 |                   |                  |           |
+        :     Phase 1: Bootstrap Token Acquisition               :           :
+        |                 |                   |                  |           |
+        |                 |<- CLIENT_SETUP[] -+                  |           |
+        |                 +-- UNAUTHORIZED -->|                  |           |
+        |                 |  [TokenChallenge] |                  |           |
+        |                 |                   |                  |           |
+        |                 |                   |<== Attestation ==>           |
+        |                 |                   |                  |           |
+        |                 |                   +---- TokenRequest ----------->|
+        |                 |                   |<--- TokenResponse -----------+
+        |                 |                   |                  |           |
+        :     Phase 2: Token Exchange via Reverse Flow           :           :
+        |                 |                   |                  |           |
+        |                 |<- CLIENT_SETUP ---+                  |           |
+        |                 |   [Token +        |                  |           |
+        |                 |    CredentialReq] |                  |           |
+        |                 |                   |                  |           |
+        |<-CredentialReq--+                   |                  |           |
+        +--CredentialRes->|                   |                  |           |
+        |                 |                   |                  |           |
+        |                 +-- SERVER_SETUP -->|                  |           |
+        |                 |  [CredentialResp] |                  |           |
+        |                 |                   |                  |           |
+        :     Phase 3: Normal Operations with Derived Tokens     :           :
+        |                 |                   |                  |           |
+        |                 |<-- SUBSCRIBE -----+                  |           |
+        |                 |   [Token from     |                  |           |
+        |                 |    credential]    |                  |           |
+        |                 +-- SUBSCRIBE_OK -->|                  |           |
+        |                 |                   |                  |           |
 ~~~
 {: #fig-reverse-flow title="Complete Reverse Flow Authorization"}
 
