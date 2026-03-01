@@ -383,9 +383,6 @@ Table of Contents
      | MATCH_CONTAINS | 3     | Value must contain the pattern as    |
      |                |       | substring                            |
      +----------------+-------+--------------------------------------+
-     | MATCH_ANY      | 4     | All values match (pattern is         |
-     |                |       | ignored)                             |
-     +----------------+-------+--------------------------------------+
 
                          Table 2: Match Type Values
 
@@ -422,7 +419,6 @@ Table of Contents
        MATCH_PREFIX(1),
        MATCH_SUFFIX(2),
        MATCH_CONTAINS(3),
-       MATCH_ANY(4),
        (255)
    } MatchType;
 
@@ -498,27 +494,53 @@ Table of Contents
 
    The following examples illustrate authorization scope configurations:
 
-   *Subscribe to live sports namespace (prefix match)*: ~~~ MoQAuthScope
-   { actions = [SUBSCRIBE(4)], namespace_match = { match_type =
-   MATCH_PREFIX(1), value = ["sports.example.com", "live"] },
-   track_name_match = { match_type = MATCH_ANY(4), value = "" } } ~~~
+   Subscribe to live sports namespace (prefix match):
+
+   MoQAuthScope {
+       actions = [SUBSCRIBE(4)],
+       namespace_match = {
+           match_type = MATCH_PREFIX(1),
+           value = ["sports.example.com", "live"]
+       },
+       track_name_match = {
+           match_type = MATCH_PREFIX(1),
+           value = ""
+       }
+   }
 
    This matches namespace tuples like ["sports.example.com", "live",
    "soccer"] and ["sports.example.com", "live", "tennis", "finals"].
 
-   *Publish to specific meeting track (exact match)*: ~~~ MoQAuthScope {
-   actions = [PUBLISH(6)], namespace_match = { match_type =
-   MATCH_EXACT(0), value = ["meetings.example.com", "meeting", "m123"]
-   }, track_name_match = { match_type = MATCH_PREFIX(1), value =
-   "audio-" } } ~~~
+   Publish to specific meeting track (exact match):
+
+   MoQAuthScope {
+       actions = [PUBLISH(6)],
+       namespace_match = {
+           match_type = MATCH_EXACT(0),
+           value = ["meetings.example.com", "meeting", "m123"]
+       },
+       track_name_match = {
+           match_type = MATCH_PREFIX(1),
+           value = "audio-"
+       }
+   }
 
    This matches only the exact namespace tuple ["meetings.example.com",
    "meeting", "m123"] with track names starting with "audio-".
 
-   *Fetch video-on-demand with suffix matching*: ~~~ MoQAuthScope {
-   actions = [FETCH(7)], namespace_match = { match_type =
-   MATCH_CONTAINS(3), value = ["vod", "movies"] }, track_name_match = {
-   match_type = MATCH_SUFFIX(2), value = ".mp4" } } ~~~
+   Fetch video-on-demand with suffix matching:
+
+   MoQAuthScope {
+       actions = [FETCH(7)],
+       namespace_match = {
+           match_type = MATCH_CONTAINS(3),
+           value = ["vod", "movies"]
+       },
+       track_name_match = {
+           match_type = MATCH_SUFFIX(2),
+           value = ".mp4"
+       }
+   }
 
    This matches namespace tuples containing the contiguous subsequence
    ["vod", "movies"], such as ["example.com", "vod", "movies",
@@ -538,34 +560,39 @@ Table of Contents
    matching, both the pattern and target are tuples of byte strings;
    matching operates at tuple element boundaries.
 
-   *MATCH_EXACT (0)*: The target MUST be identical to the pattern.  For
-   namespace tuples, this means the same number of elements with each
-   element byte-for-byte identical.  The pattern tuple ["example.com",
-   "live"] matches only ["example.com", "live"], not ["example.com",
-   "live", "sports"].
+   MATCH_EXACT (0):
 
-   *MATCH_PREFIX (1)*: The target MUST start with the pattern at tuple
-   element boundaries.  The pattern tuple ["example.com", "live"]
-   matches ["example.com", "live", "sports"] and ["example.com", "live",
-   "news", "breaking"] but not ["example.com", "vod"].  Note that
-   ["example.com", "liv"] does NOT match ["example.com", "live"] since
-   matching is at element boundaries.
+   The target MUST be identical to the pattern.  For namespace tuples,
+   this means the same number of elements with each element byte-for-
+   byte identical.  The pattern tuple ["example.com", "live"] matches
+   only ["example.com", "live"], not ["example.com", "live", "sports"].
 
-   *MATCH_SUFFIX (2)*: The target MUST end with the pattern at tuple
-   element boundaries.  The pattern tuple ["audio"] matches
-   ["meeting123", "audio"] and ["conference", "room1", "audio"] but not
-   ["audio", "opus"].
+   MATCH_PREFIX (1):
 
-   *MATCH_CONTAINS (3)*: The target MUST contain the pattern as a
-   contiguous subsequence of tuple elements.  The pattern tuple ["live",
-   "sports"] matches ["example.com", "live", "sports", "soccer"] but the
-   single-element pattern ["sports"] does NOT match ["live-sports",
-   "channel"] since "sports" is a substring within an element, not a
-   complete element.
+   The target MUST start with the pattern at tuple element boundaries.
+   The pattern tuple ["example.com", "live"] matches ["example.com",
+   "live", "sports"] and ["example.com", "live", "news", "breaking"] but
+   not ["example.com", "vod"].  Note that ["example.com", "liv"] does
+   NOT match ["example.com", "live"] since matching is at element
+   boundaries.
 
-   *MATCH_ANY (4)*: All target values match regardless of the pattern
-   value.  This is used to grant access to all namespaces or all track
-   names within other constraints.
+   MATCH_SUFFIX (2):
+
+   The target MUST end with the pattern at tuple element boundaries.
+   The pattern tuple ["audio"] matches ["meeting123", "audio"] and
+   ["conference", "room1", "audio"] but not ["audio", "opus"].
+
+   MATCH_CONTAINS (3):
+
+   The target MUST contain the pattern as a contiguous subsequence of
+   tuple elements.  The pattern tuple ["live", "sports"] matches
+   ["example.com", "live", "sports", "soccer"] but the single-element
+   pattern ["sports"] does NOT match ["live-sports", "channel"] since
+   "sports" is a substring within an element, not a complete element.
+
+   Note: To match all values, use MATCH_PREFIX with an empty pattern ([]
+   for namespaces or "" for track names).  An empty pattern is a prefix
+   of every value.
 
 3.3.2.  Matching Algorithm
 
@@ -970,9 +997,7 @@ struct {
                 +-------+----------------+---------------+
                 | 3     | MATCH_CONTAINS | Section 3.2.3 |
                 +-------+----------------+---------------+
-                | 4     | MATCH_ANY      | Section 3.2.3 |
-                +-------+----------------+---------------+
-                | 5-254 | Unassigned     |               |
+                | 4-254 | Unassigned     |               |
                 +-------+----------------+---------------+
                 | 255   | Reserved       | This document |
                 +-------+----------------+---------------+
@@ -1081,8 +1106,8 @@ B.1.  Since draft-ietf-moq-privacy-pass-auth-02
    *  Add MoQ Actions registry aligned with MoQTransport control message
       types
 
-   *  Add Match Types registry with exact, prefix, suffix, contains, and
-      any matching
+   *  Add Match Types registry with exact, prefix, suffix, and contains
+      matching
 
    *  Define MoQAuthorizationInfo structure for origin_info encoding
 
