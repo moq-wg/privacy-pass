@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-22T00:59:24.961653+00:00",
+  "timestamp": "2026-03-01T01:17:25.885694+00:00",
   "repo": "moq-wg/privacy-pass",
   "labels": [
     {
@@ -69,9 +69,17 @@
       ],
       "body": "In section 2: \n\n`Client: The MoQ client requesting access to media content.`\n\nI think this statement can be improved. Because I think the authorization is to either be allowed to subscribe or publish media content. ",
       "createdAt": "2025-11-01T12:31:10Z",
-      "updatedAt": "2025-11-01T12:31:10Z",
+      "updatedAt": "2026-02-28T23:57:04Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@gloinul this should be fixed in the latest commit\n",
+          "createdAt": "2026-02-28T23:57:04Z",
+          "updatedAt": "2026-02-28T23:57:04Z"
+        }
+      ]
     },
     {
       "number": 4,
@@ -87,7 +95,33 @@
       ],
       "body": "In Section 2 it is stated: \n\n`MoQ Relay/Origin: The MoQ relay server or origin that forwards media content and requires authorization.`\n\nSo I believe this needs improvement. First is the reference into the term for what we call the authority component of the MoQ URI. I do understand that this is referred to as Origin in many context, but it is not defined in MoQT, I think relay may work here as sole term. Secondly, I stumble a bit on \"requires authorization\". Maybe, \"and for which the endpoint has to prove it's authorization.\" Maybe you have an alternative that tries to be a bit crisper here? ",
       "createdAt": "2025-11-01T12:39:16Z",
-      "updatedAt": "2025-11-01T12:39:16Z",
+      "updatedAt": "2026-02-28T23:56:46Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@gloinul should be fixed in the latest commit",
+          "createdAt": "2026-02-28T23:56:46Z",
+          "updatedAt": "2026-02-28T23:56:46Z"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOQDQvX87uwvjf",
+      "title": "Expand on matching rules, algorithm and presentation options for various MoQ Actions and Scopes",
+      "url": "https://github.com/moq-wg/privacy-pass/issues/7",
+      "state": "OPEN",
+      "author": "suhasHere",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [
+        "suhasHere"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-03-01T00:09:02Z",
+      "updatedAt": "2026-03-01T00:23:59Z",
       "closedAt": null,
       "comments": []
     }
@@ -208,25 +242,35 @@
       "id": "PR_kwDOQDQvX86-LnGg",
       "title": "No need to encode PrivateTokenAuth in base64url",
       "url": "https://github.com/moq-wg/privacy-pass/pull/5",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "thibmeu",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "[AUTHORIZATION](https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.3.1.5) is a key value pair with an odd value = 0x3, which means its value is a sequence of [raw bytes](https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#name-key-value-pair-structure).\r\n\r\nOn the contrary to an HTTP header which has to be encoded, this is not the case here and we can use the raw value directly, which is more consistent with the byte definication of KV pair.",
       "createdAt": "2026-01-20T10:33:15Z",
-      "updatedAt": "2026-01-20T15:12:07Z",
+      "updatedAt": "2026-02-28T16:23:53Z",
       "baseRepository": "moq-wg/privacy-pass",
       "baseRefName": "main",
       "baseRefOid": "53e719c719733a346c7d8c0a1f9e43f2fed699f2",
       "headRepository": "thibmeu/privacy-pass",
       "headRefName": "main",
       "headRefOid": "acdeace86320d32a9732a4e895e8e1a15f1d1a49",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2026-02-28T16:23:53Z",
+      "mergedAt": "2026-02-28T16:23:53Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "eead9d14a3c911a0f240d2c86074612e98851363"
+      },
+      "comments": [
+        {
+          "author": "thibmeu",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@suhasHere i don't have merge permission on the repository. feel free to do so once ready",
+          "createdAt": "2026-02-28T16:22:50Z",
+          "updatedAt": "2026-02-28T16:22:50Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOQDQvX87bgZ0N",
@@ -242,6 +286,60 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDOQDQvX87HBTJe",
+      "title": "Error handling, batch token support, updated SETUP flow",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/6",
+      "state": "MERGED",
+      "author": "thibmeu",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "To be merged after #5 or be rebased on the latest update.\r\n\r\nThe latest commit changes\r\n- add errors section (UNAUTHORIZED/REQUEST_ERROR)\r\n- integrate reverse flow + batched token extensions in PrivateTokenAuth\r\n- update diagram to show full SETUP exchange\r\n- add 0x0005 token type, fix typos\r\n\r\nRendered updated diagram for privacy pass flow\r\n\r\n<img width=\"2225\" height=\"1550\" alt=\"a\" src=\"https://github.com/user-attachments/assets/ab336f21-38f8-419b-b0b8-9d833894c8ee\" />\r\n\r\n@suhasHere for review. this should cover most of what we have discussed",
+      "createdAt": "2026-02-28T16:22:15Z",
+      "updatedAt": "2026-02-28T23:41:38Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "53e719c719733a346c7d8c0a1f9e43f2fed699f2",
+      "headRepository": "thibmeu/privacy-pass",
+      "headRefName": "error-handling-and-diagrams",
+      "headRefOid": "2fbdb023970307b0fe82b289609cb0144b9503c1",
+      "closedAt": "2026-02-28T23:41:37Z",
+      "mergedAt": "2026-02-28T23:41:37Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "9bfdc9c51290599962399f17146fc2909a611ecc"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDOQDQvX87HDhxr",
+      "title": " Define auth info to capture moqt actions and elements for authorization",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/8",
+      "state": "OPEN",
+      "author": "suhasHere",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #7 ",
+      "createdAt": "2026-03-01T00:23:25Z",
+      "updatedAt": "2026-03-01T00:32:20Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "9606b4b5b76074c9269c1291e1144bce9a945712",
+      "headRepository": "moq-wg/privacy-pass",
+      "headRefName": "snk-7",
+      "headRefOid": "56e26b7b5beccbcb23cf819ce0b5d2cb9356d2d8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
