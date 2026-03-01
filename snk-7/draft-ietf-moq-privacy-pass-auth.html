@@ -1818,8 +1818,13 @@ explicitly permitted by a token scope.<a href="#section-3.2.2-3" class="pilcrow"
             </tbody>
           </table>
 </div>
-<p id="section-3.2.3-3">No normalization is performed on namespace or track name values before matching.
-Comparisons are performed as byte-level operations on the entire value.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-3">Track namespaces in MoQ are represented as ordered tuples of byte strings
+(e.g., <code>["example.com", "live", "sports"]</code>). Match rules operate on these
+tuples at tuple element boundaries. The pattern in a MatchRule is also a
+tuple of byte strings, and matching is performed element-by-element.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-4">No normalization is performed on namespace tuple elements or track name values
+before matching. Comparisons are performed as byte-level operations on each
+tuple element.<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scope-origin-info">
@@ -1854,14 +1859,27 @@ enum {
 } MatchType;
 
 struct {
+    opaque element&lt;0..2^16-1&gt;;
+} TupleElement;
+
+struct {
+    TupleElement elements&lt;0..2^16-1&gt;;
+} NamespaceTuple;
+
+struct {
+    MatchType match_type;
+    NamespaceTuple value;
+} NamespaceMatchRule;
+
+struct {
     MatchType match_type;
     opaque value&lt;0..2^16-1&gt;;
-} MatchRule;
+} TrackNameMatchRule;
 
 struct {
     MoQAction actions&lt;1..2^8-1&gt;;
-    MatchRule namespace_match;
-    MatchRule track_name_match;
+    NamespaceMatchRule namespace_match;
+    TrackNameMatchRule track_name_match;
 } MoQAuthScope;
 
 struct {
@@ -1926,7 +1944,7 @@ MoQAuthScope {
     actions = [SUBSCRIBE(4)],
     namespace_match = {
         match_type = MATCH_PREFIX(1),
-        value = "sports.example.com/live/"
+        value = ["sports.example.com", "live"]
     },
     track_name_match = {
         match_type = MATCH_ANY(4),
@@ -1934,34 +1952,40 @@ MoQAuthScope {
     }
 }
 ~~~<a href="#section-3.2.6-2" class="pilcrow">¶</a></p>
-<p id="section-3.2.6-3"><strong>Publish to specific meeting track (exact match)</strong>:
+<p id="section-3.2.6-3">This matches namespace tuples like <code>["sports.example.com", "live", "soccer"]</code>
+and <code>["sports.example.com", "live", "tennis", "finals"]</code>.<a href="#section-3.2.6-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.6-4"><strong>Publish to specific meeting track (exact match)</strong>:
 ~~~
 MoQAuthScope {
     actions = [PUBLISH(6)],
     namespace_match = {
         match_type = MATCH_EXACT(0),
-        value = "meetings.example.com/meeting/m123"
+        value = ["meetings.example.com", "meeting", "m123"]
     },
     track_name_match = {
         match_type = MATCH_PREFIX(1),
-        value = "audio/"
+        value = "audio-"
     }
 }
-~~~<a href="#section-3.2.6-3" class="pilcrow">¶</a></p>
-<p id="section-3.2.6-4"><strong>Fetch video-on-demand with suffix matching</strong>:
+~~~<a href="#section-3.2.6-4" class="pilcrow">¶</a></p>
+<p id="section-3.2.6-5">This matches only the exact namespace tuple <code>["meetings.example.com", "meeting", "m123"]</code>
+with track names starting with "audio-".<a href="#section-3.2.6-5" class="pilcrow">¶</a></p>
+<p id="section-3.2.6-6"><strong>Fetch video-on-demand with suffix matching</strong>:
 ~~~
 MoQAuthScope {
     actions = [FETCH(7)],
     namespace_match = {
         match_type = MATCH_CONTAINS(3),
-        value = "movies"
+        value = ["vod", "movies"]
     },
     track_name_match = {
         match_type = MATCH_SUFFIX(2),
         value = ".mp4"
     }
 }
-~~~<a href="#section-3.2.6-4" class="pilcrow">¶</a></p>
+~~~<a href="#section-3.2.6-6" class="pilcrow">¶</a></p>
+<p id="section-3.2.6-7">This matches namespace tuples containing the contiguous subsequence
+<code>["vod", "movies"]</code>, such as <code>["example.com", "vod", "movies", "action"]</code>.<a href="#section-3.2.6-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1979,19 +2003,27 @@ and track name matching use the same <code>MatchRule</code> structure and algori
           <h4 id="name-match-rule-evaluation">
 <a href="#section-3.3.1" class="section-number selfRef">3.3.1. </a><a href="#name-match-rule-evaluation" class="section-name selfRef">Match Rule Evaluation</a>
           </h4>
-<p id="section-3.3.1-1">Given a <code>MatchRule</code> and a target value (namespace or track name), the match
-succeeds according to the following rules:<a href="#section-3.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.3.1-2"><strong>MATCH_EXACT (0)</strong>: The target value <span class="bcp14">MUST</span> be byte-for-byte identical to the
-pattern value.<a href="#section-3.3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.3.1-3"><strong>MATCH_PREFIX (1)</strong>: The target value <span class="bcp14">MUST</span> start with the pattern value. The
-pattern <code>"example.com/live/"</code> matches <code>"example.com/live/sports"</code> and
-<code>"example.com/live/news/breaking"</code> but not <code>"example.com/vod/movies"</code>.<a href="#section-3.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-3.3.1-4"><strong>MATCH_SUFFIX (2)</strong>: The target value <span class="bcp14">MUST</span> end with the pattern value. The
-pattern <code>"/audio"</code> matches <code>"meeting123/audio"</code> and <code>"conference/room1/audio"</code>
-but not <code>"audio/opus"</code>.<a href="#section-3.3.1-4" class="pilcrow">¶</a></p>
-<p id="section-3.3.1-5"><strong>MATCH_CONTAINS (3)</strong>: The target value <span class="bcp14">MUST</span> contain the pattern value as a
-substring. The pattern <code>"sports"</code> matches <code>"live/sports/soccer"</code>,
-<code>"sports-news"</code>, and <code>"all-sports-channel"</code>.<a href="#section-3.3.1-5" class="pilcrow">¶</a></p>
+<p id="section-3.3.1-1">Given a <code>MatchRule</code> and a target value (namespace tuple or track name), the
+match succeeds according to the following rules. For namespace matching, both
+the pattern and target are tuples of byte strings; matching operates at tuple
+element boundaries.<a href="#section-3.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.1-2"><strong>MATCH_EXACT (0)</strong>: The target <span class="bcp14">MUST</span> be identical to the pattern. For namespace
+tuples, this means the same number of elements with each element byte-for-byte
+identical. The pattern tuple <code>["example.com", "live"]</code> matches only
+<code>["example.com", "live"]</code>, not <code>["example.com", "live", "sports"]</code>.<a href="#section-3.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.3.1-3"><strong>MATCH_PREFIX (1)</strong>: The target <span class="bcp14">MUST</span> start with the pattern at tuple element
+boundaries. The pattern tuple <code>["example.com", "live"]</code> matches
+<code>["example.com", "live", "sports"]</code> and <code>["example.com", "live", "news", "breaking"]</code>
+but not <code>["example.com", "vod"]</code>. Note that <code>["example.com", "liv"]</code> does NOT
+match <code>["example.com", "live"]</code> since matching is at element boundaries.<a href="#section-3.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.3.1-4"><strong>MATCH_SUFFIX (2)</strong>: The target <span class="bcp14">MUST</span> end with the pattern at tuple element
+boundaries. The pattern tuple <code>["audio"]</code> matches <code>["meeting123", "audio"]</code> and
+<code>["conference", "room1", "audio"]</code> but not <code>["audio", "opus"]</code>.<a href="#section-3.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.3.1-5"><strong>MATCH_CONTAINS (3)</strong>: The target <span class="bcp14">MUST</span> contain the pattern as a contiguous
+subsequence of tuple elements. The pattern tuple <code>["live", "sports"]</code> matches
+<code>["example.com", "live", "sports", "soccer"]</code> but the single-element pattern
+<code>["sports"]</code> does NOT match <code>["live-sports", "channel"]</code> since "sports" is a
+substring within an element, not a complete element.<a href="#section-3.3.1-5" class="pilcrow">¶</a></p>
 <p id="section-3.3.1-6"><strong>MATCH_ANY (4)</strong>: All target values match regardless of the pattern value.
 This is used to grant access to all namespaces or all track names within
 other constraints.<a href="#section-3.3.1-6" class="pilcrow">¶</a></p>
@@ -2005,82 +2037,232 @@ other constraints.<a href="#section-3.3.1-6" class="pilcrow">¶</a></p>
 <p id="section-3.3.2-1">When a MoQ relay receives a request with a Privacy Pass token, it performs the
 following validation steps to determine whether to authorize the requested
 operation:<a href="#section-3.3.2-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-3.3.2-2">
-<li id="section-3.3.2-2.1">
-              <p id="section-3.3.2-2.1.1"><strong>Token Extraction</strong>: Extract the Privacy Pass token from the MoQ control
-message (SETUP, SUBSCRIBE, FETCH, PUBLISH, ANNOUNCE, or other operation).<a href="#section-3.3.2-2.1.1" class="pilcrow">¶</a></p>
+<span id="name-token-validation-and-matchi"></span><div id="fig-matching-algorithm">
+<figure id="figure-2">
+            <div id="section-3.3.2-2.1">
+              <div class="alignLeft art-svg artwork" id="section-3.3.2-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="992" width="352" viewBox="0 0 352 992" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 8,32 L 8,80" fill="none" stroke="black"></path>
+                  <path d="M 8,128 L 8,176" fill="none" stroke="black"></path>
+                  <path d="M 8,224 L 8,272" fill="none" stroke="black"></path>
+                  <path d="M 8,320 L 8,384" fill="none" stroke="black"></path>
+                  <path d="M 8,432 L 8,464" fill="none" stroke="black"></path>
+                  <path d="M 8,512 L 8,560" fill="none" stroke="black"></path>
+                  <path d="M 8,608 L 8,656" fill="none" stroke="black"></path>
+                  <path d="M 8,704 L 8,752" fill="none" stroke="black"></path>
+                  <path d="M 8,800 L 8,848" fill="none" stroke="black"></path>
+                  <path d="M 80,80 L 80,120" fill="none" stroke="black"></path>
+                  <path d="M 80,176 L 80,216" fill="none" stroke="black"></path>
+                  <path d="M 80,272 L 80,312" fill="none" stroke="black"></path>
+                  <path d="M 80,384 L 80,424" fill="none" stroke="black"></path>
+                  <path d="M 80,464 L 80,504" fill="none" stroke="black"></path>
+                  <path d="M 80,560 L 80,600" fill="none" stroke="black"></path>
+                  <path d="M 80,656 L 80,696" fill="none" stroke="black"></path>
+                  <path d="M 80,752 L 80,792" fill="none" stroke="black"></path>
+                  <path d="M 152,928 L 152,976" fill="none" stroke="black"></path>
+                  <path d="M 160,32 L 160,80" fill="none" stroke="black"></path>
+                  <path d="M 160,128 L 160,176" fill="none" stroke="black"></path>
+                  <path d="M 160,224 L 160,272" fill="none" stroke="black"></path>
+                  <path d="M 160,320 L 160,384" fill="none" stroke="black"></path>
+                  <path d="M 160,432 L 160,464" fill="none" stroke="black"></path>
+                  <path d="M 160,512 L 160,560" fill="none" stroke="black"></path>
+                  <path d="M 160,608 L 160,656" fill="none" stroke="black"></path>
+                  <path d="M 160,704 L 160,752" fill="none" stroke="black"></path>
+                  <path d="M 160,800 L 160,848" fill="none" stroke="black"></path>
+                  <path d="M 184,528 L 184,752" fill="none" stroke="black"></path>
+                  <path d="M 208,128 L 208,176" fill="none" stroke="black"></path>
+                  <path d="M 208,224 L 208,272" fill="none" stroke="black"></path>
+                  <path d="M 208,760 L 208,920" fill="none" stroke="black"></path>
+                  <path d="M 248,448 L 248,752" fill="none" stroke="black"></path>
+                  <path d="M 288,928 L 288,976" fill="none" stroke="black"></path>
+                  <path d="M 344,128 L 344,176" fill="none" stroke="black"></path>
+                  <path d="M 344,224 L 344,272" fill="none" stroke="black"></path>
+                  <path d="M 8,32 L 160,32" fill="none" stroke="black"></path>
+                  <path d="M 8,80 L 160,80" fill="none" stroke="black"></path>
+                  <path d="M 8,128 L 160,128" fill="none" stroke="black"></path>
+                  <path d="M 208,128 L 344,128" fill="none" stroke="black"></path>
+                  <path d="M 168,144 L 200,144" fill="none" stroke="black"></path>
+                  <path d="M 8,176 L 160,176" fill="none" stroke="black"></path>
+                  <path d="M 208,176 L 344,176" fill="none" stroke="black"></path>
+                  <path d="M 8,224 L 160,224" fill="none" stroke="black"></path>
+                  <path d="M 208,224 L 344,224" fill="none" stroke="black"></path>
+                  <path d="M 168,240 L 200,240" fill="none" stroke="black"></path>
+                  <path d="M 8,272 L 160,272" fill="none" stroke="black"></path>
+                  <path d="M 208,272 L 344,272" fill="none" stroke="black"></path>
+                  <path d="M 8,320 L 160,320" fill="none" stroke="black"></path>
+                  <path d="M 8,384 L 160,384" fill="none" stroke="black"></path>
+                  <path d="M 8,432 L 160,432" fill="none" stroke="black"></path>
+                  <path d="M 168,448 L 248,448" fill="none" stroke="black"></path>
+                  <path d="M 8,464 L 160,464" fill="none" stroke="black"></path>
+                  <path d="M 8,512 L 160,512" fill="none" stroke="black"></path>
+                  <path d="M 168,528 L 184,528" fill="none" stroke="black"></path>
+                  <path d="M 8,560 L 160,560" fill="none" stroke="black"></path>
+                  <path d="M 8,608 L 160,608" fill="none" stroke="black"></path>
+                  <path d="M 168,624 L 184,624" fill="none" stroke="black"></path>
+                  <path d="M 8,656 L 160,656" fill="none" stroke="black"></path>
+                  <path d="M 8,704 L 160,704" fill="none" stroke="black"></path>
+                  <path d="M 168,720 L 184,720" fill="none" stroke="black"></path>
+                  <path d="M 8,752 L 160,752" fill="none" stroke="black"></path>
+                  <path d="M 184,752 L 248,752" fill="none" stroke="black"></path>
+                  <path d="M 8,800 L 160,800" fill="none" stroke="black"></path>
+                  <path d="M 8,848 L 160,848" fill="none" stroke="black"></path>
+                  <path d="M 192,880 L 208,880" fill="none" stroke="black"></path>
+                  <path d="M 152,928 L 288,928" fill="none" stroke="black"></path>
+                  <path d="M 152,976 L 288,976" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="216,920 204,914.4 204,925.6" fill="black" transform="rotate(90,208,920)"></polygon>
+                  <polygon class="arrowhead" points="216,760 204,754.4 204,765.6" fill="black" transform="rotate(270,208,760)"></polygon>
+                  <polygon class="arrowhead" points="208,240 196,234.4 196,245.6" fill="black" transform="rotate(0,200,240)"></polygon>
+                  <polygon class="arrowhead" points="208,144 196,138.4 196,149.6" fill="black" transform="rotate(0,200,144)"></polygon>
+                  <polygon class="arrowhead" points="176,448 164,442.4 164,453.6" fill="black" transform="rotate(180,168,448)"></polygon>
+                  <polygon class="arrowhead" points="88,792 76,786.4 76,797.6" fill="black" transform="rotate(90,80,792)"></polygon>
+                  <polygon class="arrowhead" points="88,696 76,690.4 76,701.6" fill="black" transform="rotate(90,80,696)"></polygon>
+                  <polygon class="arrowhead" points="88,600 76,594.4 76,605.6" fill="black" transform="rotate(90,80,600)"></polygon>
+                  <polygon class="arrowhead" points="88,504 76,498.4 76,509.6" fill="black" transform="rotate(90,80,504)"></polygon>
+                  <polygon class="arrowhead" points="88,424 76,418.4 76,429.6" fill="black" transform="rotate(90,80,424)"></polygon>
+                  <polygon class="arrowhead" points="88,312 76,306.4 76,317.6" fill="black" transform="rotate(90,80,312)"></polygon>
+                  <polygon class="arrowhead" points="88,216 76,210.4 76,221.6" fill="black" transform="rotate(90,80,216)"></polygon>
+                  <polygon class="arrowhead" points="88,120 76,114.4 76,125.6" fill="black" transform="rotate(90,80,120)"></polygon>
+                  <g class="text">
+                    <text x="48" y="52">Extract</text>
+                    <text x="104" y="52">Token</text>
+                    <text x="36" y="68">from</text>
+                    <text x="72" y="68">MoQ</text>
+                    <text x="120" y="68">Message</text>
+                    <text x="44" y="148">Verify</text>
+                    <text x="96" y="148">Token</text>
+                    <text x="272" y="148">Authorization</text>
+                    <text x="80" y="164">(Type-specific)</text>
+                    <text x="180" y="164">No</text>
+                    <text x="244" y="164">Failed</text>
+                    <text x="104" y="196">Yes</text>
+                    <text x="40" y="244">Check</text>
+                    <text x="92" y="244">Replay</text>
+                    <text x="272" y="244">Authorization</text>
+                    <text x="60" y="260">Protection</text>
+                    <text x="180" y="260">No</text>
+                    <text x="244" y="260">Failed</text>
+                    <text x="104" y="292">Yes</text>
+                    <text x="48" y="340">Extract</text>
+                    <text x="104" y="340">Scope</text>
+                    <text x="68" y="356">(origin_info</text>
+                    <text x="132" y="356">or</text>
+                    <text x="80" y="372">redemption_ctx)</text>
+                    <text x="32" y="452">For</text>
+                    <text x="68" y="452">each</text>
+                    <text x="116" y="452">Scope:</text>
+                    <text x="44" y="532">Action</text>
+                    <text x="84" y="532">in</text>
+                    <text x="76" y="548">scope.actions?</text>
+                    <text x="204" y="548">No</text>
+                    <text x="104" y="580">Yes</text>
+                    <text x="56" y="628">Namespace</text>
+                    <text x="120" y="628">Match</text>
+                    <text x="36" y="644">Rule</text>
+                    <text x="88" y="644">passes?</text>
+                    <text x="204" y="644">No</text>
+                    <text x="104" y="676">Yes</text>
+                    <text x="40" y="724">Track</text>
+                    <text x="84" y="724">Name</text>
+                    <text x="128" y="724">Match</text>
+                    <text x="36" y="740">Rule</text>
+                    <text x="88" y="740">passes?</text>
+                    <text x="204" y="740">No</text>
+                    <text x="104" y="772">Yes</text>
+                    <text x="236" y="788">More</text>
+                    <text x="284" y="788">scopes</text>
+                    <text x="72" y="820">Authorization</text>
+                    <text x="48" y="836">Granted</text>
+                    <text x="124" y="884">No</text>
+                    <text x="160" y="884">match</text>
+                    <text x="124" y="900">in</text>
+                    <text x="152" y="900">any</text>
+                    <text x="136" y="916">scope</text>
+                    <text x="216" y="948">Authorization</text>
+                    <text x="188" y="964">Failed</text>
+                  </g>
+                </svg><a href="#section-3.3.2-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-token-validation-and-matchi" class="selfRef">Token Validation and Matching Algorithm</a>
+            </figcaption></figure>
+</div>
+<ol start="1" type="1" class="normal type-1" id="section-3.3.2-3">
+<li id="section-3.3.2-3.1">
+              <p id="section-3.3.2-3.1.1"><strong>Token Extraction</strong>: Extract the Privacy Pass token from the MoQ control
+message (SETUP, SUBSCRIBE, FETCH, PUBLISH, ANNOUNCE, or other operation).<a href="#section-3.3.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-3.3.2-2.2">
-              <p id="section-3.3.2-2.2.1"><strong>Token Verification</strong>: Verify the token using the appropriate method for
-the token type:<a href="#section-3.3.2-2.2.1" class="pilcrow">¶</a></p>
+            <li id="section-3.3.2-3.2">
+              <p id="section-3.3.2-3.2.1"><strong>Token Verification</strong>: Verify the token using the appropriate method for
+the token type:<a href="#section-3.3.2-3.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.3.2-2.2.2.1">
-                  <p id="section-3.3.2-2.2.2.1.1">Token Type <code>0x0001</code> or <code>0x0005</code> (VOPRF): Verify using the issuer's
-private validation key<a href="#section-3.3.2-2.2.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.3.2-3.2.2.1">
+                  <p id="section-3.3.2-3.2.2.1.1">Token Type <code>0x0001</code> or <code>0x0005</code> (VOPRF): Verify using the issuer's
+private validation key<a href="#section-3.3.2-3.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-3.3.2-2.2.2.2">
-                  <p id="section-3.3.2-2.2.2.2.1">Token Type <code>0x0002</code> (Blind RSA): Verify using the issuer's public
-verification key<a href="#section-3.3.2-2.2.2.2.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.3.2-3.2.2.2">
+                  <p id="section-3.3.2-3.2.2.2.1">Token Type <code>0x0002</code> (Blind RSA): Verify using the issuer's public
+verification key<a href="#section-3.3.2-3.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-3.3.2-2.2.2.3">
-                  <p id="section-3.3.2-2.2.2.3.1">Token Type <code>0xE5AC</code> (ARC): Verify the presentation proof using the
-issuer's public parameters<a href="#section-3.3.2-2.2.2.3.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.3.2-3.2.2.3">
+                  <p id="section-3.3.2-3.2.2.3.1">Token Type <code>0xE5AC</code> (ARC): Verify the presentation proof using the
+issuer's public parameters<a href="#section-3.3.2-3.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
-            <li id="section-3.3.2-2.3">
-              <p id="section-3.3.2-2.3.1"><strong>Replay Protection</strong>: Validate that the token has not been replayed:<a href="#section-3.3.2-2.3.1" class="pilcrow">¶</a></p>
+            <li id="section-3.3.2-3.3">
+              <p id="section-3.3.2-3.3.1"><strong>Replay Protection</strong>: Validate that the token has not been replayed:<a href="#section-3.3.2-3.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.3.2-2.3.2.1">
-                  <p id="section-3.3.2-2.3.2.1.1">Check token nonce uniqueness within the configured replay window<a href="#section-3.3.2-2.3.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.3.2-3.3.2.1">
+                  <p id="section-3.3.2-3.3.2.1.1">Check token nonce uniqueness within the configured replay window<a href="#section-3.3.2-3.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-3.3.2-2.3.2.2">
-                  <p id="section-3.3.2-2.3.2.2.1">Verify token expiration timestamp if present in token metadata<a href="#section-3.3.2-2.3.2.2.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.3.2-3.3.2.2">
+                  <p id="section-3.3.2-3.3.2.2.1">Verify token expiration timestamp if present in token metadata<a href="#section-3.3.2-3.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
-            <li id="section-3.3.2-2.4">
-              <p id="section-3.3.2-2.4.1"><strong>Scope Extraction</strong>: Extract authorization scope from the token:<a href="#section-3.3.2-2.4.1" class="pilcrow">¶</a></p>
+            <li id="section-3.3.2-3.4">
+              <p id="section-3.3.2-3.4.1"><strong>Scope Extraction</strong>: Extract authorization scope from the token:<a href="#section-3.3.2-3.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.3.2-2.4.2.1">
-                  <p id="section-3.3.2-2.4.2.1.1">If using <code>origin_info</code>: Decode the <code>MoQAuthorizationInfo</code> structure<a href="#section-3.3.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.3.2-3.4.2.1">
+                  <p id="section-3.3.2-3.4.2.1.1">If using <code>origin_info</code>: Decode the <code>MoQAuthorizationInfo</code> structure<a href="#section-3.3.2-3.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-3.3.2-2.4.2.2">
-                  <p id="section-3.3.2-2.4.2.2.1">If using <code>redemption_context</code>: Decode the <code>CompactMoQScope</code> structure<a href="#section-3.3.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.3.2-3.4.2.2">
+                  <p id="section-3.3.2-3.4.2.2.1">If using <code>redemption_context</code>: Decode the <code>CompactMoQScope</code> structure<a href="#section-3.3.2-3.4.2.2.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
-            <li id="section-3.3.2-2.5">
-              <p id="section-3.3.2-2.5.1"><strong>Scope Evaluation</strong>: For each <code>MoQAuthScope</code> in the token, check if the
-requested operation is authorized:<a href="#section-3.3.2-2.5.1" class="pilcrow">¶</a></p>
-<p id="section-3.3.2-2.5.2">
+            <li id="section-3.3.2-3.5">
+              <p id="section-3.3.2-3.5.1"><strong>Scope Evaluation</strong>: For each <code>MoQAuthScope</code> in the token, check if the
+requested operation is authorized:<a href="#section-3.3.2-3.5.1" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-3.5.2">
 a. <strong>Action Check</strong>: Verify the requested MoQ action (from <a href="#moq-actions" class="auto internal xref">Section 3.2.2</a>)
-   is present in the scope's <code>actions</code> list or bitmask<a href="#section-3.3.2-2.5.2" class="pilcrow">¶</a></p>
-<p id="section-3.3.2-2.5.3">
+   is present in the scope's <code>actions</code> list or bitmask<a href="#section-3.3.2-3.5.2" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-3.5.3">
 b. <strong>Namespace Match</strong>: Apply the <code>namespace_match</code> rule to the requested
-   track namespace using the algorithm in <a href="#match-types" class="auto internal xref">Section 3.2.3</a><a href="#section-3.3.2-2.5.3" class="pilcrow">¶</a></p>
-<p id="section-3.3.2-2.5.4">
+   track namespace using the algorithm in <a href="#match-types" class="auto internal xref">Section 3.2.3</a><a href="#section-3.3.2-3.5.3" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-3.5.4">
 c. <strong>Track Name Match</strong>: Apply the <code>track_name_match</code> rule to the requested
-   track name using the algorithm in <a href="#match-types" class="auto internal xref">Section 3.2.3</a><a href="#section-3.3.2-2.5.4" class="pilcrow">¶</a></p>
-<p id="section-3.3.2-2.5.5">
-d. If all three checks pass, authorization succeeds for this scope<a href="#section-3.3.2-2.5.5" class="pilcrow">¶</a></p>
+   track name using the algorithm in <a href="#match-types" class="auto internal xref">Section 3.2.3</a><a href="#section-3.3.2-3.5.4" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-3.5.5">
+d. If all three checks pass, authorization succeeds for this scope<a href="#section-3.3.2-3.5.5" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-3.3.2-2.6">
-              <p id="section-3.3.2-2.6.1"><strong>Authorization Decision</strong>: Access is granted if and only if:<a href="#section-3.3.2-2.6.1" class="pilcrow">¶</a></p>
+            <li id="section-3.3.2-3.6">
+              <p id="section-3.3.2-3.6.1"><strong>Authorization Decision</strong>: Access is granted if and only if:<a href="#section-3.3.2-3.6.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.3.2-2.6.2.1">
-                  <p id="section-3.3.2-2.6.2.1.1">Token verification succeeds (step 2)<a href="#section-3.3.2-2.6.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.3.2-3.6.2.1">
+                  <p id="section-3.3.2-3.6.2.1.1">Token verification succeeds (step 2)<a href="#section-3.3.2-3.6.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-3.3.2-2.6.2.2">
-                  <p id="section-3.3.2-2.6.2.2.1">Replay protection passes (step 3)<a href="#section-3.3.2-2.6.2.2.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.3.2-3.6.2.2">
+                  <p id="section-3.3.2-3.6.2.2.1">Replay protection passes (step 3)<a href="#section-3.3.2-3.6.2.2.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-3.3.2-2.6.2.3">
-                  <p id="section-3.3.2-2.6.2.3.1">At least one scope in the token authorizes the operation (step 5)<a href="#section-3.3.2-2.6.2.3.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.3.2-3.6.2.3">
+                  <p id="section-3.3.2-3.6.2.3.1">At least one scope in the token authorizes the operation (step 5)<a href="#section-3.3.2-3.6.2.3.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
           </ol>
-<p id="section-3.3.2-3">If authorization fails, an error is returned as specified in <a href="#errors" class="auto internal xref">Section 3.4.4</a>.<a href="#section-3.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-4">If authorization fails, an error is returned as specified in <a href="#errors" class="auto internal xref">Section 3.4.4</a>.<a href="#section-3.3.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2268,7 +2450,7 @@ configured with the necessary validation keys and content policies, the
 relay can verify Privacy Pass tokens locally and deliver media directly
 without contacting the Issuer. This uses token with public verifiability.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <span id="name-direct-relay-authorization-"></span><div id="direct-relay-authorization-flow">
-<figure id="figure-2">
+<figure id="figure-3">
         <div id="section-4-2.1">
           <div class="alignLeft art-svg artwork" id="section-4-2.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="512" width="712" viewBox="0 0 712 512" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -2356,7 +2538,7 @@ without contacting the Issuer. This uses token with public verifiability.<a href
             </svg><a href="#section-4-2.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-direct-relay-authorization-" class="selfRef">Direct Relay Authorization Flow</a>
         </figcaption></figure>
 </div>
