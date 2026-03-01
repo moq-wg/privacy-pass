@@ -472,6 +472,70 @@ When a MoQ relay receives a request with a Privacy Pass token, it performs the
 following validation steps to determine whether to authorize the requested
 operation:
 
+~~~aasvg
++------------------+
+| Extract Token    |
+| from MoQ Message |
++--------+---------+
+         |
+         v
++------------------+     +----------------+
+| Verify Token     |---->| Authorization  |
+| (Type-specific)  | No  | Failed         |
++--------+---------+     +----------------+
+         | Yes
+         v
++------------------+     +----------------+
+| Check Replay     |---->| Authorization  |
+| Protection       | No  | Failed         |
++--------+---------+     +----------------+
+         | Yes
+         v
++------------------+
+| Extract Scope    |
+| (origin_info or  |
+| redemption_ctx)  |
++--------+---------+
+         |
+         v
++------------------+
+| For each Scope:  |<---------+
++--------+---------+          |
+         |                    |
+         v                    |
++------------------+          |
+| Action in        |--+       |
+| scope.actions?   |  | No    |
++--------+---------+  |       |
+         | Yes        |       |
+         v            |       |
++------------------+  |       |
+| Namespace Match  |--+       |
+| Rule passes?     |  | No    |
++--------+---------+  |       |
+         | Yes        |       |
+         v            |       |
++------------------+  |       |
+| Track Name Match |--+       |
+| Rule passes?     |  | No    |
++--------+---------+  +-------+
+         | Yes           ^
+         v               | More scopes
++------------------+     |
+| Authorization    |     |
+| Granted          |     |
++------------------+     |
+                         |
+              No match --+
+              in any     |
+              scope      v
+                  +----------------+
+                  | Authorization  |
+                  | Failed         |
+                  +----------------+
+~~~
+{: #fig-matching-algorithm title="Token Validation and Matching Algorithm"}
+
 1. **Token Extraction**: Extract the Privacy Pass token from the MoQ control
    message (SETUP, SUBSCRIBE, FETCH, PUBLISH, ANNOUNCE, or other operation).
 
