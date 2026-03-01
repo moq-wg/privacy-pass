@@ -410,7 +410,8 @@ verification.
 
 The following examples illustrate authorization scope configurations:
 
-**Subscribe to live sports namespace (prefix match)**:
+Subscribe to live sports namespace (prefix match):
+
 ~~~
 MoQAuthScope {
     actions = [SUBSCRIBE(4)],
@@ -428,7 +429,8 @@ MoQAuthScope {
 This matches namespace tuples like `["sports.example.com", "live", "soccer"]`
 and `["sports.example.com", "live", "tennis", "finals"]`.
 
-**Publish to specific meeting track (exact match)**:
+Publish to specific meeting track (exact match):
+
 ~~~
 MoQAuthScope {
     actions = [PUBLISH(6)],
@@ -446,7 +448,8 @@ MoQAuthScope {
 This matches only the exact namespace tuple `["meetings.example.com", "meeting", "m123"]`
 with track names starting with "audio-".
 
-**Fetch video-on-demand with suffix matching**:
+Fetch video-on-demand with suffix matching:
+
 ~~~
 MoQAuthScope {
     actions = [FETCH(7)],
@@ -477,28 +480,38 @@ match succeeds according to the following rules. For namespace matching, both
 the pattern and target are tuples of byte strings; matching operates at tuple
 element boundaries.
 
-**MATCH_EXACT (0)**: The target MUST be identical to the pattern. For namespace
+MATCH_EXACT (0):
+
+The target MUST be identical to the pattern. For namespace
 tuples, this means the same number of elements with each element byte-for-byte
 identical. The pattern tuple `["example.com", "live"]` matches only
 `["example.com", "live"]`, not `["example.com", "live", "sports"]`.
 
-**MATCH_PREFIX (1)**: The target MUST start with the pattern at tuple element
+MATCH_PREFIX (1):
+
+The target MUST start with the pattern at tuple element
 boundaries. The pattern tuple `["example.com", "live"]` matches
 `["example.com", "live", "sports"]` and `["example.com", "live", "news", "breaking"]`
 but not `["example.com", "vod"]`. Note that `["example.com", "liv"]` does NOT
 match `["example.com", "live"]` since matching is at element boundaries.
 
-**MATCH_SUFFIX (2)**: The target MUST end with the pattern at tuple element
+MATCH_SUFFIX (2):
+
+The target MUST end with the pattern at tuple element
 boundaries. The pattern tuple `["audio"]` matches `["meeting123", "audio"]` and
 `["conference", "room1", "audio"]` but not `["audio", "opus"]`.
 
-**MATCH_CONTAINS (3)**: The target MUST contain the pattern as a contiguous
+MATCH_CONTAINS (3):
+
+The target MUST contain the pattern as a contiguous
 subsequence of tuple elements. The pattern tuple `["live", "sports"]` matches
 `["example.com", "live", "sports", "soccer"]` but the single-element pattern
 `["sports"]` does NOT match `["live-sports", "channel"]` since "sports" is a
 substring within an element, not a complete element.
 
-**MATCH_ANY (4)**: All target values match regardless of the pattern value.
+MATCH_ANY (4):
+
+All target values match regardless of the pattern value.
 This is used to grant access to all namespaces or all track names within
 other constraints.
 
