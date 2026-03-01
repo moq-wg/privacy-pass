@@ -479,12 +479,23 @@ If the authentication fails for any reason, the server MUST send an error.
 If the error occurs during SETUP, the Relay MUST terminate the connection with
 `UNAUTHORIZED` defined in {{Section 3.4 of MoQ-TRANSPORT}}.
 
-If the error occurs over an establishhed connection, the Relay MUST send a `REQUEST_ERROR`
+If the error occurs over an established connection, the Relay MUST send a `REQUEST_ERROR`
 defined in {{Section 9.8 of MoQ-TRANSPORT}}.
 
-In both cases, the Relay SHOULD provide a reason/message set to a `TokenChallenge`.
+The error code MUST be one of:
 
-> TODO: reason tends to be a string. should TokenChallenge be encoded in base64, or even have a structure?
+| Error Code | Name | Description |
+|------------|------|-------------|
+| 0x0100 | TOKEN_MISSING | No token provided when required |
+| 0x0101 | TOKEN_INVALID | Token signature verification failed |
+| 0x0102 | TOKEN_EXPIRED | Token has expired or been revoked |
+| 0x0103 | TOKEN_REPLAYED | Token nonce has been seen before |
+| 0x0104 | SCOPE_MISMATCH | Token scope does not authorize this operation |
+| 0x0105 | ISSUER_UNKNOWN | Token issuer is not trusted by this relay |
+{: #error-codes-table title="Privacy Pass Authorization Error Codes"}
+
+In both cases, the Relay SHOULD provide a reason/message set to a `TokenChallenge`
+when the client should retry with a new token.
 
 # Example Authorization Flow
 
@@ -543,6 +554,26 @@ TODO
 
 * Register namespace?
 * New registry for auth_scheme with 0x01 as the first registered auth_scheme
+
+## MoQ Privacy Pass Error Code Registry
+
+IANA is requested to create a new registry titled "MoQ Privacy Pass Authorization
+Error Codes" with the following initial contents:
+
+| Value | Name | Reference |
+|-------|------|-----------|
+| 0x0100 | TOKEN_MISSING | {{errors}} |
+| 0x0101 | TOKEN_INVALID | {{errors}} |
+| 0x0102 | TOKEN_EXPIRED | {{errors}} |
+| 0x0103 | TOKEN_REPLAYED | {{errors}} |
+| 0x0104 | SCOPE_MISMATCH | {{errors}} |
+| 0x0105 | ISSUER_UNKNOWN | {{errors}} |
+| 0x0106-0x01FF | Unassigned | |
+{: #error-code-registry title="MoQ Privacy Pass Error Codes Registry"}
+
+New entries in this registry require Specification Required registration policy.
+Values are allocated from the 0x0100-0x01FF range reserved for Privacy Pass
+authorization errors.
 
 
 --- back
