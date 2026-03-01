@@ -579,7 +579,7 @@ operation:
    requested operation is authorized:
 
    a. **Action Check**: Verify the requested MoQ action (from {{moq-actions}})
-      is present in the scope's `actions` list or bitmask
+      is present in the scope's `actions` list
 
    b. **Namespace Match**: Apply the `namespace_match` rule to the requested
       track namespace using the algorithm in {{match-types}}
@@ -686,15 +686,16 @@ SUBSCRIBE {
 }
 ~~~
 
-### Continuous Authorization with Batched Tokens {#continuous-auth}
+### Continuous Authorization with Batched Tokens {#continuous-auth-batched}
 
 Long-lived MoQ sessions (such as live streaming or real-time communication)
 require periodic re-authorization to ensure continued eligibility. Unlike
 JWT-based approaches that use explicit revalidation intervals, Privacy Pass
-achieves continuous authorization through batched token issuance.
+can achieve continuous authorization through batched token issuance.
 
 During the initial SETUP exchange, clients can request multiple tokens via
-`GenericBatchTokenRequest`. Each token in the batch is independently valid
+`GenericBatchTokenRequest` (defined in {{Section 6.1 of PRIVACYPASS-BATCHED}}).
+Each token in the batch is independently valid
 and can be presented for subsequent operations or periodic re-authorization.
 
 ~~~
@@ -714,9 +715,10 @@ Time 3T:    Relay requests re-authorization
 
 Relays MAY request periodic re-authorization by sending a `TokenChallenge`
 in a `REQUEST_ERROR` message. Clients SHOULD present a fresh token from their
-batch in response.
+batch in response if any satisfy the new `TokenChallenge`. If not, they SHOULD
+perform a new issuance process.
 
-When using ARC tokens (`0xE5AC`), the credential's `presentation_limit` controls
+When using {{ARC}} tokens (`0xE5AC`), the credential's `presentation_limit` controls
 how many times the client can present tokens from a single credential issuance.
 This provides rate limiting while preserving unlinkability between presentations.
 
@@ -728,6 +730,31 @@ This provides rate limiting while preserving unlinkability between presentations
 - Clients SHOULD request new token batches before exhausting their supply
 - For high-security deployments, shorter re-authorization intervals with
   smaller batches provide stronger revocation guarantees
+
+### Continuous Authorization with Reverse Flow {#continuous-auth-reverse}
+
+If the client and the relay support it, a Relay MAY perform continuous
+authentication using a reverse flow.
+
+To do so, when presenting `PrivateTokenAuth`, a client MUST send at least one
+`GenericBatchTokenRequest`. The Relay then acts as a reverse issuer, and issues
+the corresponding number of `GenericBatchTokenResponse`.
+
+Tokens obtained this way can be presented by the Client to maintain
+the continuity of the session without linkability.
+
+~~~
+Reverse Flow Token Usage Timeline:
+
+Time 0:     CLIENT_SETUP with Token_1, request batch of 1 token
+            SERVER_SETUP with batch of 1 token
+
+Time T:     SUBSCRIBE with Token_2 (from batch), request batch of 1 token
+            Relay responds with batch of 1 token
+
+Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 token
+            Relay responds with batch of 1 token
+~~~
 
 ### Errors {#errors}
 
@@ -867,8 +894,10 @@ a final version of this document.
 * Add MoQ Actions registry aligned with MoQTransport control message types
 * Add Match Types registry with exact, prefix, suffix, and contains matching
 * Define MoQAuthorizationInfo structure for origin_info encoding
+* Add continuous authorization section using reverse flow
 * Add continuous authorization section using batched tokens
-* Add IANA registries for auth schemes, actions, and match types* Define error handling
+* Add IANA registries for auth schemes, actions, and match types
+* Define error handling
 * Integrate privacy pass reverse flow within PrivateTokenAuth
 * MoQ definition now follow draft-ietf-moq-transport-16
 * Update dependencies
