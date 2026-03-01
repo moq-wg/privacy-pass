@@ -497,6 +497,10 @@ The error code MUST be one of:
 In both cases, the Relay SHOULD provide a reason/message set to a `TokenChallenge`
 when the client should retry with a new token.
 
+As per {{Section 3.4.4 of MoQ-TRANSPORT}}, implementations MAY elevate subscription
+or request-specific errors to session-level errors. Implementations need to consider
+the impact on other outstanding subscriptions before making this choice.
+
 # Example Authorization Flow
 
 Below shows an example deployment scenarios where the relay has been
