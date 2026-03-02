@@ -838,14 +838,16 @@ a `MoQAuthChallenge` structure:
 
 ~~~
 struct {
-    TokenChallenge challenge;
-    uint16_t supported_token_types<1..2^16-1>;
+    TokenChallenge challenges<1..2^16-1>;
 } MoQAuthChallenge;
 ~~~
 
-The `supported_token_types` field lists token types the relay accepts, ordered
+The `challenges` field lists token challenges the relay accepts, ordered
 by preference (most preferred first). This allows clients to select an appropriate
-issuance protocol. Relay MUST set at least one supported token type.
+issuance protocol based on supported token types and issuers. Each challenge
+specifies a token type, issuer, and optional scope, enabling relays to accept
+different issuers or scopes for different token types. Relay MUST include at
+least one challenge.
 
 #### Operation Errors
 
@@ -870,17 +872,19 @@ when the client should retry with a new token, encoded as a byte-string.
 
 #### TokenChallenge Construction
 
-The `TokenChallenge` in `MoQAuthChallenge` MUST be constructed as follows:
+Each `TokenChallenge` in `MoQAuthChallenge` MUST be constructed as follows:
 
-- `token_type`: The preferred token type from `supported_token_types`
-- `issuer_name`: The issuer name as configured by the relay
+- `token_type`: The token type for this challenge
+- `issuer_name`: The issuer name that can issue tokens for this challenge
 - `redemption_context`: A fresh 32-byte random value, or empty if the relay
   accepts tokens with any redemption context
 - `origin_info`: The relay's origin identifier, optionally including the
   required authorization scope
 
-When `origin_info` is empty, the relay accepts tokens with any scope and
-performs authorization based solely on the token's embedded scope information.
+Different challenges MAY specify different issuers or scopes for different
+token types. When `origin_info` is empty, the relay accepts tokens with any
+scope and performs authorization based solely on the token's embedded scope
+information.
 
 #### Error Response Example
 
@@ -889,13 +893,26 @@ REQUEST_ERROR {
     Request_ID = 42,
     Error_Code = 0x0104,  /* SCOPE_MISMATCH */
     Reason = MoQAuthChallenge {
-        challenge = TokenChallenge {
-            token_type = 0x0002,
-            issuer_name = "issuer.example.com",
-            redemption_context = <32 random bytes>,
-            origin_info = <authorization scope>
-        },
-        supported_token_types = [0x0002, 0xE5AC, 0x0001]
+        challenges = [
+            TokenChallenge {
+                token_type = 0x0002,
+                issuer_name = "public-issuer.example.com",
+                redemption_context = <32 random bytes>,
+                origin_info = <authorization scope>
+            },
+            TokenChallenge {
+                token_type = 0xE5AC,
+                issuer_name = "relay.example.com",
+                redemption_context = <32 random bytes>,
+                origin_info = <authorization scope>
+            },
+            TokenChallenge {
+                token_type = 0x0001,
+                issuer_name = "relay.example.com",
+                redemption_context = <32 random bytes>,
+                origin_info = <authorization scope>
+            }
+        ]
     }
 }
 ~~~
