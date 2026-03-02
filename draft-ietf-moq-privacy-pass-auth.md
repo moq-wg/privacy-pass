@@ -110,7 +110,7 @@ interactions:
 or publish media content. The client is responsible for obtaining Privacy Pass
 tokens through the attestation and issuance process, and presenting these
 tokens when requesting MoQ operations such as SUBSCRIBE, FETCH, PUBLISH, or
-ANNOUNCE.
+PUBLISH_NAMESPACE.
 
 - **MoQ Relay**: The MoQ relay server that forwards media content and verifies
 that clients are authorized. The relay validates Privacy Pass tokens presented
@@ -261,9 +261,15 @@ struct {
 } TokenChallenge;
 ~~~
 
-For MoQ usage, authorization scope information can be encoded in either the
-`origin_info` field (bound at issuance time) or the `redemption_context` field
-(bound at presentation time), depending on the deployment model.
+For MoQ usage, authorization scope information can be encoded by the origin
+within `origin_info` field. This is encoded in the Token at issuance time when
+types `0x0001`, `0x0002`, `0x0005` are used. When clients present a credential
+such as with {{ARC}}, the scope may be restricted at presentation time.
+
+Origins MAY use `redemption_context` to scope token use to properties of the client
+session. As described in {{Section 2.1.1.2 of RFC9577}}, `redemption context` can
+be set to 32-byte random nonce, to the hash of a specific time window, or even
+derived from the client's ASN.
 
 ### MoQ Actions {#moq-actions}
 
@@ -286,31 +292,7 @@ MoQTransport control message types:
 The default authorization policy is "blocked" - all actions are denied unless
 explicitly permitted by a token scope.
 
-### Match Types {#match-types}
-
-Match rules for namespaces and track names support the following types:
-
-| Match Type | Value | Description |
-|------------|-------|-------------|
-| MATCH_EXACT | 0 | Value must equal the pattern exactly |
-| MATCH_PREFIX | 1 | Value must start with the pattern |
-| MATCH_SUFFIX | 2 | Value must end with the pattern |
-| MATCH_CONTAINS | 3 | Value must contain the pattern as substring |
-{: #match-types-table title="Match Type Values"}
-
-Track namespaces in MoQ are represented as ordered tuples of byte strings
-(e.g., `["example.com", "live", "sports"]`). Match rules operate on these
-tuples at tuple element boundaries. The pattern in a MatchRule is also a
-tuple of byte strings, and matching is performed element-by-element.
-
-No normalization is performed on namespace tuple elements or track name values
-before matching. Comparisons are performed as byte-level operations on each
-tuple element.
-
-### Authorization Scope Structure (origin_info) {#scope-origin-info}
-
-When authorization scope is bound at issuance time, the `origin_info` field
-contains a binary-encoded `MoQAuthorizationInfo` structure:
+`MoQAction` wire representation is as follows
 
 ~~~
 enum {
@@ -325,7 +307,35 @@ enum {
     TRACK_STATUS(8),
     (255)
 } MoQAction;
+~~~
 
+### Match Types {#match-types}
+
+Match rules for namespaces and track names support the following types:
+
+| Match Type | Value | Description |
+|------------|-------|-------------|
+| MATCH_EXACT | 0 | Value must equal the pattern exactly |
+| MATCH_PREFIX | 1 | Value must start with the pattern |
+| MATCH_SUFFIX | 2 | Value must end with the pattern |
+| MATCH_CONTAINS | 3 | Value must contain the pattern as substring |
+{: #match-types-table title="Match Type Values"}
+
+Track namespaces in MoQ are represented as ordered tuples of byte strings
+(e.g., `["example.com", "live", "sports"]`). Match rules operate on these
+tuples at tuple element boundaries. The pattern in a `MatchRule` (defined in {{scope-origin-info}}) is also a
+tuple of byte strings, and matching is performed element-by-element.
+
+As for track names, match rules can be applied directly given there is a single
+tuple element.
+
+No normalization is performed on namespace tuple elements or track name values
+before matching. Comparisons are performed as byte-level operations on each
+tuple element.
+
+`MatchType` wire representation is as follows
+
+~~~
 enum {
     MATCH_EXACT(0),
     MATCH_PREFIX(1),
@@ -333,7 +343,14 @@ enum {
     MATCH_CONTAINS(3),
     (255)
 } MatchType;
+~~~
 
+### Authorization Scope Structure (origin_info) {#scope-origin-info}
+
+When authorization scope is bound at issuance time, the `origin_info` field
+contains a binary-encoded `MoQAuthorizationInfo` structure:
+
+~~~
 struct {
     opaque element<0..2^16-1>;
 } TupleElement;
@@ -359,50 +376,13 @@ struct {
 } MoQAuthScope;
 
 struct {
-    MoQAuthScope scopes<1..2^16-1>;
+    MoQAuthScope scopes<1..2^8-1>;
 } MoQAuthorizationInfo;
 ~~~
 
 A token MAY contain multiple `MoQAuthScope` entries to authorize different
 combinations of actions and resource patterns. Authorization succeeds if
 ANY scope in the token permits the requested operation.
-
-### Compact Authorization Scope (redemption_context) {#scope-redemption-context}
-
-For anonymous credentials where authorization scope should be bound at
-presentation time rather than issuance time, the `redemption_context` field
-(limited to 32 bytes) uses a compact encoding:
-
-~~~
-struct {
-    uint16_t actions_bitmask;
-    uint8_t namespace_match_type;
-    uint8_t track_match_type;
-    opaque namespace_pattern<0..13>;
-    opaque track_pattern<0..13>;
-} CompactMoQScope;
-~~~
-
-The `actions_bitmask` field encodes permitted actions as a bitmask where bit N
-corresponds to action value N from {{moq-actions}}. For example, a bitmask of
-`0x00D0` (binary `0000000011010000`) permits SUBSCRIBE (4), PUBLISH (6), and
-FETCH (7).
-
-When patterns exceed 13 bytes, implementations SHOULD use a truncated hash:
-
-~~~
-struct {
-    uint16_t actions_bitmask;
-    uint8_t namespace_match_type;
-    uint8_t track_match_type;
-    opaque namespace_hash[14];
-    opaque track_hash[14];
-} CompactMoQScopeHashed;
-~~~
-
-The hash values are the first 14 bytes of SHA-256 applied to the full pattern.
-The relay MUST maintain a mapping of hash values to full patterns for
-verification.
 
 ### Examples
 
@@ -478,14 +458,14 @@ match succeeds according to the following rules. For namespace matching, both
 the pattern and target are tuples of byte strings; matching operates at tuple
 element boundaries.
 
-MATCH_EXACT (0):
+`MATCH_EXACT (0)`:
 
 The target MUST be identical to the pattern. For namespace
 tuples, this means the same number of elements with each element byte-for-byte
 identical. The pattern tuple `["example.com", "live"]` matches only
 `["example.com", "live"]`, not `["example.com", "live", "sports"]`.
 
-MATCH_PREFIX (1):
+`MATCH_PREFIX (1)`:
 
 The target MUST start with the pattern at tuple element
 boundaries. The pattern tuple `["example.com", "live"]` matches
@@ -493,13 +473,13 @@ boundaries. The pattern tuple `["example.com", "live"]` matches
 but not `["example.com", "vod"]`. Note that `["example.com", "liv"]` does NOT
 match `["example.com", "live"]` since matching is at element boundaries.
 
-MATCH_SUFFIX (2):
+`MATCH_SUFFIX (2)`:
 
 The target MUST end with the pattern at tuple element
 boundaries. The pattern tuple `["audio"]` matches `["meeting123", "audio"]` and
 `["conference", "room1", "audio"]` but not `["audio", "opus"]`.
 
-MATCH_CONTAINS (3):
+`MATCH_CONTAINS (3)`:
 
 The target MUST contain the pattern as a contiguous
 subsequence of tuple elements. The pattern tuple `["live", "sports"]` matches
@@ -521,6 +501,12 @@ operation:
 | Extract Token    |
 | from MoQ Message |
 +--------+---------+
+         | Yes
+         v
++------------------+     +----------------+
+| Check Replay     |---->| Authorization  |
+| Protection       | No  | Failed         |
++--------+---------+     +----------------+
          |
          v
 +------------------+     +----------------+
@@ -529,59 +515,46 @@ operation:
 +--------+---------+     +----------------+
          | Yes
          v
-+------------------+     +----------------+
-| Check Replay     |---->| Authorization  |
-| Protection       | No  | Failed         |
-+--------+---------+     +----------------+
-         | Yes
-         v
 +------------------+
 | Extract Scope    |
-| (origin_info or  |
-| redemption_ctx)  |
+| (origin_info)    |
 +--------+---------+
          |
          v
-+------------------+
-| For each Scope:  |<---------+
++------------------+                 +----------------+
+|                  +---------------->| Authorization  |
+| For each Scope   | No more scopes  | Failed         |
+|                  |<---------+      +----------------+
 +--------+---------+          |
          |                    |
          v                    |
 +------------------+          |
-| Action in        |--+       |
-| scope.actions?   |  | No    |
-+--------+---------+  |       |
-         | Yes        |       |
-         v            |       |
-+------------------+  |       |
-| Namespace Match  |--+       |
-| Rule passes?     |  | No    |
-+--------+---------+  |       |
-         | Yes        |       |
-         v            |       |
-+------------------+  |       |
-| Track Name Match |--+       |
-| Rule passes?     |  | No    |
-+--------+---------+  +-------+
-         | Yes           ^
-         v               | More scopes
-+------------------+     |
-| Authorization    |     |
-| Granted          |     |
-+------------------+     |
-                         |
-              No match --+
-              in any     |
-              scope      v
-                  +----------------+
-                  | Authorization  |
-                  | Failed         |
-                  +----------------+
+| Action in        |----------+
+| scope.actions?   |    No    |
++--------+---------+          |
+         | Yes                |
+         v                    |
++------------------+          |
+| Namespace Match  |----------+
+| Rule passes?     |    No    |
++--------+---------+          |
+         | Yes                |
+         v                    |
++------------------+          |
+| Track Name Match |----------+
+| Rule passes?     |
++--------+---------+
+         | Yes
+         v
++------------------+
+| Authorization    |
+| Granted          |
++------------------+
 ~~~
 {: #fig-matching-algorithm title="Token Validation and Matching Algorithm"}
 
 1. **Token Extraction**: Extract the Privacy Pass token from the MoQ control
-   message (SETUP, SUBSCRIBE, FETCH, PUBLISH, ANNOUNCE, or other operation).
+   message (SETUP, SUBSCRIBE, FETCH, PUBLISH, PUBLISH_NAMESPACE, or other operation).
 
 2. **Token Verification**: Verify the token using the appropriate method for
    the token type:
@@ -601,13 +574,12 @@ operation:
 4. **Scope Extraction**: Extract authorization scope from the token:
 
    - If using `origin_info`: Decode the `MoQAuthorizationInfo` structure
-   - If using `redemption_context`: Decode the `CompactMoQScope` structure
 
 5. **Scope Evaluation**: For each `MoQAuthScope` in the token, check if the
    requested operation is authorized:
 
    a. **Action Check**: Verify the requested MoQ action (from {{moq-actions}})
-      is present in the scope's `actions` list or bitmask
+      is present in the scope's `actions` list
 
    b. **Namespace Match**: Apply the `namespace_match` rule to the requested
       track namespace using the algorithm in {{match-types}}
@@ -714,15 +686,16 @@ SUBSCRIBE {
 }
 ~~~
 
-### Continuous Authorization with Batched Tokens {#continuous-auth}
+### Continuous Authorization with Batched Tokens {#continuous-auth-batched}
 
 Long-lived MoQ sessions (such as live streaming or real-time communication)
 require periodic re-authorization to ensure continued eligibility. Unlike
 JWT-based approaches that use explicit revalidation intervals, Privacy Pass
-achieves continuous authorization through batched token issuance.
+can achieve continuous authorization through batched token issuance.
 
 During the initial SETUP exchange, clients can request multiple tokens via
-`GenericBatchTokenRequest`. Each token in the batch is independently valid
+`GenericBatchTokenRequest` (defined in {{Section 6.1 of PRIVACYPASS-BATCHED}}).
+Each token in the batch is independently valid
 and can be presented for subsequent operations or periodic re-authorization.
 
 ~~~
@@ -742,9 +715,10 @@ Time 3T:    Relay requests re-authorization
 
 Relays MAY request periodic re-authorization by sending a `TokenChallenge`
 in a `REQUEST_ERROR` message. Clients SHOULD present a fresh token from their
-batch in response.
+batch in response if any satisfy the new `TokenChallenge`. If not, they SHOULD
+perform a new issuance process.
 
-When using ARC tokens (`0xE5AC`), the credential's `presentation_limit` controls
+When using {{ARC}} tokens (`0xE5AC`), the credential's `presentation_limit` controls
 how many times the client can present tokens from a single credential issuance.
 This provides rate limiting while preserving unlinkability between presentations.
 
@@ -757,6 +731,31 @@ This provides rate limiting while preserving unlinkability between presentations
 - For high-security deployments, shorter re-authorization intervals with
   smaller batches provide stronger revocation guarantees
 
+### Continuous Authorization with Reverse Flow {#continuous-auth-reverse}
+
+If the client and the relay support it, a Relay MAY perform continuous
+authentication using a reverse flow.
+
+To do so, when presenting `PrivateTokenAuth`, a client MUST send at least one
+`GenericBatchTokenRequest`. The Relay then acts as a reverse issuer, and issues
+the corresponding number of `GenericBatchTokenResponse`.
+
+Tokens obtained this way can be presented by the Client to maintain
+the continuity of the session without linkability.
+
+~~~
+Reverse Flow Token Usage Timeline:
+
+Time 0:     CLIENT_SETUP with Token_1, request batch of 1 token
+            SERVER_SETUP with batch of 1 token
+
+Time T:     SUBSCRIBE with Token_2 (from batch), request batch of 1 token
+            Relay responds with batch of 1 token
+
+Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 token
+            Relay responds with batch of 1 token
+~~~
+
 ### Errors {#errors}
 
 If the authentication fails for any reason, the server MUST send an error.
@@ -764,7 +763,7 @@ If the authentication fails for any reason, the server MUST send an error.
 If the error occurs during SETUP, the Relay MUST terminate the connection with
 `UNAUTHORIZED` defined in {{Section 3.4 of MoQ-TRANSPORT}}.
 
-If the error occurs over an establishhed connection, the Relay MUST send a `REQUEST_ERROR`
+If the error occurs over an established connection, the Relay MUST send a `REQUEST_ERROR`
 defined in {{Section 9.8 of MoQ-TRANSPORT}}.
 
 In both cases, the Relay SHOULD provide a reason/message set to a `TokenChallenge`.
@@ -889,18 +888,15 @@ TODO acknowledge.
 RFC Editor's Note: Please remove this section prior to publication of
 a final version of this document.
 
-## Since draft-ietf-moq-privacy-pass-auth-02
+## Since draft-ietf-moq-privacy-pass-auth-01
 
 * Replace text-based moq-scope with binary TLS presentation language structures
 * Add MoQ Actions registry aligned with MoQTransport control message types
 * Add Match Types registry with exact, prefix, suffix, and contains matching
 * Define MoQAuthorizationInfo structure for origin_info encoding
-* Define CompactMoQScope structure for redemption_context encoding
+* Add continuous authorization section using reverse flow
 * Add continuous authorization section using batched tokens
 * Add IANA registries for auth schemes, actions, and match types
-
-## Since draft-ietf-moq-privacy-pass-auth-01
-
 * Define error handling
 * Integrate privacy pass reverse flow within PrivateTokenAuth
 * MoQ definition now follow draft-ietf-moq-transport-16
