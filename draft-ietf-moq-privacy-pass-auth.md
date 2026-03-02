@@ -371,7 +371,7 @@ in the token scope:
     - If Exact Match, the requested namespace/name MUST exactly equal the pattern
     - If Prefix Match, the requested namespace/name MUST start with the pattern prefix
 
-Access is granded to the requested resource if and only if ALL of the following
+Access is granted to the requested resource if and only if ALL of the following
 conditions are met:
 
    - Token signature verification succeeds
@@ -479,7 +479,7 @@ If the authentication fails for any reason, the server MUST send an error.
 If the error occurs during SETUP, the Relay MUST terminate the connection with
 `UNAUTHORIZED` defined in {{Section 3.4 of MoQ-TRANSPORT}}.
 
-If the error occurs over an establishhed connection, the Relay MUST send a `REQUEST_ERROR`
+If the error occurs over an established connection, the Relay MUST send a `REQUEST_ERROR`
 defined in {{Section 9.8 of MoQ-TRANSPORT}}.
 
 In both cases, the Relay SHOULD provide a reason/message set to a `TokenChallenge`.
