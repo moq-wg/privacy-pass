@@ -548,20 +548,20 @@ a valid token and retry the operation.
 #### SETUP Errors
 
 If authentication fails during SETUP, the Relay MUST terminate the connection
-with the `UNAUTHORIZED` (0x010C) Termination Error Code defined in
+with the `UNAUTHORIZED` (0x02) Termination Error Code defined in
 {{Section 3.4 of MoQ-TRANSPORT}}. The termination reason phrase MUST contain
 a `MoQAuthChallenge` structure:
 
 ~~~
 struct {
     TokenChallenge challenge;
-    uint16_t supported_token_types<2..2^16-1>;
+    uint16_t supported_token_types<1..2^16-1>;
 } MoQAuthChallenge;
 ~~~
 
 The `supported_token_types` field lists token types the relay accepts, ordered
 by preference (most preferred first). This allows clients to select an appropriate
-issuance protocol.
+issuance protocol. Relay MUST set at least one supported token type.
 
 #### Operation Errors
 
@@ -579,10 +579,11 @@ The error code MUST be one of:
 | 0x0103 | TOKEN_REPLAYED | Token nonce has been seen before |
 | 0x0104 | SCOPE_MISMATCH | Token scope does not authorize this operation |
 | 0x0105 | ISSUER_UNKNOWN | Token issuer is not trusted by this relay |
+| 0x0106 | TOKEN_MALFORMED | Token cannot be parsed correctly |
 {: #error-codes-table title="Privacy Pass Authorization Error Codes"}
 
 The reason phrase in `REQUEST_ERROR` MUST contain a `MoQAuthChallenge` structure
-when the client should retry with a new token.
+when the client should retry with a new token, encoded as a byte-string.
 
 #### TokenChallenge Construction
 
@@ -648,7 +649,7 @@ without contacting the Issuer. This example uses publicly verifiable tokens.
          +-----+-----+                        +---+----+         +----+-----+ +---+----+
                |                                  |                   |           |
                |<--------------- CLIENT_SETUP[] --+                   |           |
-               |   UNAUTHORIZED (0x010C) [        |                   |           |
+               |   UNAUTHORIZED (0x2)    [        |                   |           |
                +--   Reason=MoQAuthChallenge ---->|                   |           |
                |   ]                              |                   |           |
                |                                  |                   |           |
@@ -715,7 +716,8 @@ Error Codes" with the following initial contents:
 | 0x0103 | TOKEN_REPLAYED | {{errors}} |
 | 0x0104 | SCOPE_MISMATCH | {{errors}} |
 | 0x0105 | ISSUER_UNKNOWN | {{errors}} |
-| 0x0106-0x01FF | Unassigned | |
+| 0x0106 | TOKEN_MALFORMED | {{errors}} |
+| 0x0107-0x01FF | Unassigned | |
 {: #error-code-registry title="MoQ Privacy Pass Error Codes Registry"}
 
 New entries in this registry require Specification Required registration policy.
