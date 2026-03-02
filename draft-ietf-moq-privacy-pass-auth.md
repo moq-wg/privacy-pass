@@ -178,7 +178,7 @@ This two-phase approach provides several advantages:
 
 ### Reverse Flow Overview
 
-The reverse flow, as described in {{Section 6.3 of PRIVACYPASS-REVERSE-FLOW}},
+The reverse flow, as described in {{Section 4 of PRIVACYPASS-REVERSE-FLOW}},
 allows a client to exchange a publicly verifiable token for privately verifiable
 tokens (or credentials) issued directly by the MoQ relay.
 
