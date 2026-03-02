@@ -5,9 +5,9 @@
 Media Over QUIC                                            S. Nandakumar
 Internet-Draft                                               C. Jennings
 Intended status: Standards Track                                   Cisco
-Expires: 2 September 2026                                     T. Meunier
+Expires: 3 September 2026                                     T. Meunier
                                                          Cloudflare Inc.
-                                                            1 March 2026
+                                                            2 March 2026
 
 
          Privacy Pass Authentication for Media over QUIC (MoQ)
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 September 2026.
+   This Internet-Draft will expire on 3 September 2026.
 
 Copyright Notice
 
@@ -234,7 +234,7 @@ Table of Contents
 
 2.2.1.  Reverse Flow Overview
 
-   The reverse flow, as described in Section 6.3 of
+   The reverse flow, as described in Section 4 of
    [PRIVACYPASS-REVERSE-FLOW], allows a client to exchange a publicly
    verifiable token for privately verifiable tokens (or credentials)
    issued directly by the MoQ relay.
