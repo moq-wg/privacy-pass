@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-01T01:17:25.885694+00:00",
+  "timestamp": "2026-03-03T01:11:40.926370+00:00",
   "repo": "moq-wg/privacy-pass",
   "labels": [
     {
@@ -112,7 +112,7 @@
       "id": "I_kwDOQDQvX87uwvjf",
       "title": "Expand on matching rules, algorithm and presentation options for various MoQ Actions and Scopes",
       "url": "https://github.com/moq-wg/privacy-pass/issues/7",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "suhasHere",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [
@@ -121,8 +121,24 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-03-01T00:09:02Z",
-      "updatedAt": "2026-03-01T00:23:59Z",
-      "closedAt": null,
+      "updatedAt": "2026-03-02T01:34:16Z",
+      "closedAt": "2026-03-02T01:34:16Z",
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOQDQvX87u8g8y",
+      "title": "Support TokenChallenge as an Array",
+      "url": "https://github.com/moq-wg/privacy-pass/issues/11",
+      "state": "CLOSED",
+      "author": "suhasHere",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Current structure:\n  struct {\n      TokenChallenge challenge;       // contains ONE\n  token_type, issuer_name, origin_info\n      uint16_t supported_token_types<1..2^16-1>;\n  } MoQAuthChallenge;\n\n@thibmeu  suggested Return an array of TokenChallenge instead.\n\n  This is a good observation\n\n  The current design has a limitation: since\n  TokenChallenge contains a single issuer_name and\n  origin_info, you can only specify one issuer and one\n  scope even though you support multiple token types.\n\n  Real scenarios where the array approach helps:\n\n  1. Different issuers per token type:\n    - Accept 0x0002 from public-issuer.example.com\n  (external)\n    - Accept 0x0001 from relay.example.com\n  (self-issued)\n  2. Different scopes per token type:\n    - Bootstrap token (0x0002): Broad scope for\n  connection establishment\n    - Privately verifiable (0xE5AC): Narrower scope for\n   specific namespaces\n  3. Multiple trusted issuers for same token type:\n    - Accept 0x0002 from either issuer-a.com or\n  issuer-b.com",
+      "createdAt": "2026-03-02T01:51:22Z",
+      "updatedAt": "2026-03-02T01:54:23Z",
+      "closedAt": "2026-03-02T01:54:23Z",
       "comments": []
     }
   ],
@@ -299,7 +315,7 @@
       "labels": [],
       "body": "To be merged after #5 or be rebased on the latest update.\r\n\r\nThe latest commit changes\r\n- add errors section (UNAUTHORIZED/REQUEST_ERROR)\r\n- integrate reverse flow + batched token extensions in PrivateTokenAuth\r\n- update diagram to show full SETUP exchange\r\n- add 0x0005 token type, fix typos\r\n\r\nRendered updated diagram for privacy pass flow\r\n\r\n<img width=\"2225\" height=\"1550\" alt=\"a\" src=\"https://github.com/user-attachments/assets/ab336f21-38f8-419b-b0b8-9d833894c8ee\" />\r\n\r\n@suhasHere for review. this should cover most of what we have discussed",
       "createdAt": "2026-02-28T16:22:15Z",
-      "updatedAt": "2026-02-28T23:41:38Z",
+      "updatedAt": "2026-03-01T08:09:34Z",
       "baseRepository": "moq-wg/privacy-pass",
       "baseRefName": "main",
       "baseRefOid": "53e719c719733a346c7d8c0a1f9e43f2fed699f2",
@@ -320,26 +336,347 @@
       "id": "PR_kwDOQDQvX87HDhxr",
       "title": " Define auth info to capture moqt actions and elements for authorization",
       "url": "https://github.com/moq-wg/privacy-pass/pull/8",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "suhasHere",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Fixes #7 ",
       "createdAt": "2026-03-01T00:23:25Z",
-      "updatedAt": "2026-03-01T00:32:20Z",
+      "updatedAt": "2026-03-02T01:34:21Z",
       "baseRepository": "moq-wg/privacy-pass",
       "baseRefName": "main",
       "baseRefOid": "9606b4b5b76074c9269c1291e1144bce9a945712",
       "headRepository": "moq-wg/privacy-pass",
       "headRefName": "snk-7",
-      "headRefOid": "56e26b7b5beccbcb23cf819ce0b5d2cb9356d2d8",
-      "closedAt": null,
+      "headRefOid": "79e3bedfd974acdbed1da484e539942e00274967",
+      "closedAt": "2026-03-02T01:34:15Z",
+      "mergedAt": "2026-03-02T01:34:15Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "76951a886802958b74771a06dbe5b119aecd4b7b"
+      },
+      "comments": [
+        {
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@thibmeu @fluffy please let me know, if this looks good.",
+          "createdAt": "2026-03-01T01:36:01Z",
+          "updatedAt": "2026-03-01T01:36:01Z"
+        },
+        {
+          "author": "thibmeu",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "added a review https://github.com/moq-wg/privacy-pass/pull/10\r\n\r\ni really like the actual sp;ecification of scope and matching pattern. this was missing and will help implementing",
+          "createdAt": "2026-03-01T09:42:20Z",
+          "updatedAt": "2026-03-01T09:42:20Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOQDQvX87m5DEY",
+          "commit": {
+            "abbreviatedOid": "79e3bed"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Merging it since i got @thibmeu from other PR merged into this one.",
+          "createdAt": "2026-03-02T01:34:09Z",
+          "updatedAt": "2026-03-02T01:34:09Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "PR_kwDOQDQvX87HEdEg",
+      "title": "Add Privacy Pass authorization error codes",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/9",
+      "state": "MERGED",
+      "author": "suhasHere",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@thibmeu , please check",
+      "createdAt": "2026-03-01T02:56:46Z",
+      "updatedAt": "2026-03-02T01:50:21Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "76951a886802958b74771a06dbe5b119aecd4b7b",
+      "headRepository": "moq-wg/privacy-pass",
+      "headRefName": "snk-error-codes",
+      "headRefOid": "df7c0f8c9ffd9de963fdc66f351373fab545805c",
+      "closedAt": "2026-03-02T01:41:57Z",
+      "mergedAt": "2026-03-02T01:41:57Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "8c6db157946abe690ed31eb98c685e089c2111f7"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOQDQvX87mxzQD",
+          "commit": {
+            "abbreviatedOid": "5222958"
+          },
+          "author": "thibmeu",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "having the error better specified and within a registry helps.\n\nbeyond the few nits, the main question I have is should the MoQAuthChallenge return a TokenChallenge+supported_)token_types, or simply an array with multiple token challenges? I'd be in favor of that last options as that's more flexible and aligned with existing WWW-Authenticate",
+          "createdAt": "2026-03-01T09:57:42Z",
+          "updatedAt": "2026-03-01T10:13:11Z",
+          "comments": [
+            {
+              "originalPosition": 155,
+              "body": "should be `0x2` per moq-transport draft",
+              "createdAt": "2026-03-01T09:57:42Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 191,
+              "body": "```suggestion\nwhen the client should retry with a new token, encoded as a byte-string.\n```\nis byte-string safe or should we suggest base64 (rfc4648) instead?\n",
+              "createdAt": "2026-03-01T09:58:57Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 263,
+              "body": "```suggestion\n               |   UNAUTHORIZED (0x2)    [        |                   |           |\n```",
+              "createdAt": "2026-03-01T09:59:15Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 306,
+              "body": "once merged, should be open an issue against MoQ transport draft to ensure this is cross tracked and we don't end up overlapping?",
+              "createdAt": "2026-03-01T10:00:43Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 31,
+              "body": "```suggestion\nThe reverse flow, as described in {{Section 4 of PRIVACYPASS-REVERSE-FLOW}},\n```\n\nsection 6 is all about using HTTP header and therefore specific deployments. section 4 is the architecture\n\nside: i wonder if the reverse flow could not describe the various architecture in section 4 and let section 6 as \"we define a new header which can be used\". this way, moq+privacy pass draft fits directly",
+              "createdAt": "2026-03-01T10:03:03Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 302,
+              "body": "```suggestion\n| 0x0106 | TOKEN_MALFORMED | {{errors}} |\n| 0x0107-0x01FF | Unassigned | |\n```",
+              "createdAt": "2026-03-01T10:06:02Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 187,
+              "body": "```suggestion\n| 0x0105 | ISSUER_UNKNOWN | Token issuer is not trusted by this relay |\n| 0x0106 | TOKEN_MALFORMED | Token cannot be parsed correctly |\n```",
+              "createdAt": "2026-03-01T10:06:49Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 169,
+              "body": "```suggestion\nissuance protocol. Relay MUST set at least one supported token type.\n```",
+              "createdAt": "2026-03-01T10:09:14Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 163,
+              "body": "```suggestion\n    uint16_t supported_token_types<1..2^16-1>;\n```\n\nat least one. 2 is not required",
+              "createdAt": "2026-03-01T10:09:31Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            },
+            {
+              "originalPosition": 162,
+              "body": "one interesting thing here is that tokenchallenge contains a token type. should we returnn an array of token challenge instead of only one token chlalenge and supported token types? this would allow to specify the supported issuers for instance, or different origin_info",
+              "createdAt": "2026-03-01T10:10:31Z",
+              "updatedAt": "2026-03-01T10:13:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOQDQvX87m5DxR",
+          "commit": {
+            "abbreviatedOid": "fb2cc58"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-02T01:36:35Z",
+          "updatedAt": "2026-03-02T01:36:35Z",
+          "comments": [
+            {
+              "originalPosition": 155,
+              "body": "```suggestion\nwith the `UNAUTHORIZED` (0x02) Termination Error Code defined in\n```",
+              "createdAt": "2026-03-02T01:36:35Z",
+              "updatedAt": "2026-03-02T01:36:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOQDQvX87m5Ebw",
+          "commit": {
+            "abbreviatedOid": "b8f406e"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Merging after accepting review comments from @thibmeu ",
+          "createdAt": "2026-03-02T01:38:53Z",
+          "updatedAt": "2026-03-02T01:39:17Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "PR_kwDOQDQvX87HGvSq",
+      "title": "Snk 7 comments",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/10",
+      "state": "MERGED",
+      "author": "thibmeu",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "made a commit instead of commenting on #7 \r\n\r\nthe main change is removing the overload of redemption_context and focusing on origin_info instead, which can be included in a presentation_context when using anonymous credential\r\n\r\ni've also added continuous authorization via reverse flow. the previous continuous authorization section uses is (given SETUP leverages a reverse flow), but this makes it clearer to the reader\r\n\r\nfinally, there are some minor corrections on types and structure",
+      "createdAt": "2026-03-01T09:41:24Z",
+      "updatedAt": "2026-03-02T01:31:14Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "snk-7",
+      "baseRefOid": "5328705867b7a2b28e621b74da01dde5a45805d0",
+      "headRepository": "thibmeu/privacy-pass",
+      "headRefName": "snk-7-comments",
+      "headRefOid": "6a2da5e4c244b7bb123564839472c40dcc74d33b",
+      "closedAt": "2026-03-02T01:31:14Z",
+      "mergedAt": "2026-03-02T01:31:14Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "79e3bedfd974acdbed1da484e539942e00274967"
+      },
+      "comments": [
+        {
+          "author": "thibmeu",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@suhasHere for review",
+          "createdAt": "2026-03-01T09:41:39Z",
+          "updatedAt": "2026-03-01T09:41:39Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOQDQvX87m5CM9",
+          "commit": {
+            "abbreviatedOid": "6a2da5e"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-02T01:31:07Z",
+          "updatedAt": "2026-03-02T01:31:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "PR_kwDOQDQvX87HNYXt",
+      "title": "Change MoQAuthChallenge to use array of TokenChallenges",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/12",
+      "state": "MERGED",
+      "author": "suhasHere",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #11 ",
+      "createdAt": "2026-03-02T01:54:15Z",
+      "updatedAt": "2026-03-02T01:54:47Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "8c6db157946abe690ed31eb98c685e089c2111f7",
+      "headRepository": "moq-wg/privacy-pass",
+      "headRefName": "snk-token-array",
+      "headRefOid": "ababc23eb09cade0faeeb795304d89c3d27c1c60",
+      "closedAt": "2026-03-02T01:54:22Z",
+      "mergedAt": "2026-03-02T01:54:22Z",
+      "mergedBy": "suhasHere",
+      "mergeCommit": {
+        "oid": "8356a382142e9bdd1ac6fd166c8febf332b4a74f"
+      },
+      "comments": [
+        {
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@thibmeu addressed your suggestion and merging it to be ready for submission",
+          "createdAt": "2026-03-02T01:54:47Z",
+          "updatedAt": "2026-03-02T01:54:47Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOQDQvX87HVUw_",
+      "title": "fix two minor typos",
+      "url": "https://github.com/moq-wg/privacy-pass/pull/13",
+      "state": "CLOSED",
+      "author": "thibmeu",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@suhasHere very minor typos. the draft is ok for a new cut otherwise",
+      "createdAt": "2026-03-02T13:32:13Z",
+      "updatedAt": "2026-03-02T13:52:20Z",
+      "baseRepository": "moq-wg/privacy-pass",
+      "baseRefName": "main",
+      "baseRefOid": "8356a382142e9bdd1ac6fd166c8febf332b4a74f",
+      "headRepository": "thibmeu/privacy-pass",
+      "headRefName": "fix-minor-typos",
+      "headRefOid": "517adc0069dba05cd9bcb27c2b93d70a372d9249",
+      "closedAt": "2026-03-02T13:52:15Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "comments": [
+        {
+          "author": "thibmeu",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "note: i'm cuprrently resolving the conflict. i pushed too fast \ud83d\ude01 ",
+          "createdAt": "2026-03-02T13:38:00Z",
+          "updatedAt": "2026-03-02T13:38:00Z"
+        },
+        {
+          "author": "thibmeu",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "no typos in the latest. good to cut imo",
+          "createdAt": "2026-03-02T13:52:15Z",
+          "updatedAt": "2026-03-02T13:52:15Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOQDQvX87nCyBn",
+          "commit": {
+            "abbreviatedOid": "517adc0"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-02T13:36:03Z",
+          "updatedAt": "2026-03-02T13:36:03Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOQDQvX87nCy-C",
+          "commit": {
+            "abbreviatedOid": "517adc0"
+          },
+          "author": "suhasHere",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-02T13:36:38Z",
+          "updatedAt": "2026-03-02T13:36:38Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
