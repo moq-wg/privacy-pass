@@ -17,23 +17,24 @@ fetches, publications, and relay operations while supporting fine-grained
 access control through prefix-based track namespace and track name matching
 rules. 
     " name="description">
-<meta content="xml2rfc 3.31.0" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="media over quic" name="keyword">
 <meta content="privacy-pass" name="keyword">
 <meta content="draft-ietf-moq-privacy-pass-auth-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.31.0
-    Python 3.12.12
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.5.1
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
     pycountry 24.6.1
     PyYAML 6.0.3
-    requests 2.32.5
-    wcwidth 0.3.0
+    requests 2.33.1
+    wcwidth 0.8.2
 -->
 <link href="draft-ietf-moq-privacy-pass-auth.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -300,16 +301,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-h1#title {
-  font-size: 32px;
-  line-height: 40px;
-  clear: both;
-}
-h1#title, h1#rfcnum {
-  margin: 1.5em 0 0.2em;
-}
-h1#rfcnum + h1#title {
-  margin: 0.2em 0;
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
 }
 
 h1, h2, h3 {
@@ -329,10 +333,10 @@ h4, h5, h6 {
 #abstract+p {
   font-size: 18px;
   line-height: 24px;
-}
-#abstract+p code, #abstract+p samp, #abstract+p tt {
-  font-size: 16px;
-  line-height: 0;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
 }
 
 p {
@@ -343,59 +347,59 @@ p {
 div {
   margin: 0;
 }
-.alignRight.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignRight.art-text pre {
-  padding: 0;
-  width: auto;
-}
 .alignRight {
   margin: 1em 0;
-}
-.alignRight > *:first-child {
-  border: none;
-  margin: 0;
-  float: right;
-  clear: both;
-}
-.alignRight > *:nth-child(2) {
-  clear: both;
-  display: block;
-  border: none;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
 }
 svg {
   display: block;
-}
-/* font-family isn't space-separated, but =~ will have to do */
-svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
-  font-family: var(--font-mono);
-}
-.alignCenter.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignCenter.art-text pre {
-  padding: 0;
-  width: auto;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
 }
 .alignCenter {
   margin: 1em 0;
-}
-.alignCenter > *:first-child {
-  border: none;
-  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
-     support flexbox yet.
-  */
-  display: table;
-  margin: 0 auto;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
 }
 
 /* lists */
@@ -433,26 +437,25 @@ dl {
     --indent: 5ch;
     & > dt {
       min-width: calc(var(--indent) - 2ch);
+      float: none;
     }
-  }
-  &.olPercent > dt {
-    float: none;
   }
 
   dl > dd > & {
     margin-top: 0.5em;
     margin-bottom: 0;
   }
-}
-dl:not(.dlNewline) > dt {
-  float: left;
-  margin-right: 2ch;
-  min-width: 8ch;
-}
-dl > dd {
-  margin-bottom: .8em;
-  margin-left: var(--indent) !important; /* stupid element overrides */
-  min-height: 2ex;
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -468,20 +471,22 @@ dl > dd {
 }
 
 /* links */
-a, a[href].selfRef:hover {
+a {
   text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
 }
-a[href] {
-  color: var(--link-color);
-}
-a[href].selfRef, .iref + a[href].internal {
+.iref + a[href].internal {
   color: var(--text-color);
-}
-a[href]:hover {
-  text-decoration: underline;
-}
-a[href].selfRef:hover {
-  background-color: var(--highlight-color);
 }
 a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
@@ -517,9 +522,9 @@ img {
 figure {
   margin: 0.5em 0;
   padding: 0;
-}
-figure blockquote {
-  margin: 0.8em 0.4em 0.4em;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
 }
 figcaption, caption {
   font-style: italic;
@@ -529,17 +534,19 @@ figcaption, caption {
 }
 @media screen {
   /* Auto-collapse boilerplate. */
-  :is(#status-of-memo, #copyright) p {
-    margin: -2px 0;
-    max-height: 0;
-    transition: max-height 2s ease, margin 0.5s ease 0.5s;
-    overflow: hidden;
-  }
-  :is(#status-of-memo, #copyright):hover p,
-  :is(#status-of-memo, #copyright) h2:target ~ p {
-    margin: 0.5em 0;
-    max-height: 500px;
-    overflow: auto;
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
   }
   pre, svg {
     display: inline-block;
@@ -589,25 +596,17 @@ table {
   max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
-}
-table.right {
-  margin-left: auto;
-}
-table.center {
-  margin-left: auto;
-  margin-right: auto;
-}
-table.left {
-  margin-right: auto;
-}
-table .text-left {
-  text-align: left;
-}
-table .text-center {
-  text-align: center;
-}
-table .text-right {
-  text-align: right;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
 }
 
 thead, tbody {
@@ -627,13 +626,6 @@ th {
 :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
 }
-table caption {
-  margin: 0;
-  padding: 3px 0 3px 1em;
-}
-table p {
-  margin: 0;
-}
 
 /* pilcrow */
 a.pilcrow {
@@ -644,18 +636,16 @@ a.pilcrow {
     color: var(--pilcrow-weak);
     &:hover { text-decoration: none; }
   }
-}
-@media not print {
-  :hover > a.pilcrow, a.pilcrow:focus {
-    opacity: 1;
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
   }
-  a.pilcrow[href]:hover {
-    color: var(--pilcrow-strong);
-    background-color: transparent;
-  }
-}
-@media print {
-  a.pilcrow {
+  @media print {
     display: none;
   }
 }
@@ -714,9 +704,9 @@ sub, sup {
   font-size: 0.9em;
   font-style: italic;
   margin-top: 2em;
-}
-.docInfo .prepared {
-  float: right;
+  & .prepared {
+    float: right;
+  }
 }
 
 /* table of contents */
@@ -806,23 +796,27 @@ hr.addr {
   max-width: calc(100% - 16px);
 }
 @media (min-width: 500px) {
-  #authors-addresses > section {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  #authors-addresses > section > h2 {
-    column-span: all;
-  }
-  /* hack for break-inside: avoid-column */
-  #authors-addresses address {
-    display: inline-block;
-    break-inside: avoid-column;
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
   }
 }
 
 /* Comments */
-.rfcEditorRemove p:first-of-type {
-  font-style: italic;
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
 }
 .cref {
   background-color: rgba(249, 232, 105, 0.3);
@@ -833,19 +827,21 @@ hr.addr {
 }
 
 @media screen {
-  #toc nav {
-    font-family: var(--font-title);
-    font-weight: 360;
-    & > ul { margin-bottom: 2em; }
-    & ul {
-      margin: 0 0 0 4px;
-      & :is(p, li) {
-        margin: 2px 0;
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
       }
     }
-  }
-  #toc a.toplink {
-    float: right;
+    & a.toplink {
+      float: right;
+    }
   }
 }
 @media not screen {
@@ -866,54 +862,54 @@ hr.addr {
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 2px 0 2px 6px;
-    padding-right: 1em;
-    font-size: 18px;
-    line-height: 24px;
-    min-width: 190px;
-    text-align: right;
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-    &::before { /* css hamburger */
-      float: right;
-      position: relative;
-      width: 1em;
-      height: 1px;
-      left: -164px;
-      margin: 8px 0 0 0;
-      background: white none repeat scroll 0 0;
-      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
-      content: "";
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
     }
-  }
-  #toc nav {
-    display: none;
-    background-color: var(--background-color);
-    padding: 0.5em 1em 1em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    height: calc(100vh - 48px);
-    border-left: 1px solid #ddd;
-  }
-  #toc.active {
-    opacity: 1;
-    & nav { display: block; }
-  }
-  /* Make the collapsed ToC header render white on gray also when it's a link */
-  #toc h2 a,
-  #toc h2 a:is(:link, :focus, :hover),
-  #toc a.toplink,
-  #toc a.toplink:hover {
-    color: white;
-    background-color: #444;
-    text-decoration: none;
-  }
-  #toc a.toplink {
-    margin: 2px 0.5em 0;
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
   }
 }
 
@@ -932,26 +928,26 @@ hr.addr {
     margin: 0;
     padding: 0;
     z-index: 1;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 0.25em 1em 1em 0;
-  }
-  #toc nav {
-    display: block;
-    height: calc(90vh - 84px);
-    bottom: 0;
-    padding: 0.5em 0 2em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
   }
   img { /* future proofing */
     max-width: 100%;
     height: auto;
-  }
-  #toc a.toplink {
-    margin: 8px 0.5em 0;
   }
 }
 
@@ -967,12 +963,13 @@ hr.addr {
   #n-copyright-notice {
     border-bottom: none;
   }
-  #toc, #n-introduction {
-    page-break-before: always;
-  }
   #toc {
+    page-break-before: always;
     border-top: none;
     padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
   }
   figure, pre, .vcard {
     page-break-inside: avoid;
@@ -1034,17 +1031,19 @@ hr.addr {
 }
 
 /* SVG Trick: a prefix match works because only black and white are allowed */
-svg :is([stroke="black"], [stroke^="#000"]) {
-  stroke: var(--text-color);
-}
-svg :is([stroke="white"], [stroke^="#fff"]) {
-  stroke: var(--background-color);
-}
-svg :is([fill="black"], [fill^="#000"], :not([fill])) {
-  fill: var(--text-color);
-}
-svg :is([fill="white"], [fill^="#fff"]) {
-  fill: var(--background-color);
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
 }
 </style>
 
@@ -1054,11 +1053,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Privacy Pass MoQ Auth</td>
-<td class="right">March 2026</td>
+<td class="right">July 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Nandakumar, et al.</td>
-<td class="center">Expires 3 September 2026</td>
+<td class="center">Expires 6 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1071,12 +1070,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-moq-privacy-pass-auth-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-03-02" class="published">2 March 2026</time>
+<time datetime="2026-07-05" class="published">5 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-09-03">3 September 2026</time></dd>
+<dd class="expires"><time datetime="2027-01-06">6 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1141,7 +1140,7 @@ rules.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1297,24 +1296,35 @@ rules.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-change-log" class="internal xref">Change Log</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-deployment-considerations" class="internal xref">Deployment considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-since-draft-ietf-moq-privac" class="internal xref">Since draft-ietf-moq-privacy-pass-auth-02</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-fetching-key-material-for-t" class="internal xref">Fetching key material for the bootstrap issuer</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-since-draft-ietf-moq-privacy" class="internal xref">Since draft-ietf-moq-privacy-pass-auth-01</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
-                <p id="section-toc.1-1.9.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-since-draft-ietf-moq-privacy-" class="internal xref">Since draft-ietf-moq-privacy-pass-auth-00</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-fetching-key-material-for-th" class="internal xref">Fetching key material for the relay reverse issuer</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-changelog" class="internal xref">Changelog</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#appendix-C.1" class="auto internal xref"></a><a href="#name-since-draft-ietf-moq-privac" class="internal xref">Since draft-ietf-moq-privacy-pass-auth-02</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#appendix-C.2" class="auto internal xref"></a><a href="#name-since-draft-ietf-moq-privacy" class="internal xref">Since draft-ietf-moq-privacy-pass-auth-01</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
+                <p id="section-toc.1-1.10.2.3.1"><a href="#appendix-C.3" class="auto internal xref"></a><a href="#name-since-draft-ietf-moq-privacy-" class="internal xref">Since draft-ietf-moq-privacy-pass-auth-00</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1367,35 +1377,43 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
 <p id="section-2-1">Privacy Pass Terminology defined in <span><a href="https://rfc-editor.org/rfc/rfc9576#section-2" class="relref">Section 2</a> of [<a href="#RFC9576" class="cite xref">RFC9576</a>]</span> is reused here.
 The Privacy Pass MoQ integration involves the following entities and their
 interactions:<a href="#section-2-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-2-2.1">
-          <p id="section-2-2.1.1"><strong>Client</strong>: The MoQ client requesting authorization to subscribe to, fetch,
+<span class="break"></span><dl class="dlParallel" id="section-2-2">
+        <dt id="section-2-2.1"><strong>Client</strong></dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.2">
+          <p id="section-2-2.2.1">The MoQ client requesting authorization to subscribe to, fetch,
 or publish media content. The client is responsible for obtaining Privacy Pass
 tokens through the attestation and issuance process, and presenting these
 tokens when requesting MoQ operations such as SUBSCRIBE, FETCH, PUBLISH, or
-PUBLISH_NAMESPACE.<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-2-2.2">
-          <p id="section-2-2.2.1"><strong>MoQ Relay</strong>: The MoQ relay server that forwards media content and verifies
+PUBLISH_NAMESPACE.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-2.3"><strong>MoQ Relay</strong></dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.4">
+          <p id="section-2-2.4.1">The MoQ relay server that forwards media content and verifies
 that clients are authorized. The relay validates Privacy Pass tokens presented
 by clients, enforces access policies, and forwards authorized requests to other
 relays. Relays maintain configuration for trusted issuers and validate token
-signatures and metadata.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-2-2.3">
-          <p id="section-2-2.3.1"><strong>Privacy Pass Issuer</strong>: The entity that issues Privacy Pass tokens to clients
+signatures and metadata.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-2.5"><strong>Privacy Pass Issuer</strong></dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.6">
+          <p id="section-2-2.6.1">The entity that issues Privacy Pass tokens to clients
 after successful attestation. The issuer operates the token issuance protocol,
 manages cryptographic keys. The issuer creates tokens with appropriate
-MoQ-specific metadata.<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-2-2.4">
-          <p id="section-2-2.4.1"><strong>Privacy Pass Attester</strong>: The entity that attests to properties of clients
+MoQ-specific metadata.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-2.7"><strong>Privacy Pass Attester</strong></dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.8">
+          <p id="section-2-2.8.1">The entity that attests to properties of clients
 for the purposes of token issuance. The attester verifies client credentials,
 subscription status, or other eligibility criteria. Common attestation methods
 include username/password, OAuth, device certificates, or other authentication
-mechanisms.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
+mechanisms.<a href="#section-2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
 <div id="joint-issuer-attester">
 <section id="section-2.1">
         <h3 id="name-joint-attester-and-issuer">
@@ -1514,7 +1532,7 @@ the same credential.<a href="#section-2.2-5.3.1" class="pilcrow">¶</a></p>
           <h4 id="name-reverse-flow-overview">
 <a href="#section-2.2.1" class="section-number selfRef">2.2.1. </a><a href="#name-reverse-flow-overview" class="section-name selfRef">Reverse Flow Overview</a>
           </h4>
-<p id="section-2.2.1-1">The reverse flow, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-03#section-4" class="relref">Section 4</a> of [<a href="#PRIVACYPASS-REVERSE-FLOW" class="cite xref">PRIVACYPASS-REVERSE-FLOW</a>]</span>,
+<p id="section-2.2.1-1">The reverse flow, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-05#section-4" class="relref">Section 4</a> of [<a href="#PRIVACYPASS-REVERSE-FLOW" class="cite xref">PRIVACYPASS-REVERSE-FLOW</a>]</span>,
 allows a client to exchange a publicly verifiable token for privately verifiable
 tokens (or credentials) issued directly by the MoQ relay.<a href="#section-2.2.1-1" class="pilcrow">¶</a></p>
 <span id="name-complete-reverse-flow-autho"></span><div id="fig-reverse-flow">
@@ -1729,19 +1747,19 @@ tokens derived from the credential obtained in Phase 2.<a href="#section-2.2.2-6
 contains the credential or token request for the privately verifiable token type:<a href="#section-2.2.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.2.3-2.1">
-              <p id="section-2.2.3-2.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>TokenRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-5.1" class="relref">Section 5.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-2.2.3-2.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>TokenRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-5.1" class="relref">Section 5.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-2.2.3-2.2">
-              <p id="section-2.2.3-2.2.1">For <code>0xE5AC</code>: <code>CredentialRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-00#section-7.1" class="relref">Section 7.1</a> of [<a href="#PRIVACYPASS-ARC" class="cite xref">PRIVACYPASS-ARC</a>]</span><a href="#section-2.2.3-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-2.2.3-2.2.1">For <code>0xE5AC</code>: <code>CredentialRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-01#section-7.1" class="relref">Section 7.1</a> of [<a href="#PRIVACYPASS-ARC" class="cite xref">PRIVACYPASS-ARC</a>]</span><a href="#section-2.2.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-2.2.3-3">Similarly, <code>GenericBatchTokenResponse</code> in <code>ServerPrivateTokenAuth</code> contains:<a href="#section-2.2.3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.2.3-4.1">
-              <p id="section-2.2.3-4.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>TokenResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-5.2" class="relref">Section 5.2</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-4.1.1" class="pilcrow">¶</a></p>
+              <p id="section-2.2.3-4.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>TokenResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-5.2" class="relref">Section 5.2</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-2.2.3-4.2">
-              <p id="section-2.2.3-4.2.1">For <code>0xE5AC</code>: <code>CredentialResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-00#section-7.2" class="relref">Section 7.2</a> of [<a href="#PRIVACYPASS-ARC" class="cite xref">PRIVACYPASS-ARC</a>]</span><a href="#section-2.2.3-4.2.1" class="pilcrow">¶</a></p>
+              <p id="section-2.2.3-4.2.1">For <code>0xE5AC</code>: <code>CredentialResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-01#section-7.2" class="relref">Section 7.2</a> of [<a href="#PRIVACYPASS-ARC" class="cite xref">PRIVACYPASS-ARC</a>]</span><a href="#section-2.2.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -1794,11 +1812,11 @@ across multiple relays.<a href="#section-3.1-3.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-5.1">
             <p id="section-3.1-5.1.1"><code>0x0001 (VOPRF(P-384, SHA-384))</code>: Defined in <span><a href="https://rfc-editor.org/rfc/rfc9578#section-6" class="relref">Section 6</a> of [<a href="#RFC9578" class="cite xref">RFC9578</a>]</span>. Uses VOPRF (<span>[<a href="#RFC9497" class="cite xref">RFC9497</a>]</span>) for
-deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
+deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-5.2">
-            <p id="section-3.1-5.2.1"><code>0x0005 (VOPRF(ristretto255, SHA-512))</code>: Defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-8.1" class="relref">Section 8.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>. Uses VOPRF (<span>[<a href="#RFC9497" class="cite xref">RFC9497</a>]</span>) for
-deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-5.2.1"><code>0x0005 (VOPRF(ristretto255, SHA-512))</code>: Defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-8.1" class="relref">Section 8.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>. Uses VOPRF (<span>[<a href="#RFC9497" class="cite xref">RFC9497</a>]</span>) for
+deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-5.3">
             <p id="section-3.1-5.3.1"><code>0xE5AC (ARC(P-256))</code>: Anonymous Rate Limit Credentials Token using <span>[<a href="#ARC" class="cite xref">ARC</a>]</span>.
@@ -1885,63 +1903,63 @@ MoQTransport control message types:<a href="#section-3.2.2-1" class="pilcrow">¶
                 <td class="text-left" rowspan="1" colspan="1">CLIENT_SETUP</td>
                 <td class="text-left" rowspan="1" colspan="1">0</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SERVER_SETUP</td>
                 <td class="text-left" rowspan="1" colspan="1">1</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">PUBLISH_NAMESPACE</td>
                 <td class="text-left" rowspan="1" colspan="1">2</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.20" class="relref">Section 9.20</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.20" class="relref">Section 9.20</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SUBSCRIBE_NAMESPACE</td>
                 <td class="text-left" rowspan="1" colspan="1">3</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.25" class="relref">Section 9.25</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.25" class="relref">Section 9.25</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SUBSCRIBE</td>
                 <td class="text-left" rowspan="1" colspan="1">4</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.9" class="relref">Section 9.9</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.9" class="relref">Section 9.9</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">REQUEST_UPDATE</td>
                 <td class="text-left" rowspan="1" colspan="1">5</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.11" class="relref">Section 9.11</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.11" class="relref">Section 9.11</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">PUBLISH</td>
                 <td class="text-left" rowspan="1" colspan="1">6</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.13" class="relref">Section 9.13</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.13" class="relref">Section 9.13</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">FETCH</td>
                 <td class="text-left" rowspan="1" colspan="1">7</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.16" class="relref">Section 9.16</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.16" class="relref">Section 9.16</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">TRACK_STATUS</td>
                 <td class="text-left" rowspan="1" colspan="1">8</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.19" class="relref">Section 9.19</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.19" class="relref">Section 9.19</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
             </tbody>
@@ -2420,7 +2438,7 @@ authorization framework with the following adaptations:<a href="#section-3.4-1" 
 <a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-setup-message-authorization" class="section-name selfRef">SETUP Message Authorization</a>
           </h4>
 <p id="section-3.4.1-1">For connection-level authorization, Privacy Pass tokens are included in the
-SETUP message's authorization parameter (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.3.1.5" class="relref">Section 9.3.1.5</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>).<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
+SETUP message's authorization parameter (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.3.1.5" class="relref">Section 9.3.1.5</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>).<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.4.1-2">
 <pre>
 SETUP {
@@ -2437,7 +2455,7 @@ type PrivateTokenAuth = ClientPrivateTokenAuth | ServerPrivateTokenAuth;
 </pre><a href="#section-3.4.1-2" class="pilcrow">¶</a>
 </div>
 <p id="section-3.4.1-3">For <code>CLIENT_SETUP</code>, the authorization value uses <code>GenericBatchTokenRequest</code>
-as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span> as follows:<a href="#section-3.4.1-3" class="pilcrow">¶</a></p>
+as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span> as follows:<a href="#section-3.4.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.4.1-4">
 <pre>
 struct {
@@ -2448,7 +2466,7 @@ struct {
 </pre><a href="#section-3.4.1-4" class="pilcrow">¶</a>
 </div>
 <p id="section-3.4.1-5">For <code>SERVER_SETUP</code>, the authorization value uses <code>GenericBatchTokenResponse</code>
-as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-6.2" class="relref">Section 6.2</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span> as follows:<a href="#section-3.4.1-5" class="pilcrow">¶</a></p>
+as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-6.2" class="relref">Section 6.2</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span> as follows:<a href="#section-3.4.1-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.4.1-6">
 <pre>
 struct {
@@ -2515,7 +2533,7 @@ require periodic re-authorization to ensure continued eligibility. Unlike
 JWT-based approaches that use explicit revalidation intervals, Privacy Pass
 can achieve continuous authorization through batched token issuance.<a href="#section-3.4.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.4.3-2">During the initial SETUP exchange, clients can request multiple tokens via
-<code>GenericBatchTokenRequest</code> (defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>).
+<code>GenericBatchTokenRequest</code> (defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>).
 Each token in the batch is independently valid
 and can be presented for subsequent operations or periodic re-authorization.<a href="#section-3.4.3-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.4.3-3">
@@ -2603,7 +2621,7 @@ a valid token and retry the operation.<a href="#section-3.4.5-1" class="pilcrow"
             </h5>
 <p id="section-3.4.5.1-1">If authentication fails during SETUP, the Relay <span class="bcp14">MUST</span> terminate the connection
 with the <code>UNAUTHORIZED</code> (0x02) Termination Error Code defined in
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-3.4" class="relref">Section 3.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>. The termination reason phrase <span class="bcp14">MUST</span> contain
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-3.4" class="relref">Section 3.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>. The termination reason phrase <span class="bcp14">MUST</span> contain
 a <code>MoQAuthChallenge</code> structure:<a href="#section-3.4.5.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.4.5.1-2">
 <pre>
@@ -2626,7 +2644,7 @@ least one challenge.<a href="#section-3.4.5.1-3" class="pilcrow">¶</a></p>
 <a href="#section-3.4.5.2" class="section-number selfRef">3.4.5.2. </a><a href="#name-operation-errors" class="section-name selfRef">Operation Errors</a>
             </h5>
 <p id="section-3.4.5.2-1">If the error occurs over an established connection, the Relay <span class="bcp14">MUST</span> send a <code>REQUEST_ERROR</code>
-defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-9.8" class="relref">Section 9.8</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>.<a href="#section-3.4.5.2-1" class="pilcrow">¶</a></p>
+defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.8" class="relref">Section 9.8</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>.<a href="#section-3.4.5.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.4.5.2-2">The error code <span class="bcp14">MUST</span> be one of:<a href="#section-3.4.5.2-2" class="pilcrow">¶</a></p>
 <span id="name-privacy-pass-authorization-"></span><div id="error-codes-table">
 <table class="center" id="table-3">
@@ -2758,7 +2776,7 @@ REQUEST_ERROR {
 returns a <code>REQUEST_ERROR</code> with the appropriate error code from <a href="#error-codes-table" class="auto internal xref">Table 3</a>.
 The client <span class="bcp14">MAY</span> retry the operation with a valid token obtained using the
 <code>TokenChallenge</code> from the error response.<a href="#section-3.4.5.5-1" class="pilcrow">¶</a></p>
-<p id="section-3.4.5.5-2">As per <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16#section-3.4.4" class="relref">Section 3.4.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, implementations <span class="bcp14">MAY</span> elevate
+<p id="section-3.4.5.5-2">As per <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-3.4.4" class="relref">Section 3.4.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, implementations <span class="bcp14">MAY</span> elevate
 request-specific errors to session-level errors. This elevation is appropriate
 when:<a href="#section-3.4.5.5-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -3228,15 +3246,15 @@ authorization errors.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 <dl class="references">
 <dt id="ARC">[ARC]</dt>
         <dd>
-<span class="refAuthor">Yun, C.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">A. F. Faz-Hernandez</span>, <span class="refTitle">"Anonymous Rate-Limited Credentials Cryptography"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-arc-crypto-00</span>, <time datetime="2026-02-03" class="refDate">3 February 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-crypto-00">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-crypto-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Yun, C.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">A. F. Faz-Hernandez</span>, <span class="refTitle">"Anonymous Rate-Limited Credentials Cryptography"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-arc-crypto-01</span>, <time datetime="2026-03-02" class="refDate">2 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-crypto-01">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-crypto-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="MoQ-TRANSPORT">[MoQ-TRANSPORT]</dt>
         <dd>
-<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-16</span>, <time datetime="2026-01-13" class="refDate">13 January 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-16</a>&gt;</span>. </dd>
+<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-18</span>, <time datetime="2026-05-12" class="refDate">12 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PRIVACYPASS-ARC">[PRIVACYPASS-ARC]</dt>
         <dd>
-<span class="refAuthor">Yun, C.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">A. F. Faz-Hernandez</span>, <span class="refTitle">"Privacy Pass Issuance Protocol for Anonymous Rate-Limited Credentials"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-arc-protocol-00</span>, <time datetime="2026-02-04" class="refDate">4 February 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-00">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Yun, C.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">A. F. Faz-Hernandez</span>, <span class="refTitle">"Privacy Pass Issuance Protocol for Anonymous Rate-Limited Credentials"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-arc-protocol-01</span>, <time datetime="2026-03-02" class="refDate">2 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-01">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -3275,122 +3293,171 @@ authorization errors.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
+<dt id="KEYTRANS">[KEYTRANS]</dt>
+        <dd>
+<span class="refAuthor">McMillion, B.</span>, <span class="refTitle">"Key Transparency Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-keytrans-architecture-09</span>, <time datetime="2026-06-29" class="refDate">29 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-keytrans-architecture-09">https://datatracker.ietf.org/doc/html/draft-ietf-keytrans-architecture-09</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="PRIVACYPASS-BATCHED">[PRIVACYPASS-BATCHED]</dt>
         <dd>
-<span class="refAuthor">Robert, R.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">T. Meunier</span>, <span class="refTitle">"Batched Token Issuance Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-batched-tokens-07</span>, <time datetime="2026-02-25" class="refDate">25 February 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-07</a>&gt;</span>. </dd>
+<span class="refAuthor">Robert, R.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">T. Meunier</span>, <span class="refTitle">"Batched Token Issuance Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-batched-tokens-08</span>, <time datetime="2026-05-04" class="refDate">4 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PRIVACYPASS-IANA">[PRIVACYPASS-IANA]</dt>
         <dd>
 <span class="refTitle">"Privacy Pass IANA"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/privacy-pass/privacy-pass.xhtml">https://www.iana.org/assignments/privacy-pass/privacy-pass.xhtml</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="PRIVACYPASS-MIRRORS">[PRIVACYPASS-MIRRORS]</dt>
+        <dd>
+<span class="refAuthor">Beurdouche, B.</span>, <span class="refAuthor">Finkel, M.</span>, <span class="refAuthor">Valdez, S.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">T. Pauly</span>, <span class="refTitle">"Checking Resource Consistency with HTTP Mirrors"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-consistency-mirror-00</span>, <time datetime="2024-01-30" class="refDate">30 January 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-consistency-mirror-00">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-consistency-mirror-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="PRIVACYPASS-REVERSE-FLOW">[PRIVACYPASS-REVERSE-FLOW]</dt>
         <dd>
-<span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"Privacy Pass Reverse Flow"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-privacypass-reverse-flow-03</span>, <time datetime="2026-02-16" class="refDate">16 February 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-03">https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-03</a>&gt;</span>. </dd>
+<span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"Privacy Pass Reverse Flow"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-privacypass-reverse-flow-05</span>, <time datetime="2026-06-18" class="refDate">18 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-05">https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9458">[RFC9458]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Oblivious HTTP"</span>, <span class="seriesInfo">RFC 9458</span>, <span class="seriesInfo">DOI 10.17487/RFC9458</span>, <time datetime="2024-01" class="refDate">January 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9458">https://www.rfc-editor.org/rfc/rfc9458</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SCITT">[SCITT]</dt>
+      <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Delignat-Lavaud, A.</span>, <span class="refAuthor">Fournet, C.</span>, <span class="refAuthor">Deshpande, Y.</span>, and <span class="refAuthor">S. Lasker</span>, <span class="refTitle">"An Architecture for Trustworthy and Transparent Digital Supply Chains"</span>, <span class="seriesInfo">RFC 9943</span>, <span class="seriesInfo">DOI 10.17487/RFC9943</span>, <time datetime="2026-06" class="refDate">June 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9943">https://www.rfc-editor.org/rfc/rfc9943</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="deployment-considerations">
 <section id="appendix-A">
-      <h2 id="name-acknowledgments">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      <h2 id="name-deployment-considerations">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-deployment-considerations" class="section-name selfRef">Deployment considerations</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<div id="bootstrap-key-material">
+<section id="appendix-A.1">
+        <h3 id="name-fetching-key-material-for-t">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-fetching-key-material-for-t" class="section-name selfRef">Fetching key material for the bootstrap issuer</a>
+        </h3>
+<p id="appendix-A.1-1">This draft does not define how Clients are expected to retrieve
+privacy pass issuer configuration, nor how they establish a relationship
+with an attester that is capable of vouching for such tokens to be
+issued.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-2">Clients may reuse issuers that are exposed over HTTP, as defined in <span>[<a href="#RFC9577" class="cite xref">RFC9577</a>]</span>.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-3">Clients should also consider ways to be less susceptible to partitions,
+hurting the privacy guarantees that Privacy Pass provides. This is discussed in
+<span><a href="https://rfc-editor.org/rfc/rfc9576#section-6.2" class="relref">Section 6.2</a> of [<a href="#RFC9576" class="cite xref">RFC9576</a>]</span>.
+For that, they may rely on mechanisms such as using mirrors <span>[<a href="#PRIVACYPASS-MIRRORS" class="cite xref">PRIVACYPASS-MIRRORS</a>]</span> providing
+multiple vantage points, or transparency mechanisms such as those in <span>[<a href="#KEYTRANS" class="cite xref">KEYTRANS</a>]</span> or <span>[<a href="#SCITT" class="cite xref">SCITT</a>]</span>.<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="change-log">
+<div id="fetching-key-material-for-the-relay-reverse-issuer">
+<section id="appendix-A.2">
+        <h3 id="name-fetching-key-material-for-th">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-fetching-key-material-for-th" class="section-name selfRef">Fetching key material for the relay reverse issuer</a>
+        </h3>
+<p id="appendix-A.2-1">Similarly, Clients should retrieve material for the relay issuer operating in a reverse mode.
+This can be via a pre-established relation, such as shipped as part
+of the initial app installation, webpage load, or device setup.
+This can also be done on the fly via HTTP, or MoQ API.
+This draft does not define any of these.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">Consistency considerations mentioned in <a href="#bootstrap-key-material" class="auto internal xref">Appendix A.1</a> apply.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
 <section id="appendix-B">
-      <h2 id="name-change-log">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-change-log" class="section-name selfRef">Change Log</a>
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-B-1">RFC Editor's Note: Please remove this section prior to publication of
-a final version of this document.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">TODO acknowledge.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="changelog">
+<section id="appendix-C">
+      <h2 id="name-changelog">
+<a href="#name-changelog" class="section-name selfRef">Changelog</a>
+      </h2>
+<p id="appendix-C-1">RFC Editor's Note: Please remove this section prior to publication of
+a final version of this document.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <div id="since-draft-ietf-moq-privacy-pass-auth-02">
-<section id="appendix-B.1">
+<section id="appendix-C.1">
         <h3 id="name-since-draft-ietf-moq-privac">
-<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-since-draft-ietf-moq-privac" class="section-name selfRef">Since draft-ietf-moq-privacy-pass-auth-02</a>
+<a href="#name-since-draft-ietf-moq-privac" class="section-name selfRef">Since draft-ietf-moq-privacy-pass-auth-02</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="appendix-B.1-1.1">
-            <p id="appendix-B.1-1.1.1">Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)<a href="#appendix-B.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-C.1-1.1">
+            <p id="appendix-C.1-1.1.1">Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)<a href="#appendix-C.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.2">
-            <p id="appendix-B.1-1.2.1">Defined MoQAuthChallenge structure for error responses with supported_token_types<a href="#appendix-B.1-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.2">
+            <p id="appendix-C.1-1.2.1">Defined MoQAuthChallenge structure for error responses with supported_token_types<a href="#appendix-C.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.3">
-            <p id="appendix-B.1-1.3.1">Added TokenChallenge construction requirements<a href="#appendix-B.1-1.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.3">
+            <p id="appendix-C.1-1.3.1">Added TokenChallenge construction requirements<a href="#appendix-C.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.4">
-            <p id="appendix-B.1-1.4.1">Added control message authorization failure handling section<a href="#appendix-B.1-1.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.4">
+            <p id="appendix-C.1-1.4.1">Added control message authorization failure handling section<a href="#appendix-C.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.5">
-            <p id="appendix-B.1-1.5.1">Documented credential request/response encoding for different token types<a href="#appendix-B.1-1.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.5">
+            <p id="appendix-C.1-1.5.1">Documented credential request/response encoding for different token types<a href="#appendix-C.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="since-draft-ietf-moq-privacy-pass-auth-01">
-<section id="appendix-B.2">
+<section id="appendix-C.2">
         <h3 id="name-since-draft-ietf-moq-privacy">
-<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-since-draft-ietf-moq-privacy" class="section-name selfRef">Since draft-ietf-moq-privacy-pass-auth-01</a>
+<a href="#name-since-draft-ietf-moq-privacy" class="section-name selfRef">Since draft-ietf-moq-privacy-pass-auth-01</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="appendix-B.2-1.1">
-            <p id="appendix-B.2-1.1.1">Replace text-based moq-scope with binary TLS presentation language structures<a href="#appendix-B.2-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-C.2-1.1">
+            <p id="appendix-C.2-1.1.1">Replace text-based moq-scope with binary TLS presentation language structures<a href="#appendix-C.2-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.2">
-            <p id="appendix-B.2-1.2.1">Add MoQ Actions registry aligned with MoQTransport control message types<a href="#appendix-B.2-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.2">
+            <p id="appendix-C.2-1.2.1">Add MoQ Actions registry aligned with MoQTransport control message types<a href="#appendix-C.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.3">
-            <p id="appendix-B.2-1.3.1">Add Match Types registry with exact, prefix, suffix, and contains matching<a href="#appendix-B.2-1.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.3">
+            <p id="appendix-C.2-1.3.1">Add Match Types registry with exact, prefix, suffix, and contains matching<a href="#appendix-C.2-1.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.4">
-            <p id="appendix-B.2-1.4.1">Define MoQAuthorizationInfo structure for origin_info encoding<a href="#appendix-B.2-1.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.4">
+            <p id="appendix-C.2-1.4.1">Define MoQAuthorizationInfo structure for origin_info encoding<a href="#appendix-C.2-1.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.5">
-            <p id="appendix-B.2-1.5.1">Add continuous authorization section using reverse flow<a href="#appendix-B.2-1.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.5">
+            <p id="appendix-C.2-1.5.1">Add continuous authorization section using reverse flow<a href="#appendix-C.2-1.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.6">
-            <p id="appendix-B.2-1.6.1">Add continuous authorization section using batched tokens<a href="#appendix-B.2-1.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.6">
+            <p id="appendix-C.2-1.6.1">Add continuous authorization section using batched tokens<a href="#appendix-C.2-1.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.7">
-            <p id="appendix-B.2-1.7.1">Add IANA registries for auth schemes, actions, and match types<a href="#appendix-B.2-1.7.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.7">
+            <p id="appendix-C.2-1.7.1">Add IANA registries for auth schemes, actions, and match types<a href="#appendix-C.2-1.7.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.8">
-            <p id="appendix-B.2-1.8.1">Define error handling<a href="#appendix-B.2-1.8.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.8">
+            <p id="appendix-C.2-1.8.1">Define error handling<a href="#appendix-C.2-1.8.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.9">
-            <p id="appendix-B.2-1.9.1">Integrate privacy pass reverse flow within PrivateTokenAuth<a href="#appendix-B.2-1.9.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.9">
+            <p id="appendix-C.2-1.9.1">Integrate privacy pass reverse flow within PrivateTokenAuth<a href="#appendix-C.2-1.9.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.10">
-            <p id="appendix-B.2-1.10.1">MoQ definition now follow draft-ietf-moq-transport-16<a href="#appendix-B.2-1.10.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.10">
+            <p id="appendix-C.2-1.10.1">MoQ definition now follow draft-ietf-moq-transport-16<a href="#appendix-C.2-1.10.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.11">
-            <p id="appendix-B.2-1.11.1">Update dependencies<a href="#appendix-B.2-1.11.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.11">
+            <p id="appendix-C.2-1.11.1">Update dependencies<a href="#appendix-C.2-1.11.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.2-1.12">
-            <p id="appendix-B.2-1.12.1">Removed b64 encoding given MoQ can use bytes directly<a href="#appendix-B.2-1.12.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.2-1.12">
+            <p id="appendix-C.2-1.12.1">Removed b64 encoding given MoQ can use bytes directly<a href="#appendix-C.2-1.12.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="since-draft-ietf-moq-privacy-pass-auth-00">
-<section id="appendix-B.3">
+<section id="appendix-C.3">
         <h3 id="name-since-draft-ietf-moq-privacy-">
-<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-since-draft-ietf-moq-privacy-" class="section-name selfRef">Since draft-ietf-moq-privacy-pass-auth-00</a>
+<a href="#name-since-draft-ietf-moq-privacy-" class="section-name selfRef">Since draft-ietf-moq-privacy-pass-auth-00</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="appendix-B.3-1.1">
-            <p id="appendix-B.3-1.1.1">Add Thibault Meunier as Coauthor<a href="#appendix-B.3-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-C.3-1.1">
+            <p id="appendix-C.3-1.1.1">Add Thibault Meunier as Coauthor<a href="#appendix-C.3-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.3-1.2">
-            <p id="appendix-B.3-1.2.1">Add support for Reverse flow to be deploy and scale friendly way to get tokens<a href="#appendix-B.3-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.3-1.2">
+            <p id="appendix-C.3-1.2.1">Add support for Reverse flow to be deploy and scale friendly way to get tokens<a href="#appendix-C.3-1.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -3398,7 +3465,7 @@ a final version of this document.<a href="#appendix-B-1" class="pilcrow">¶</a><
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>

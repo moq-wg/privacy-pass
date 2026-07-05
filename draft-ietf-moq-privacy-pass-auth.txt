@@ -5,9 +5,9 @@
 Media Over QUIC                                            S. Nandakumar
 Internet-Draft                                               C. Jennings
 Intended status: Standards Track                                   Cisco
-Expires: 3 September 2026                                     T. Meunier
+Expires: 6 January 2027                                       T. Meunier
                                                          Cloudflare Inc.
-                                                            2 March 2026
+                                                             5 July 2026
 
 
          Privacy Pass Authentication for Media over QUIC (MoQ)
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 September 2026.
+   This Internet-Draft will expire on 6 January 2027.
 
 Copyright Notice
 
@@ -110,11 +110,14 @@ Table of Contents
    7.  References
      7.1.  Normative References
      7.2.  Informative References
-   Appendix A.  Acknowledgments
-   Appendix B.  Change Log
-     B.1.  Since draft-ietf-moq-privacy-pass-auth-02
-     B.2.  Since draft-ietf-moq-privacy-pass-auth-01
-     B.3.  Since draft-ietf-moq-privacy-pass-auth-00
+   Appendix A.  Deployment considerations
+     A.1.  Fetching key material for the bootstrap issuer
+     A.2.  Fetching key material for the relay reverse issuer
+   Acknowledgments
+   Changelog
+     Since draft-ietf-moq-privacy-pass-auth-02
+     Since draft-ietf-moq-privacy-pass-auth-01
+     Since draft-ietf-moq-privacy-pass-auth-00
    Authors' Addresses
 
 1.  Introduction
@@ -162,26 +165,26 @@ Table of Contents
    here.  The Privacy Pass MoQ integration involves the following
    entities and their interactions:
 
-   *  *Client*: The MoQ client requesting authorization to subscribe to,
+   *Client*  The MoQ client requesting authorization to subscribe to,
       fetch, or publish media content.  The client is responsible for
       obtaining Privacy Pass tokens through the attestation and issuance
       process, and presenting these tokens when requesting MoQ
       operations such as SUBSCRIBE, FETCH, PUBLISH, or
       PUBLISH_NAMESPACE.
 
-   *  *MoQ Relay*: The MoQ relay server that forwards media content and
+   *MoQ Relay*  The MoQ relay server that forwards media content and
       verifies that clients are authorized.  The relay validates Privacy
       Pass tokens presented by clients, enforces access policies, and
       forwards authorized requests to other relays.  Relays maintain
       configuration for trusted issuers and validate token signatures
       and metadata.
 
-   *  *Privacy Pass Issuer*: The entity that issues Privacy Pass tokens
-      to clients after successful attestation.  The issuer operates the
+   *Privacy Pass Issuer*  The entity that issues Privacy Pass tokens to
+      clients after successful attestation.  The issuer operates the
       token issuance protocol, manages cryptographic keys.  The issuer
       creates tokens with appropriate MoQ-specific metadata.
 
-   *  *Privacy Pass Attester*: The entity that attests to properties of
+   *Privacy Pass Attester*  The entity that attests to properties of
       clients for the purposes of token issuance.  The attester verifies
       client credentials, subscription status, or other eligibility
       criteria.  Common attestation methods include username/password,
@@ -1256,24 +1259,24 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
 
    [ARC]      Yun, C., Wood, C. A., and A. F. Faz-Hernandez, "Anonymous
               Rate-Limited Credentials Cryptography", Work in Progress,
-              Internet-Draft, draft-ietf-privacypass-arc-crypto-00, 3
-              February 2026, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-privacypass-arc-crypto-00>.
+              Internet-Draft, draft-ietf-privacypass-arc-crypto-01, 2
+              March 2026, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-privacypass-arc-crypto-01>.
 
    [MoQ-TRANSPORT]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
-              Draft, draft-ietf-moq-transport-16, 13 January 2026,
+              Draft, draft-ietf-moq-transport-18, 12 May 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
-              transport-16>.
+              transport-18>.
 
    [PRIVACYPASS-ARC]
               Yun, C., Wood, C. A., and A. F. Faz-Hernandez, "Privacy
               Pass Issuance Protocol for Anonymous Rate-Limited
               Credentials", Work in Progress, Internet-Draft, draft-
-              ietf-privacypass-arc-protocol-00, 4 February 2026,
+              ietf-privacypass-arc-protocol-01, 2 March 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-
-              privacypass-arc-protocol-00>.
+              privacypass-arc-protocol-01>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1309,39 +1312,88 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
 
 7.2.  Informative References
 
+   [KEYTRANS] McMillion, B., "Key Transparency Architecture", Work in
+              Progress, Internet-Draft, draft-ietf-keytrans-
+              architecture-09, 29 June 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              keytrans-architecture-09>.
+
    [PRIVACYPASS-BATCHED]
               Robert, R., Wood, C. A., and T. Meunier, "Batched Token
               Issuance Protocol", Work in Progress, Internet-Draft,
-              draft-ietf-privacypass-batched-tokens-07, 25 February
-              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              privacypass-batched-tokens-07>.
+              draft-ietf-privacypass-batched-tokens-08, 4 May 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              privacypass-batched-tokens-08>.
 
    [PRIVACYPASS-IANA]
               "Privacy Pass IANA", n.d.,
               <https://www.iana.org/assignments/privacy-pass/privacy-
               pass.xhtml>.
 
+   [PRIVACYPASS-MIRRORS]
+              Beurdouche, B., Finkel, M., Valdez, S., Wood, C. A., and
+              T. Pauly, "Checking Resource Consistency with HTTP
+              Mirrors", Work in Progress, Internet-Draft, draft-ietf-
+              privacypass-consistency-mirror-00, 30 January 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              privacypass-consistency-mirror-00>.
+
    [PRIVACYPASS-REVERSE-FLOW]
               Meunier, T., "Privacy Pass Reverse Flow", Work in
               Progress, Internet-Draft, draft-meunier-privacypass-
-              reverse-flow-03, 16 February 2026,
+              reverse-flow-05, 18 June 2026,
               <https://datatracker.ietf.org/doc/html/draft-meunier-
-              privacypass-reverse-flow-03>.
+              privacypass-reverse-flow-05>.
 
    [RFC9458]  Thomson, M. and C. A. Wood, "Oblivious HTTP", RFC 9458,
               DOI 10.17487/RFC9458, January 2024,
               <https://www.rfc-editor.org/rfc/rfc9458>.
 
-Appendix A.  Acknowledgments
+   [SCITT]    Birkholz, H., Delignat-Lavaud, A., Fournet, C., Deshpande,
+              Y., and S. Lasker, "An Architecture for Trustworthy and
+              Transparent Digital Supply Chains", RFC 9943,
+              DOI 10.17487/RFC9943, June 2026,
+              <https://www.rfc-editor.org/rfc/rfc9943>.
+
+Appendix A.  Deployment considerations
+
+A.1.  Fetching key material for the bootstrap issuer
+
+   This draft does not define how Clients are expected to retrieve
+   privacy pass issuer configuration, nor how they establish a
+   relationship with an attester that is capable of vouching for such
+   tokens to be issued.
+
+   Clients may reuse issuers that are exposed over HTTP, as defined in
+   [RFC9577].
+
+   Clients should also consider ways to be less susceptible to
+   partitions, hurting the privacy guarantees that Privacy Pass
+   provides.  This is discussed in Section 6.2 of [RFC9576].  For that,
+   they may rely on mechanisms such as using mirrors
+   [PRIVACYPASS-MIRRORS] providing multiple vantage points, or
+   transparency mechanisms such as those in [KEYTRANS] or [SCITT].
+
+A.2.  Fetching key material for the relay reverse issuer
+
+   Similarly, Clients should retrieve material for the relay issuer
+   operating in a reverse mode.  This can be via a pre-established
+   relation, such as shipped as part of the initial app installation,
+   webpage load, or device setup.  This can also be done on the fly via
+   HTTP, or MoQ API.  This draft does not define any of these.
+
+   Consistency considerations mentioned in Appendix A.1 apply.
+
+Acknowledgments
 
    TODO acknowledge.
 
-Appendix B.  Change Log
+Changelog
 
    RFC Editor's Note: Please remove this section prior to publication of
    a final version of this document.
 
-B.1.  Since draft-ietf-moq-privacy-pass-auth-02
+Since draft-ietf-moq-privacy-pass-auth-02
 
    *  Expanded reverse flow documentation with three-phase flow
       (bootstrap, exchange, operations)
@@ -1356,7 +1408,7 @@ B.1.  Since draft-ietf-moq-privacy-pass-auth-02
    *  Documented credential request/response encoding for different
       token types
 
-B.2.  Since draft-ietf-moq-privacy-pass-auth-01
+Since draft-ietf-moq-privacy-pass-auth-01
 
    *  Replace text-based moq-scope with binary TLS presentation language
       structures
@@ -1385,7 +1437,7 @@ B.2.  Since draft-ietf-moq-privacy-pass-auth-01
 
    *  Removed b64 encoding given MoQ can use bytes directly
 
-B.3.  Since draft-ietf-moq-privacy-pass-auth-00
+Since draft-ietf-moq-privacy-pass-auth-00
 
    *  Add Thibault Meunier as Coauthor
 
