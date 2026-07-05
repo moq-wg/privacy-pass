@@ -106,24 +106,28 @@ Privacy Pass Terminology defined in {{Section 2 of RFC9576}} is reused here.
 The Privacy Pass MoQ integration involves the following entities and their
 interactions:
 
-- **Client**: The MoQ client requesting authorization to subscribe to, fetch,
+**Client**
+: The MoQ client requesting authorization to subscribe to, fetch,
 or publish media content. The client is responsible for obtaining Privacy Pass
 tokens through the attestation and issuance process, and presenting these
 tokens when requesting MoQ operations such as SUBSCRIBE, FETCH, PUBLISH, or
 PUBLISH_NAMESPACE.
 
-- **MoQ Relay**: The MoQ relay server that forwards media content and verifies
+**MoQ Relay**
+: The MoQ relay server that forwards media content and verifies
 that clients are authorized. The relay validates Privacy Pass tokens presented
 by clients, enforces access policies, and forwards authorized requests to other
 relays. Relays maintain configuration for trusted issuers and validate token
 signatures and metadata.
 
-- **Privacy Pass Issuer**: The entity that issues Privacy Pass tokens to clients
+**Privacy Pass Issuer**
+: The entity that issues Privacy Pass tokens to clients
 after successful attestation. The issuer operates the token issuance protocol,
 manages cryptographic keys. The issuer creates tokens with appropriate
 MoQ-specific metadata.
 
-- **Privacy Pass Attester**: The entity that attests to properties of clients
+**Privacy Pass Attester**
+: The entity that attests to properties of clients
 for the purposes of token issuance. The attester verifies client credentials,
 subscription status, or other eligibility criteria. Common attestation methods
 include username/password, OAuth, device certificates, or other authentication
