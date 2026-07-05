@@ -55,6 +55,9 @@ informative:
     title: Privacy Pass IANA
     target: https://www.iana.org/assignments/privacy-pass/privacy-pass.xhtml
   PRIVACYPASS-REVERSE-FLOW: I-D.draft-meunier-privacypass-reverse-flow
+  PRIVACYPASS-MIRRORS: I-D.ietf-privacypass-consistency-mirror
+  KEYTRANS: I-D.ietf-keytrans-architecture
+  SCITT: RFC9943
 
 --- abstract
 
@@ -106,24 +109,28 @@ Privacy Pass Terminology defined in {{Section 2 of RFC9576}} is reused here.
 The Privacy Pass MoQ integration involves the following entities and their
 interactions:
 
-- **Client**: The MoQ client requesting authorization to subscribe to, fetch,
+**Client**
+: The MoQ client requesting authorization to subscribe to, fetch,
 or publish media content. The client is responsible for obtaining Privacy Pass
 tokens through the attestation and issuance process, and presenting these
 tokens when requesting MoQ operations such as SUBSCRIBE, FETCH, PUBLISH, or
 PUBLISH_NAMESPACE.
 
-- **MoQ Relay**: The MoQ relay server that forwards media content and verifies
+**MoQ Relay**
+: The MoQ relay server that forwards media content and verifies
 that clients are authorized. The relay validates Privacy Pass tokens presented
 by clients, enforces access policies, and forwards authorized requests to other
 relays. Relays maintain configuration for trusted issuers and validate token
 signatures and metadata.
 
-- **Privacy Pass Issuer**: The entity that issues Privacy Pass tokens to clients
+**Privacy Pass Issuer**
+: The entity that issues Privacy Pass tokens to clients
 after successful attestation. The issuer operates the token issuance protocol,
 manages cryptographic keys. The issuer creates tokens with appropriate
 MoQ-specific metadata.
 
-- **Privacy Pass Attester**: The entity that attests to properties of clients
+**Privacy Pass Attester**
+: The entity that attests to properties of clients
 for the purposes of token issuance. The attester verifies client credentials,
 subscription status, or other eligibility criteria. Common attestation methods
 include username/password, OAuth, device certificates, or other authentication
@@ -1075,16 +1082,46 @@ authorization errors.
 
 --- back
 
+# Deployment considerations
+
+## Fetching key material for the bootstrap issuer {#bootstrap-key-material}
+
+This draft does not define how Clients are expected to retrieve
+privacy pass issuer configuration, nor how they establish a relationship
+with an attester that is capable of vouching for such tokens to be
+issued.
+
+Clients may reuse issuers that are exposed over HTTP, as defined in {{RFC9577}}.
+
+Clients should also consider ways to be less susceptible to partitions,
+hurting the privacy guarantees that Privacy Pass provides. This is discussed in
+{{Section 6.2 of RFC9576}}.
+For that, they may rely on mechanisms such as using mirrors {{PRIVACYPASS-MIRRORS}} providing
+multiple vantage points, or transparency mechanisms such as those in {{KEYTRANS}} or {{SCITT}}.
+
+## Fetching key material for the relay reverse issuer
+
+Similarly, Clients should retrieve material for the relay issuer operating in a reverse mode.
+This can be via a pre-established relation, such as shipped as part
+of the initial app installation, webpage load, or device setup.
+This can also be done on the fly via HTTP, or MoQ API.
+This draft does not define any of these.
+
+Consistency considerations mentioned in {{bootstrap-key-material}} apply.
+
 # Acknowledgments
+{:numbered="false"}
 
 TODO acknowledge.
 
-# Change Log
+# Changelog
+{:numbered="false"}
 
 RFC Editor's Note: Please remove this section prior to publication of
 a final version of this document.
 
 ## Since draft-ietf-moq-privacy-pass-auth-02
+{:numbered="false"}
 
 * Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)
 * Defined MoQAuthChallenge structure for error responses with supported_token_types
@@ -1093,6 +1130,7 @@ a final version of this document.
 * Documented credential request/response encoding for different token types
 
 ## Since draft-ietf-moq-privacy-pass-auth-01
+{:numbered="false"}
 
 * Replace text-based moq-scope with binary TLS presentation language structures
 * Add MoQ Actions registry aligned with MoQTransport control message types
@@ -1109,6 +1147,7 @@ a final version of this document.
 
 
 ## Since draft-ietf-moq-privacy-pass-auth-00
+{:numbered="false"}
 
 * Add Thibault Meunier as Coauthor
 * Add support for Reverse flow to be deploy and scale friendly way to get tokens
