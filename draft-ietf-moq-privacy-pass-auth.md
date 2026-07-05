@@ -47,6 +47,7 @@ normative:
   RFC9576:
   RFC9577:
   RFC9578:
+  RFC9943:
 
 informative:
   RFC9458:
@@ -55,6 +56,8 @@ informative:
     title: Privacy Pass IANA
     target: https://www.iana.org/assignments/privacy-pass/privacy-pass.xhtml
   PRIVACYPASS-REVERSE-FLOW: I-D.draft-meunier-privacypass-reverse-flow
+  PRIVACYPASS-MIRRORS: I-D.ietf-privacypass-consistency-mirror
+  KEYTRANS: I-D.ietf-keytrans-architecture
 
 --- abstract
 
@@ -1079,11 +1082,40 @@ authorization errors.
 
 --- back
 
+# Deployment considerations
+
+## Fetching key material for the bootstrap issuer {#bootstrap-key-material}
+
+This draft does not define how Clients are expected to retrieve
+privacy pass issuer configuration, nor how they establish a relationship
+with an attester that is capable of vouching for such tokens to be
+issued.
+
+Clients may reuse issuers that are exposed over HTTP, as defined in {{RFC9577}}.
+
+Clients should also consider ways to be less susceptible to partitions,
+hurting the privacy guarantees that Privacy Pass provides. This is discussed in
+{{Section 6.2 of RFC9576}}.
+For that, they may rely on mechanisms such as using mirrors {{PRIVACYPASS-MIRRORS}} providing
+multiple vantage points, or transparency mechanisms such as those in {{KEYTRANS}} or {{RFC9943}}.
+
+## Fetching key material for the relay reverse issuer
+
+Similarly, Clients should retrieve material for the relay issuer operating in a reverse mode.
+This can be via a pre-established relation, such as shipped as part
+of the initial app installation, webpage load, or device setup.
+This can also be done on the fly via HTTP, or MoQ API.
+This draft does not define any of these.
+
+Consistency considerations mentioned in {{bootstrap-key-material}} apply.
+
 # Acknowledgments
+{:numbered="false"}
 
 TODO acknowledge.
 
-# Change Log
+# Changelog
+{:numbered="false"}
 
 RFC Editor's Note: Please remove this section prior to publication of
 a final version of this document.
