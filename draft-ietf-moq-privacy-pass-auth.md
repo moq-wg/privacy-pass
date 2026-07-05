@@ -47,7 +47,6 @@ normative:
   RFC9576:
   RFC9577:
   RFC9578:
-  RFC9943:
 
 informative:
   RFC9458:
@@ -58,6 +57,7 @@ informative:
   PRIVACYPASS-REVERSE-FLOW: I-D.draft-meunier-privacypass-reverse-flow
   PRIVACYPASS-MIRRORS: I-D.ietf-privacypass-consistency-mirror
   KEYTRANS: I-D.ietf-keytrans-architecture
+  SCITT: RFC9943
 
 --- abstract
 
@@ -1097,7 +1097,7 @@ Clients should also consider ways to be less susceptible to partitions,
 hurting the privacy guarantees that Privacy Pass provides. This is discussed in
 {{Section 6.2 of RFC9576}}.
 For that, they may rely on mechanisms such as using mirrors {{PRIVACYPASS-MIRRORS}} providing
-multiple vantage points, or transparency mechanisms such as those in {{KEYTRANS}} or {{RFC9943}}.
+multiple vantage points, or transparency mechanisms such as those in {{KEYTRANS}} or {{SCITT}}.
 
 ## Fetching key material for the relay reverse issuer
 
