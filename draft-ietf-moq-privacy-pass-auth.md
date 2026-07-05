@@ -1121,6 +1121,7 @@ RFC Editor's Note: Please remove this section prior to publication of
 a final version of this document.
 
 ## Since draft-ietf-moq-privacy-pass-auth-02
+{:numbered="false"}
 
 * Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)
 * Defined MoQAuthChallenge structure for error responses with supported_token_types
@@ -1129,6 +1130,7 @@ a final version of this document.
 * Documented credential request/response encoding for different token types
 
 ## Since draft-ietf-moq-privacy-pass-auth-01
+{:numbered="false"}
 
 * Replace text-based moq-scope with binary TLS presentation language structures
 * Add MoQ Actions registry aligned with MoQTransport control message types
@@ -1145,6 +1147,7 @@ a final version of this document.
 
 
 ## Since draft-ietf-moq-privacy-pass-auth-00
+{:numbered="false"}
 
 * Add Thibault Meunier as Coauthor
 * Add support for Reverse flow to be deploy and scale friendly way to get tokens
