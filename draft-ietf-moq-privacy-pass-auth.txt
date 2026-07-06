@@ -5,9 +5,9 @@
 Media Over QUIC                                            S. Nandakumar
 Internet-Draft                                               C. Jennings
 Intended status: Standards Track                                   Cisco
-Expires: 6 January 2027                                       T. Meunier
+Expires: 7 January 2027                                       T. Meunier
                                                          Cloudflare Inc.
-                                                             5 July 2026
+                                                             6 July 2026
 
 
          Privacy Pass Authentication for Media over QUIC (MoQ)
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 January 2027.
+   This Internet-Draft will expire on 7 January 2027.
 
 Copyright Notice
 
@@ -94,16 +94,19 @@ Table of Contents
      3.3.  Track Namespace and Track Name Matching Rules
        3.3.1.  Match Rule Evaluation
        3.3.2.  Matching Algorithm
-     3.4.  Token in MOQ Messages
-       3.4.1.  SETUP Message Authorization
-       3.4.2.  MoQ Operation-Level Authorization
-       3.4.3.  Continuous Authorization with Batched Tokens
-       3.4.4.  Continuous Authorization with Reverse Flow
-       3.4.5.  Errors
+     3.4.  Required MoQ Transport Extensions
+       3.4.1.  AUTH CHALLENGE Parameter
+       3.4.2.  AUTH REQUEST and AUTH RESPONSE Parameters
+     3.5.  Token in MOQ Messages
+       3.5.1.  SETUP Message Authorization
+       3.5.2.  MoQ Operation-Level Authorization
+       3.5.3.  Continuous Authorization with Batched Tokens
+       3.5.4.  Continuous Authorization with Reverse Flow
+       3.5.5.  Errors
    4.  Example Authorization Flow
    5.  Security Considerations
    6.  IANA Considerations
-     6.1.  MoQ Privacy Pass Auth Scheme Registry
+     6.1.  MOQT Auth Token Type Registration
      6.2.  MoQ Action Registry
      6.3.  MoQ Match Type Registry
      6.4.  MoQ Privacy Pass Error Code Registry
@@ -259,8 +262,9 @@ Table of Contents
         :     Phase 1: Bootstrap Token Acquisition               :           :
         |                 |                   |                  |           |
         |                 |<- CLIENT_SETUP[] -+                  |           |
-        |                 +-- UNAUTHORIZED -->|                  |           |
-        |                 |  [TokenChallenge] |                  |           |
+        |                 +- SERVER_SETUP  -->|                  |           |
+        |                 |  [AUTH CHALLENGE] |                  |           |
+        |                 +- UNAUTHORIZED --->|                  |           |
         |                 |                   |                  |           |
         |                 |                   |<== Attestation ==>           |
         |                 |                   |                  |           |
@@ -270,14 +274,14 @@ Table of Contents
         :     Phase 2: Token Exchange via Reverse Flow           :           :
         |                 |                   |                  |           |
         |                 |<- CLIENT_SETUP ---+                  |           |
-        |                 |   [Token +        |                  |           |
-        |                 |    CredentialReq] |                  |           |
+        |                 |   [AUTH TOKEN +   |                  |           |
+        |                 |    AUTH REQUEST]  |                  |           |
         |                 |                   |                  |           |
         |<-CredentialReq--+                   |                  |           |
         +--CredentialRes->|                   |                  |           |
         |                 |                   |                  |           |
         |                 +-- SERVER_SETUP -->|                  |           |
-        |                 |  [CredentialResp] |                  |           |
+        |                 |  [AUTH RESPONSE]  |                  |           |
         |                 |                   |                  |           |
         :     Phase 3: Normal Operations with Derived Tokens     :           :
         |                 |                   |                  |           |
@@ -296,9 +300,10 @@ Table of Contents
    1.  The client initiates a connection with CLIENT_SETUP without
        authorization.
 
-   2.  The MoQ relay responds with UNAUTHORIZED containing a
-       TokenChallenge specifying a publicly verifiable token type
-       (0x0002).
+   2.  The MoQ relay responds with a SERVER_SETUP carrying an AUTH
+       CHALLENGE option whose TokenChallenge specifies a publicly
+       verifiable token type (0x0002), then terminates the session with
+       UNAUTHORIZED.
 
    3.  The client performs attestation with an external attester/issuer.
 
@@ -308,18 +313,21 @@ Table of Contents
 
    1.  The client sends CLIENT_SETUP with:
 
-       *  The publicly verifiable Token from Phase 1
+       *  An AUTHORIZATION TOKEN option carrying the publicly verifiable
+          Token from Phase 1
 
-       *  A CredentialRequest (or TokenRequest) for a privately
-          verifiable token type (0x0001, 0x0005, or 0xE5AC)
+       *  An AUTH REQUEST option carrying a CredentialRequest (or
+          GenericBatchTokenRequest) for a privately verifiable token
+          type (0x0001, 0x0005, or 0xE5AC)
 
    2.  The MoQ relay validates the bootstrap token, then processes the
        credential request using its internal issuer.
 
    3.  The MoQ relay responds with SERVER_SETUP containing:
 
-       *  A CredentialResponse (or TokenResponse) with the privately
-          verifiable credential/tokens
+       *  An AUTH RESPONSE option carrying the CredentialResponse (or
+          GenericBatchTokenResponse) with the privately verifiable
+          credential/tokens
 
    *Phase 3: Normal Operations*
 
@@ -331,21 +339,20 @@ Table of Contents
 
 2.2.3.  Credential Request/Response Encoding
 
-   When using the reverse flow, the GenericBatchTokenRequest in
-   ClientPrivateTokenAuth contains the credential or token request for
-   the privately verifiable token type:
+   When using the reverse flow, the AUTH REQUEST payload (Section 3.4.2)
+   contains the credential or token request for the privately verifiable
+   token type:
 
-   *  For 0x0001 or 0x0005: TokenRequest as defined in Section 5.1 of
-      [PRIVACYPASS-BATCHED]
+   *  For 0x0001 or 0x0005: GenericBatchTokenRequest as defined in
+      Section 6.1 of [PRIVACYPASS-BATCHED]
 
    *  For 0xE5AC: CredentialRequest as defined in Section 7.1 of
       [PRIVACYPASS-ARC]
 
-   Similarly, GenericBatchTokenResponse in ServerPrivateTokenAuth
-   contains:
+   Similarly, the AUTH RESPONSE payload contains:
 
-   *  For 0x0001 or 0x0005: TokenResponse as defined in Section 5.2 of
-      [PRIVACYPASS-BATCHED]
+   *  For 0x0001 or 0x0005: GenericBatchTokenResponse as defined in
+      Section 6.2 of [PRIVACYPASS-BATCHED]
 
    *  For 0xE5AC: CredentialResponse as defined in Section 7.2 of
       [PRIVACYPASS-ARC]
@@ -783,53 +790,122 @@ Table of Contents
           5)
 
    If authorization fails, an error is returned as specified in
-   Section 3.4.5.
+   Section 3.5.5.
 
-3.4.  Token in MOQ Messages
+3.4.  Required MoQ Transport Extensions
+
+   This document relies on authentication hooks that are proposed for
+   MoQ Transport but not yet part of [MoQ-TRANSPORT] (see moq-transport
+   issue 1658).  They are defined here provisionally and are expected to
+   move to the transport draft.  They are deliberately scheme-agnostic:
+   any authorization scheme with a codepoint in the "MOQT Auth Token
+   Type" registry can use them.
+
+   This document also assumes that REQUEST_ERROR carries Message
+   Parameters, as REQUEST_OK and REQUEST_UPDATE already do.
+
+3.4.1.  AUTH CHALLENGE Parameter
+
+   The AUTH CHALLENGE parameter is a length-prefixed Message Parameter,
+   with a Setup Option counterpart of identical encoding:
+
+   Auth Challenge {
+     Token Type (vi64),
+     Challenge (..)
+   }
+
+   *  Token Type: a codepoint from the "MOQT Auth Token Type" registry
+      of [MoQ-TRANSPORT], identifying the authorization scheme.
+
+   *  Challenge: opaque bytes whose format is defined by the Token Type.
+
+   The parameter conveys that the sender will accept a credential of
+   this Token Type satisfying this Challenge.  It MAY be repeated within
+   a message; challenges are ordered by sender preference, most
+   preferred first.  A receiver ignores challenges whose Token Type it
+   does not support.
+
+   The Message Parameter can appear in REQUEST_ERROR and in successful
+   responses (REQUEST_OK, SUBSCRIBE_OK, FETCH_OK).  The Setup Option can
+   appear in SERVER_SETUP.
+
+   For this document, the Token Type is PRIVACY_PASS_TOKEN (Section 6.1)
+   and the Challenge is a TokenChallenge as defined in Section 2.1 of
+   [RFC9577].
+
+3.4.2.  AUTH REQUEST and AUTH RESPONSE Parameters
+
+   The AUTH REQUEST and AUTH RESPONSE parameters are length-prefixed
+   Message Parameters, with Setup Option counterparts of identical
+   encoding:
+
+   Auth Request {
+     Token Type (vi64),
+     Request Payload (..)
+   }
+
+   Auth Response {
+     Token Type (vi64),
+     Response Payload (..)
+   }
+
+   AUTH REQUEST asks the receiver to produce credential material defined
+   by the authorization scheme, such as a token issuance or renewal
+   request.  It can appear wherever the AUTHORIZATION TOKEN parameter
+   can, including REQUEST_UPDATE, and in CLIENT_SETUP as an option.  A
+   receiver that does not support the Token Type, or is unwilling to
+   issue, ignores the parameter and processes the message as if it were
+   absent; the sender detects this by the absence of a matching AUTH
+   RESPONSE.
+
+   AUTH RESPONSE carries the material produced in answer to an AUTH
+   REQUEST.  It can appear in the response to the message that carried
+   the AUTH REQUEST (REQUEST_OK, SUBSCRIBE_OK, FETCH_OK) and in
+   SERVER_SETUP as an option.  It MUST NOT be sent unsolicited.
+
+   Request and response payloads are transient: they are not registered
+   in the token cache and do not count against
+   MAX_AUTH_TOKEN_CACHE_SIZE.
+
+   For this document, the Token Type is PRIVACY_PASS_TOKEN and the
+   payloads are the issuance structures listed in Section 2.2.3.
+
+3.5.  Token in MOQ Messages
 
    Privacy Pass tokens are provided to MoQ relays using the existing MoQ
    authorization framework with the following adaptations:
 
-3.4.1.  SETUP Message Authorization
+3.5.1.  SETUP Message Authorization
 
-   For connection-level authorization, Privacy Pass tokens are included
-   in the SETUP message's authorization parameter (Section 9.3.1.5 of
-   [MoQ-TRANSPORT]).
+   For connection-level authorization, the client includes an
+   AUTHORIZATION TOKEN Setup Option (Section 9.3.1.5 of [MoQ-TRANSPORT])
+   whose Token Type is PRIVACY_PASS_TOKEN and whose Token Value is a
+   Token structure.  When the client also wants tokens or credentials
+   issued over this connection (Section 2.2), it adds an AUTH REQUEST
+   option (Section 3.4.2); the relay answers with an AUTH RESPONSE
+   option in SERVER_SETUP.
 
-SETUP {
-    Version = 1,
-    Parameters = [
-        {
-            Type = AUTHORIZATION,
-            Value = PrivateTokenAuth
-        }
-    ]
-}
+   CLIENT_SETUP {
+       Setup Options = [
+           AUTHORIZATION TOKEN {
+               Token Type = PRIVACY_PASS_TOKEN,
+               Token Value = Token
+           },
+           AUTH REQUEST {          /* optional, reverse flow */
+               Token Type = PRIVACY_PASS_TOKEN,
+               Request Payload = GenericBatchTokenRequest
+           }
+       ]
+   }
 
-type PrivateTokenAuth = ClientPrivateTokenAuth | ServerPrivateTokenAuth;
-
-   For CLIENT_SETUP, the authorization value uses
-   GenericBatchTokenRequest as defined in Section 6.1 of
-   [PRIVACYPASS-BATCHED] as follows:
-
-   struct {
-       uint8_t auth_scheme = 0x01;
-       Token token;
-       GenericBatchTokenRequest token_requests;
-   } ClientPrivateTokenAuth;
-
-   For SERVER_SETUP, the authorization value uses
-   GenericBatchTokenResponse as defined in Section 6.2 of
-   [PRIVACYPASS-BATCHED] as follows:
-
-   struct {
-       uint8_t auth_scheme = 0x01;
-       Token token;
-       GenericBatchTokenResponse token_responses;
-   } ServerPrivateTokenAuth;
-
-   When batch issuance is not used, token_requests and token_responses
-   are empty (length = 0).
+   SERVER_SETUP {
+       Setup Options = [
+           AUTH RESPONSE {         /* only answering an AUTH REQUEST */
+               Token Type = PRIVACY_PASS_TOKEN,
+               Response Payload = GenericBatchTokenResponse
+           }
+       ]
+   }
 
    The Token structure is prepended by a two-byte token type identifier
    as registered with IANA:
@@ -851,7 +927,7 @@ struct {
 
    Unknown token types MUST be rejected.
 
-3.4.2.  MoQ Operation-Level Authorization
+3.5.2.  MoQ Operation-Level Authorization
 
    For individual MoQ operation authorization, tokens are included in
    operation-specific control messages:
@@ -860,14 +936,14 @@ struct {
        Track_Namespace = "sports.example.com/live/soccer",
        Track_Name = "video",
        Parameters = [
-           {
-               Type = AUTHORIZATION,
-               Value = PrivateTokenAuth
+           AUTHORIZATION TOKEN {
+               Token Type = PRIVACY_PASS_TOKEN,
+               Token Value = Token
            }
        ]
    }
 
-3.4.3.  Continuous Authorization with Batched Tokens
+3.5.3.  Continuous Authorization with Batched Tokens
 
    Long-lived MoQ sessions (such as live streaming or real-time
    communication) require periodic re-authorization to ensure continued
@@ -876,10 +952,10 @@ struct {
    authorization through batched token issuance.
 
    During the initial SETUP exchange, clients can request multiple
-   tokens via GenericBatchTokenRequest (defined in Section 6.1 of
-   [PRIVACYPASS-BATCHED]).  Each token in the batch is independently
-   valid and can be presented for subsequent operations or periodic re-
-   authorization.
+   tokens by sending a GenericBatchTokenRequest (defined in Section 6.1
+   of [PRIVACYPASS-BATCHED]) in an AUTH REQUEST option.  Each token in
+   the batch is independently valid and can be presented for subsequent
+   operations or periodic re-authorization.
 
    Batched Token Usage Timeline:
 
@@ -894,9 +970,12 @@ struct {
    Time 3T:    Relay requests re-authorization
                Client presents Token_4
 
-   Relays MAY request periodic re-authorization by sending a
-   TokenChallenge in a REQUEST_ERROR message.  Clients SHOULD present a
-   fresh token from their batch in response if any satisfy the new
+   Relays MAY request periodic re-authorization by attaching an AUTH
+   CHALLENGE parameter to a REQUEST_ERROR, or ahead of time to a
+   successful response alongside the EXPIRES parameter of
+   [MoQ-TRANSPORT], which tells the client what its extending
+   REQUEST_UPDATE needs to present.  Clients SHOULD present a fresh
+   token from their batch in response if any satisfy the new
    TokenChallenge.  If not, they SHOULD perform a new issuance process.
 
    When using [ARC] tokens (0xE5AC), the credential's presentation_limit
@@ -917,56 +996,69 @@ struct {
    *  For high-security deployments, shorter re-authorization intervals
       with smaller batches provide stronger revocation guarantees
 
-3.4.4.  Continuous Authorization with Reverse Flow
+3.5.4.  Continuous Authorization with Reverse Flow
 
    If the client and the relay support it, a Relay MAY perform
    continuous authentication using a reverse flow.
 
-   To do so, when presenting PrivateTokenAuth, a client MUST send at
-   least one GenericBatchTokenRequest.  The Relay then acts as a reverse
-   issuer, and issues the corresponding number of
-   GenericBatchTokenResponse.
+   To do so, a client attaches an AUTH REQUEST parameter, carrying at
+   least one token request, to a message that also carries its
+   AUTHORIZATION TOKEN.  The Relay acts as a reverse issuer and returns
+   the corresponding AUTH RESPONSE in the message answering it:
+   SERVER_SETUP for a CLIENT_SETUP, or the corresponding REQUEST_OK,
+   SUBSCRIBE_OK, or FETCH_OK for requests on an established connection.
+
+   In particular, a subscriber can replenish its token supply without a
+   new round trip to the origin issuer by sending REQUEST_UPDATE with an
+   AUTH REQUEST parameter.  This composes with the expiry-driven update
+   cycle of [MoQ-TRANSPORT]: when a subscription carries an EXPIRES
+   parameter, the extending REQUEST_UPDATE presents a fresh token and
+   requests the next one in the same message.
 
    Tokens obtained this way can be presented by the Client to maintain
    the continuity of the session without linkability.
 
-Reverse Flow Token Usage Timeline:
+   Reverse Flow Token Usage Timeline:
 
-Time 0:     CLIENT_SETUP with Token_1, request batch of 1 token
-            SERVER_SETUP with batch of 1 token
+   Time 0:     CLIENT_SETUP with Token_1 + AUTH REQUEST for 1 token
+               SERVER_SETUP with AUTH RESPONSE (1 token)
 
-Time T:     SUBSCRIBE with Token_2 (from batch), request batch of 1 token
-            Relay responds with batch of 1 token
+   Time T:     SUBSCRIBE with Token_2 + AUTH REQUEST for 1 token
+               SUBSCRIBE_OK with AUTH RESPONSE (1 token)
 
-Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 token
-            Relay responds with batch of 1 token
+   Time 2T:    REQUEST_UPDATE with Token_3 + AUTH REQUEST for 1 token
+               REQUEST_OK with AUTH RESPONSE (1 token)
 
-3.4.5.  Errors
+3.5.5.  Errors
 
    If the authentication fails for any reason, the server MUST send an
    error.  The error response includes a TokenChallenge to enable the
    client to obtain a valid token and retry the operation.
 
-3.4.5.1.  SETUP Errors
+3.5.5.1.  SETUP Errors
 
-   If authentication fails during SETUP, the Relay MUST terminate the
-   connection with the UNAUTHORIZED (0x02) Termination Error Code
-   defined in Section 3.4 of [MoQ-TRANSPORT].  The termination reason
-   phrase MUST contain a MoQAuthChallenge structure:
+   If authentication fails during SETUP, the Relay MUST send a
+   SERVER_SETUP carrying one or more AUTH CHALLENGE Setup Options
+   (Section 3.4) and then terminate the session with the UNAUTHORIZED
+   (0x02) Termination Error Code defined in Section 3.4 of
+   [MoQ-TRANSPORT].  The termination reason phrase carries no challenge
+   material; it stays a human-readable string, as the QUIC
+   CONNECTION_CLOSE frame requires.
 
-   struct {
-       TokenChallenge challenges<1..2^16-1>;
-   } MoQAuthChallenge;
+   Each AUTH CHALLENGE option carries one TokenChallenge.  Options are
+   ordered by relay preference, most preferred first, which lets the
+   client select an issuance protocol based on the token types and
+   issuers it supports.  Different options MAY name different issuers or
+   scopes for different token types.  The Relay MUST include at least
+   one challenge.
 
-   The challenges field lists token challenges the relay accepts,
-   ordered by preference (most preferred first).  This allows clients to
-   select an appropriate issuance protocol based on supported token
-   types and issuers.  Each challenge specifies a token type, issuer,
-   and optional scope, enabling relays to accept different issuers or
-   scopes for different token types.  Relay MUST include at least one
-   challenge.
+   The client can then obtain a token satisfying one of the challenges
+   and establish a new session presenting it.  Since [MoQ-TRANSPORT]
+   requires endpoints to ignore unknown Setup Options, a client that
+   does not support this mechanism observes a regular UNAUTHORIZED
+   termination.
 
-3.4.5.2.  Operation Errors
+3.5.5.2.  Operation Errors
 
    If the error occurs over an established connection, the Relay MUST
    send a REQUEST_ERROR defined in Section 9.8 of [MoQ-TRANSPORT].
@@ -999,14 +1091,14 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
 
              Table 3: Privacy Pass Authorization Error Codes
 
-   The reason phrase in REQUEST_ERROR MUST contain a MoQAuthChallenge
-   structure when the client should retry with a new token, encoded as a
-   byte-string.
+   When the client should retry with a new token, the REQUEST_ERROR MUST
+   carry one or more AUTH CHALLENGE parameters (Section 3.4), ordered by
+   relay preference.  The reason phrase stays a human-readable string.
 
-3.4.5.3.  TokenChallenge Construction
+3.5.5.3.  TokenChallenge Construction
 
-   Each TokenChallenge in MoQAuthChallenge MUST be constructed as
-   follows:
+   The TokenChallenge carried in each AUTH CHALLENGE MUST be constructed
+   as follows:
 
    *  token_type: The token type for this challenge
 
@@ -1024,36 +1116,50 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
    tokens with any scope and performs authorization based solely on the
    token's embedded scope information.
 
-3.4.5.4.  Error Response Example
+3.5.5.4.  Error Response Example
 
    REQUEST_ERROR {
        Request_ID = 42,
        Error_Code = 0x0104,  /* SCOPE_MISMATCH */
-       Reason = MoQAuthChallenge {
-           challenges = [
-               TokenChallenge {
+       Retry_Interval = 1,
+       Reason = "token scope does not cover this namespace",
+       Parameters = [
+           AUTH_CHALLENGE {
+               token_type = PRIVACY_PASS_TOKEN,
+               challenge = TokenChallenge {
                    token_type = 0x0002,
                    issuer_name = "public-issuer.example.com",
                    redemption_context = <32 random bytes>,
                    origin_info = <authorization scope>
-               },
-               TokenChallenge {
+               }
+           },
+           AUTH_CHALLENGE {
+               token_type = PRIVACY_PASS_TOKEN,
+               challenge = TokenChallenge {
                    token_type = 0xE5AC,
                    issuer_name = "relay.example.com",
                    redemption_context = <32 random bytes>,
                    origin_info = <authorization scope>
-               },
-               TokenChallenge {
+               }
+           },
+           AUTH_CHALLENGE {
+               token_type = PRIVACY_PASS_TOKEN,
+               challenge = TokenChallenge {
                    token_type = 0x0001,
                    issuer_name = "relay.example.com",
                    redemption_context = <32 random bytes>,
                    origin_info = <authorization scope>
                }
-           ]
-       }
+           }
+       ]
    }
 
-3.4.5.5.  Control Message Authorization Failures
+   Note the two levels of token type: the parameter's token_type names
+   the authorization scheme in the "MOQT Auth Token Type" registry,
+   while the TokenChallenge.token_type names the Privacy Pass issuance
+   protocol inside that scheme.
+
+3.5.5.5.  Control Message Authorization Failures
 
    When authorization fails for MoQ control messages other than SETUP,
    the relay returns a REQUEST_ERROR with the appropriate error code
@@ -1075,6 +1181,36 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
    Implementations need to consider the impact on other outstanding
    subscriptions before elevating to session-level errors.
 
+3.5.5.6.  Retry Behavior
+
+   AUTH CHALLENGE parameters are ordered by relay preference.  A client
+   selects the first challenge whose token type it supports and whose
+   issuer it trusts.  If no challenge qualifies, the client MUST NOT
+   retry the operation and SHOULD surface the failure to the
+   application.
+
+   If the client holds an unused token satisfying the selected
+   challenge, for example from a batch obtained earlier (Section 3.5.3),
+   it SHOULD present that token rather than start a new issuance.
+
+   For operation errors, retry timing is governed by the Retry Interval
+   field of REQUEST_ERROR (Section 9.8 of [MoQ-TRANSPORT]): the client
+   MUST NOT retry before the interval has elapsed, and MUST NOT retry at
+   all when the interval is 0.
+
+   Tokens are single-use, so every retry consumes a token and possibly
+   an issuance round trip.  A client SHOULD treat a second consecutive
+   failure of the same operation with the same error code as terminal
+   rather than retry further.  In particular, SCOPE_MISMATCH is only
+   worth retrying if the client can obtain a token whose scope actually
+   covers the operation; retrying with an identically scoped token
+   cannot succeed.
+
+   The same limit applies across connections: after a session
+   termination with UNAUTHORIZED, a client SHOULD NOT reconnect with a
+   token for the same challenge more than once unless its attestation
+   context has changed.
+
 4.  Example Authorization Flow
 
    Below shows an example deployment scenario where the relay has been
@@ -1088,9 +1224,11 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
          +-----+-----+                        +---+----+         +----+-----+ +---+----+
                |                                  |                   |           |
                |<--------------- CLIENT_SETUP[] --+                   |           |
-               |   UNAUTHORIZED (0x2)    [        |                   |           |
-               +--   Reason=MoQAuthChallenge ---->|                   |           |
+               |                                  |                   |           |
+               +-- SERVER_SETUP[  --------------->|                   |           |
+               |     AUTH CHALLENGE,              |                   |           |
                |   ]                              |                   |           |
+               +-- UNAUTHORIZED (0x2) ----------->|                   |           |
                |                                  |                   |           |
                |                                  |<== Attestation ==>|           |
                |                                  |                   |           |
@@ -1100,31 +1238,24 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
                |                           FinalizeToken              |           |
                |                                  |                   |           |
                |            CLIENT_SETUP[{        |                   |           |
-               |<----------    AUTHORIZATION,   --+                   |           |
-               |               PrivateTokenAuth,  |                   |           |
+               |<----------    AUTHORIZATION      |                   |           |
+               |               TOKEN,           --+                   |           |
                |            }]                    |                   |           |
                |                                  |                   |           |
  .-------------+--.                               |                   |           |
 | Local validation |                              |                   |           |
  `-------------+--'                               |                   |           |
                |                                  |                   |           |
-               +-- SERVER_SETUP[{  -------------->|                   |           |
-               |     AUTHORIZATION,               |                   |           |
-               |     PrivateTokenAuth,            |                   |           |
-               |   }]                             |                   |           |
-               |                           FinalizeToken              |           |
+               +-- SERVER_SETUP ----------------->|                   |           |
                |                                  |                   |           |
 
               Figure 4: Direct Relay Authorization Flow
 
-   The MoQAuthChallenge in the UNAUTHORIZED response contains:
-
-   *  A TokenChallenge with the relay's issuer configuration
-
-   *  A list of supported_token_types (e.g., [0x0002, 0xE5AC])
-
-   This allows the client to select the appropriate issuance protocol
-   based on its capabilities and the available attesters/issuers.
+   The AUTH CHALLENGE options in the SERVER_SETUP carry one
+   TokenChallenge per token type the relay accepts (e.g., 0x0002 and
+   0xE5AC), each with the relay's issuer configuration.  This allows the
+   client to select the appropriate issuance protocol based on its
+   capabilities and the available attesters/issuers.
 
 5.  Security Considerations
 
@@ -1141,23 +1272,18 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
 
 6.  IANA Considerations
 
-6.1.  MoQ Privacy Pass Auth Scheme Registry
+6.1.  MOQT Auth Token Type Registration
 
-   IANA is requested to create a new registry titled "MoQ Privacy Pass
-   Auth Schemes" with the following initial contents:
+   IANA is requested to register the following entry in the "MOQT Auth
+   Token Type" registry defined by [MoQ-TRANSPORT]:
 
-               +=======+==================+===============+
-               | Value | Name             | Reference     |
-               +=======+==================+===============+
-               | 0x00  | Reserved         | This document |
-               +-------+------------------+---------------+
-               | 0x01  | PrivateTokenAuth | This document |
-               +-------+------------------+---------------+
+               +======+====================+===============+
+               | Code | Name               | Specification |
+               +======+====================+===============+
+               | TBD  | PRIVACY_PASS_TOKEN | This document |
+               +------+--------------------+---------------+
 
-                  Table 4: MoQ Privacy Pass Auth Schemes
-
-   New entries in this registry require Specification Required
-   registration policy.
+                 Table 4: MOQT Auth Token Type Registration
 
 6.2.  MoQ Action Registry
 
@@ -1230,19 +1356,19 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
             +===============+=================+===============+
             | Value         | Name            | Reference     |
             +===============+=================+===============+
-            | 0x0100        | TOKEN_MISSING   | Section 3.4.5 |
+            | 0x0100        | TOKEN_MISSING   | Section 3.5.5 |
             +---------------+-----------------+---------------+
-            | 0x0101        | TOKEN_INVALID   | Section 3.4.5 |
+            | 0x0101        | TOKEN_INVALID   | Section 3.5.5 |
             +---------------+-----------------+---------------+
-            | 0x0102        | TOKEN_EXPIRED   | Section 3.4.5 |
+            | 0x0102        | TOKEN_EXPIRED   | Section 3.5.5 |
             +---------------+-----------------+---------------+
-            | 0x0103        | TOKEN_REPLAYED  | Section 3.4.5 |
+            | 0x0103        | TOKEN_REPLAYED  | Section 3.5.5 |
             +---------------+-----------------+---------------+
-            | 0x0104        | SCOPE_MISMATCH  | Section 3.4.5 |
+            | 0x0104        | SCOPE_MISMATCH  | Section 3.5.5 |
             +---------------+-----------------+---------------+
-            | 0x0105        | ISSUER_UNKNOWN  | Section 3.4.5 |
+            | 0x0105        | ISSUER_UNKNOWN  | Section 3.5.5 |
             +---------------+-----------------+---------------+
-            | 0x0106        | TOKEN_MALFORMED | Section 3.4.5 |
+            | 0x0106        | TOKEN_MALFORMED | Section 3.5.5 |
             +---------------+-----------------+---------------+
             | 0x0107-0x01FF | Unassigned      |               |
             +---------------+-----------------+---------------+
@@ -1341,9 +1467,9 @@ Time 2T:    Client presents Token_3 (from batch of time T), request batch of 1 t
    [PRIVACYPASS-REVERSE-FLOW]
               Meunier, T., "Privacy Pass Reverse Flow", Work in
               Progress, Internet-Draft, draft-meunier-privacypass-
-              reverse-flow-05, 18 June 2026,
+              reverse-flow-06, 6 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-meunier-
-              privacypass-reverse-flow-05>.
+              privacypass-reverse-flow-06>.
 
    [RFC9458]  Thomson, M. and C. A. Wood, "Oblivious HTTP", RFC 9458,
               DOI 10.17487/RFC9458, January 2024,
@@ -1394,6 +1520,25 @@ Changelog
    a final version of this document.
 
 Since draft-ietf-moq-privacy-pass-auth-02
+
+   *  Move reverse flow issuance to AUTH REQUEST and AUTH RESPONSE
+      parameters
+
+   *  Allow token acquisition over an established connection via
+      REQUEST_UPDATE
+
+   *  Remove PrivateTokenAuth structures and the auth scheme registry
+
+   *  Carry TokenChallenge in AUTH CHALLENGE transport parameters
+      instead of reason phrases
+
+   *  Define required MoQ Transport extensions (AUTH CHALLENGE,
+      REQUEST_ERROR parameters)
+
+   *  Register a Privacy Pass codepoint in the MOQT Auth Token Type
+      registry
+
+   *  Specify retry behavior after auth challenge errors
 
    *  Expanded reverse flow documentation with three-phase flow
       (bootstrap, exchange, operations)
