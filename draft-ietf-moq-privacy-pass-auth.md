@@ -358,15 +358,16 @@ MoQTransport control message types:
 
 | Action | Value | Reference |
 |--------|-------|-----------|
-| CLIENT_SETUP | 0 | {{Section 9.3 of MoQ-TRANSPORT}} |
-| SERVER_SETUP | 1 | {{Section 9.3 of MoQ-TRANSPORT}} |
-| PUBLISH_NAMESPACE | 2 | {{Section 9.20 of MoQ-TRANSPORT}} |
-| SUBSCRIBE_NAMESPACE | 3 | {{Section 9.25 of MoQ-TRANSPORT}} |
-| SUBSCRIBE | 4 | {{Section 9.9 of MoQ-TRANSPORT}} |
-| REQUEST_UPDATE | 5 | {{Section 9.11 of MoQ-TRANSPORT}} |
-| PUBLISH | 6 | {{Section 9.13 of MoQ-TRANSPORT}} |
-| FETCH | 7 | {{Section 9.16 of MoQ-TRANSPORT}} |
-| TRACK_STATUS | 8 | {{Section 9.19 of MoQ-TRANSPORT}} |
+| CLIENT_SETUP | 0 | {{Section 10.3 of MoQ-TRANSPORT}} |
+| SERVER_SETUP | 1 | {{Section 10.3 of MoQ-TRANSPORT}} |
+| PUBLISH_NAMESPACE | 2 | {{Section 10.15 of MoQ-TRANSPORT}} |
+| SUBSCRIBE_NAMESPACE | 3 | {{Section 10.18 of MoQ-TRANSPORT}} |
+| SUBSCRIBE | 4 | {{Section 10.7 of MoQ-TRANSPORT}} |
+| REQUEST_UPDATE | 5 | {{Section 10.9 of MoQ-TRANSPORT}} |
+| PUBLISH | 6 | {{Section 10.10 of MoQ-TRANSPORT}} |
+| FETCH | 7 | {{Section 10.12 of MoQ-TRANSPORT}} |
+| TRACK_STATUS | 8 | {{Section 10.14 of MoQ-TRANSPORT}} |
+| SUBSCRIBE_TRACKS | 9 | {{Section 10.19 of MoQ-TRANSPORT}} |
 {: #moq-actions-table title="MoQ Action Values"}
 
 The default authorization policy is "blocked" - all actions are denied unless
@@ -385,6 +386,7 @@ enum {
     PUBLISH(6),
     FETCH(7),
     TRACK_STATUS(8),
+    SUBSCRIBE_TRACKS(9),
     (255)
 } MoQAction;
 ~~~
