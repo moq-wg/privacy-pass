@@ -1960,14 +1960,14 @@ MoQTransport control message types:<a href="#section-3.2.2-1" class="pilcrow">¶
                 <td class="text-left" rowspan="1" colspan="1">PUBLISH_NAMESPACE</td>
                 <td class="text-left" rowspan="1" colspan="1">2</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.14" class="relref">Section 9.14</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.13" class="relref">Section 9.13</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SUBSCRIBE_NAMESPACE</td>
                 <td class="text-left" rowspan="1" colspan="1">3</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.15" class="relref">Section 9.15</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.14" class="relref">Section 9.14</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
@@ -2002,14 +2002,14 @@ MoQTransport control message types:<a href="#section-3.2.2-1" class="pilcrow">¶
                 <td class="text-left" rowspan="1" colspan="1">TRACK_STATUS</td>
                 <td class="text-left" rowspan="1" colspan="1">8</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.13" class="relref">Section 9.13</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.12" class="relref">Section 9.12</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SUBSCRIBE_TRACKS</td>
                 <td class="text-left" rowspan="1" colspan="1">9</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.18" class="relref">Section 9.18</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.17" class="relref">Section 9.17</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
             </tbody>
@@ -2498,11 +2498,12 @@ results in subscriptions to any track under the prefix, so its
 </li>
           </ul>
 <p id="section-3.3.3-3">As an alternative, a relay <span class="bcp14">MAY</span> accept SUBSCRIBE_NAMESPACE or SUBSCRIBE_TRACKS
-under a narrower scope, provided it only sends NAMESPACE or PUBLISH messages
-for namespaces and tracks that the scope covers.<a href="#section-3.3.3-3" class="pilcrow">¶</a></p>
+under a narrower scope, provided it only sends NAMESPACE, NAMESPACE_DONE,
+PUBLISH, or PUBLISH_SKIPPED messages for namespaces and tracks that the scope
+covers.<a href="#section-3.3.3-3" class="pilcrow">¶</a></p>
 <p id="section-3.3.3-4">PUBLISH messages that a relay sends as a result of SUBSCRIBE_TRACKS are
 covered by the token presented in the SUBSCRIBE_TRACKS. That token is not
-copied into them (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.20.2" class="relref">Section 9.20.2</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>).<a href="#section-3.3.3-4" class="pilcrow">¶</a></p>
+copied into them (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.19.2" class="relref">Section 9.19.2</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>).<a href="#section-3.3.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2519,8 +2520,8 @@ for reverse flow issuance. These hooks are scheme-agnostic: any authorization
 scheme with a codepoint in the "MOQT Auth Token Type" registry can use them.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4-2">[[editor's note: These hooks depend on ongoing MoQ Transport authentication
 work (see <a href="https://github.com/moq-wg/moq-transport/issues/1658">https://github.com/moq-wg/moq-transport/issues/1658</a>).
-Error Details provides binary carriage in <code>REQUEST_ERROR</code>, but the AUTH
-CHALLENGE binding is not yet defined in MoQ Transport. SETUP challenge
+<span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span> provides Error Details in <code>REQUEST_ERROR</code>, but the
+AUTH CHALLENGE binding remains undefined. SETUP challenge
 delivery and in-band issuance, including successful-response parameters,
 also remain open. AUTH REQUEST and AUTH RESPONSE describe the exchange
 needed for reverse flow. They are not an adopted AUTH design-team solution.]]<a href="#section-3.4-2" class="pilcrow">¶</a></p>
@@ -2555,14 +2556,15 @@ Type satisfying this Challenge. It <span class="bcp14">MAY</span> be repeated wi
 Challenges are ordered by sender preference, most preferred first. A
 receiver ignores challenges whose Token Type it does not support.<a href="#section-3.4.1-4" class="pilcrow">¶</a></p>
 <p id="section-3.4.1-5">The Error Detail applies to the error codes in <a href="#error-codes-table" class="auto internal xref">Table 3</a> and
-<span class="bcp14">MAY</span> appear more than once in a <code>REQUEST_ERROR</code>. Its value, including Token
-Type, <span class="bcp14">MUST NOT</span> exceed the 65,535-byte Error Detail value limit.
+<span class="bcp14">MAY</span> appear more than once in a <code>REQUEST_ERROR</code>. Its encoding and size limits
+follow <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>.
 The Message Parameter can appear in successful responses
 (<code>REQUEST_OK</code>, <code>SUBSCRIBE_OK</code>, <code>FETCH_OK</code>), including <code>REQUEST_OK</code> responding
 to <code>REQUEST_UPDATE</code> (<code>REQUEST_UPDATE_OK</code>). The Setup Option can
 appear in <code>SERVER_SETUP</code>.<a href="#section-3.4.1-5" class="pilcrow">¶</a></p>
 <p id="section-3.4.1-6">[[editor's note: The codepoint in the "MOQT Error Detail Types" registry
-remains TBD, pending definition of the generic transport challenge mechanism.]]<a href="#section-3.4.1-6" class="pilcrow">¶</a></p>
+of <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span> remains TBD, pending definition of the generic transport
+challenge mechanism.]]<a href="#section-3.4.1-6" class="pilcrow">¶</a></p>
 <p id="section-3.4.1-7">For this document, the Token Type is PRIVACY_PASS_TOKEN
 (<a href="#iana-moqt-token-type" class="auto internal xref">Section 6.1</a>) and the Challenge is a <code>TokenChallenge</code> as
 defined in <span><a href="https://rfc-editor.org/rfc/rfc9577#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9577" class="cite xref">RFC9577</a>]</span>.<a href="#section-3.4.1-7" class="pilcrow">¶</a></p>
@@ -2677,11 +2679,11 @@ struct {
 <p id="section-3.5.1-5">Where <code>Nk</code> is determined by token_type per the <span>[<a href="#PRIVACYPASS-IANA" class="cite xref">PRIVACYPASS-IANA</a>]</span>.<a href="#section-3.5.1-5" class="pilcrow">¶</a></p>
 <p id="section-3.5.1-6">Unknown token types <span class="bcp14">MUST</span> be rejected.<a href="#section-3.5.1-6" class="pilcrow">¶</a></p>
 <p id="section-3.5.1-7">Each endpoint sends SETUP independently and <span class="bcp14">MAY</span> send it before receiving the
-peer's SETUP (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.1" class="relref">Section 9.1</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>). A relay that includes AUTH
-CHALLENGE or AUTH RESPONSE options in its SETUP <span class="bcp14">MUST</span> wait for the client's
-SETUP before sending its own, since those options depend on what the client
-presented. Requests that a client pipelines after its SETUP are lost if the
-relay terminates the session with <code>UNAUTHORIZED</code>.<a href="#section-3.5.1-7" class="pilcrow">¶</a></p>
+peer's SETUP (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.1" class="relref">Section 9.1</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>). A relay that authenticates
+SETUP or supports issuance through AUTH REQUEST <span class="bcp14">MUST</span> receive and process the
+client's SETUP before sending its own, so it can include any required AUTH
+CHALLENGE or AUTH RESPONSE. Requests that a client pipelines after its SETUP
+are lost if the relay terminates the session with <code>UNAUTHORIZED</code>.<a href="#section-3.5.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="moq-operation-level-authorization">
@@ -2961,10 +2963,11 @@ information.<a href="#section-3.5.6.3-3" class="pilcrow">¶</a></p>
             <h5 id="name-error-response-example">
 <a href="#section-3.5.6.4" class="section-number selfRef">3.5.6.4. </a><a href="#name-error-response-example" class="section-name selfRef">Error Response Example</a>
             </h5>
-<div class="alignLeft art-text artwork" id="section-3.5.6.4-1">
+<p id="section-3.5.6.4-1">This example uses Error Details from <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+and the AUTH CHALLENGE binding in <a href="#transport-hooks" class="auto internal xref">Section 3.4</a>.<a href="#section-3.5.6.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.5.6.4-2">
 <pre>
 REQUEST_ERROR {
-    Request_ID = 42,
     Error_Code = 0x0104,  /* SCOPE_MISMATCH */
     Retry_Interval = 1,
     Reason = "token scope does not cover this namespace",
@@ -2998,12 +3001,12 @@ REQUEST_ERROR {
         }
     ]
 }
-</pre><a href="#section-3.5.6.4-1" class="pilcrow">¶</a>
+</pre><a href="#section-3.5.6.4-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3.5.6.4-2">Note the two levels of token type: the Error Detail's <code>token_type</code> names the
+<p id="section-3.5.6.4-3">Note the two levels of token type: the Error Detail's <code>token_type</code> names the
 authorization scheme in the "MOQT Auth Token Type" registry, while the
 <code>TokenChallenge.token_type</code> names the Privacy Pass issuance protocol inside
-that scheme.<a href="#section-3.5.6.4-2" class="pilcrow">¶</a></p>
+that scheme.<a href="#section-3.5.6.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="control-message-authz">
@@ -3047,8 +3050,10 @@ verification. The relay answers a failed <code>REQUEST_UPDATE</code> with a
 underlying request:<a href="#section-3.5.6.6-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.5.6.6-2.1">
-                <p id="section-3.5.6.6-2.1.1">For a subscription, the relay sends <code>PUBLISH_DONE</code> with status
-<code>UNAUTHORIZED</code> (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-12.4" class="relref">Section 12.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>).<a href="#section-3.5.6.6-2.1.1" class="pilcrow">¶</a></p>
+                <p id="section-3.5.6.6-2.1.1">For a subscription, a failed <code>REQUEST_UPDATE</code> requires <code>PUBLISH_DONE</code> with
+status <code>UPDATE_FAILED</code> (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.5.1" class="relref">Section 9.5.1</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>). Token expiry
+uses <code>EXPIRED_AUTH_TOKEN</code>. Other loss of authorization uses <code>UNAUTHORIZED</code>
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-12.4" class="relref">Section 12.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>).<a href="#section-3.5.6.6-2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.5.6.6-2.2">
                 <p id="section-3.5.6.6-2.2.1">For a FETCH in progress, the relay resets the fetch stream with
@@ -3447,7 +3452,7 @@ Pass Authorization" with the following initial contents:<a href="#section-6.3-1"
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-request_error-code-registra" class="section-name selfRef">REQUEST_ERROR Code Registrations</a>
         </h3>
 <p id="section-6.4-1">IANA is requested to register the following entries in the "REQUEST_ERROR
-Codes" registry defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-16.11.2" class="relref">Section 16.11.2</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+Codes" registry defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-16.12.2" class="relref">Section 16.12.2</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <span id="name-request_error-code-registrat"></span><div id="error-code-registry">
 <table class="center" id="table-7">
           <caption>
@@ -3677,7 +3682,7 @@ a final version of this document.<a href="#appendix-C-1" class="pilcrow">¶</a><
             <p id="appendix-C.1-1.7.1">Clarify that token unlinkability does not hide connection-level correlation<a href="#appendix-C.1-1.7.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.8">
-            <p id="appendix-C.1-1.8.1">Align with draft-ietf-moq-transport-22: single SETUP message, updated section references<a href="#appendix-C.1-1.8.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.8.1">Align with draft-ietf-moq-transport-23: single SETUP message, updated section references<a href="#appendix-C.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.9">
             <p id="appendix-C.1-1.9.1">Add SUBSCRIBE_TRACKS action and define matching for Track Namespace Prefix requests<a href="#appendix-C.1-1.9.1" class="pilcrow">¶</a></p>
