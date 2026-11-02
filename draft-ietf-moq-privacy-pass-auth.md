@@ -103,6 +103,14 @@ preserving user privacy through unlinkable authentication tokens.
 
 {::boilerplate bcp14-tagged}
 
+## MoQ Transport Conventions {#moqt-conventions}
+
+{{MoQ-TRANSPORT}} defines a single SETUP message
+({{Section 9.1 of MoQ-TRANSPORT}}) that each endpoint sends on its control
+stream. In this document, `CLIENT_SETUP` denotes the SETUP message
+sent by the client and `SERVER_SETUP` denotes the SETUP message sent by the
+server.
+
 # Privacy Pass Architecture for MoQ
 
 Privacy Pass Terminology defined in {{Section 2 of RFC9576}} is reused here.
@@ -358,15 +366,16 @@ MoQTransport control message types:
 
 | Action | Value | Reference |
 |--------|-------|-----------|
-| CLIENT_SETUP | 0 | {{Section 9.3 of MoQ-TRANSPORT}} |
-| SERVER_SETUP | 1 | {{Section 9.3 of MoQ-TRANSPORT}} |
-| PUBLISH_NAMESPACE | 2 | {{Section 9.20 of MoQ-TRANSPORT}} |
-| SUBSCRIBE_NAMESPACE | 3 | {{Section 9.25 of MoQ-TRANSPORT}} |
-| SUBSCRIBE | 4 | {{Section 9.9 of MoQ-TRANSPORT}} |
-| REQUEST_UPDATE | 5 | {{Section 9.11 of MoQ-TRANSPORT}} |
-| PUBLISH | 6 | {{Section 9.13 of MoQ-TRANSPORT}} |
-| FETCH | 7 | {{Section 9.16 of MoQ-TRANSPORT}} |
-| TRACK_STATUS | 8 | {{Section 9.19 of MoQ-TRANSPORT}} |
+| CLIENT_SETUP | 0 | {{Section 9.1 of MoQ-TRANSPORT}} |
+| SERVER_SETUP | 1 | {{Section 9.1 of MoQ-TRANSPORT}} |
+| PUBLISH_NAMESPACE | 2 | {{Section 9.13 of MoQ-TRANSPORT}} |
+| SUBSCRIBE_NAMESPACE | 3 | {{Section 9.14 of MoQ-TRANSPORT}} |
+| SUBSCRIBE | 4 | {{Section 9.6 of MoQ-TRANSPORT}} |
+| REQUEST_UPDATE | 5 | {{Section 9.5 of MoQ-TRANSPORT}} |
+| PUBLISH | 6 | {{Section 9.8 of MoQ-TRANSPORT}} |
+| FETCH | 7 | {{Section 9.11 of MoQ-TRANSPORT}} |
+| TRACK_STATUS | 8 | {{Section 9.12 of MoQ-TRANSPORT}} |
+| SUBSCRIBE_TRACKS | 9 | {{Section 9.17 of MoQ-TRANSPORT}} |
 {: #moq-actions-table title="MoQ Action Values"}
 
 The default authorization policy is "blocked" - all actions are denied unless
@@ -385,6 +394,7 @@ enum {
     PUBLISH(6),
     FETCH(7),
     TRACK_STATUS(8),
+    SUBSCRIBE_TRACKS(9),
     (255)
 } MoQAction;
 ~~~
@@ -662,7 +672,8 @@ operation:
       is present in the scope's `actions` list
 
    b. **Namespace Match**: Apply the `namespace_match` rule to the requested
-      track namespace using the algorithm in {{match-types}}
+      track namespace using the algorithm in {{match-types}}. Requests that
+      carry a Track Namespace Prefix follow {{prefix-requests}}
 
    c. **Track Name Match**: Apply the `track_name_match` rule to the requested
       track name using the algorithm in {{match-types}}
@@ -677,6 +688,30 @@ operation:
 
 If authorization fails, an error is returned as specified in {{errors}}.
 
+### Requests on a Track Namespace Prefix {#prefix-requests}
+
+PUBLISH_NAMESPACE, SUBSCRIBE_NAMESPACE, and SUBSCRIBE_TRACKS carry a Track
+Namespace Prefix instead of a track namespace and track name. Such a request
+covers every track namespace that begins with the prefix, so a scope
+authorizes it only if it covers all of them:
+
+- Namespace check: The `namespace_match` rule MUST be `MATCH_PREFIX`, and
+  its pattern MUST be a prefix of the requested Track Namespace Prefix. Other
+  match types cannot cover an open-ended set of namespaces.
+- Track name check: PUBLISH_NAMESPACE and SUBSCRIBE_NAMESPACE do not name
+  tracks, so `track_name_match` is not evaluated for them. SUBSCRIBE_TRACKS
+  results in subscriptions to any track under the prefix, so its
+  `track_name_match` MUST be `MATCH_PREFIX` with an empty pattern.
+
+As an alternative, a relay MAY accept SUBSCRIBE_NAMESPACE or SUBSCRIBE_TRACKS
+under a narrower scope, provided it only sends NAMESPACE, NAMESPACE_DONE,
+PUBLISH, or PUBLISH_SKIPPED messages for namespaces and tracks that the scope
+covers.
+
+PUBLISH messages that a relay sends as a result of SUBSCRIBE_TRACKS are
+covered by the token presented in the SUBSCRIBE_TRACKS. That token is not
+copied into them ({{Section 9.19.2 of MoQ-TRANSPORT}}).
+
 ## Required MoQ Transport Extensions {#transport-hooks}
 
 This document uses the Error Details mechanism of {{MoQ-TRANSPORT}} to
@@ -687,8 +722,8 @@ scheme with a codepoint in the "MOQT Auth Token Type" registry can use them.
 
 \[\[editor's note: These hooks depend on ongoing MoQ Transport authentication
 work (see <https://github.com/moq-wg/moq-transport/issues/1658>).
-Error Details provides binary carriage in `REQUEST_ERROR`, but the AUTH
-CHALLENGE binding is not yet defined in MoQ Transport. SETUP challenge
+{{MoQ-TRANSPORT}} provides Error Details in `REQUEST_ERROR`, but the
+AUTH CHALLENGE binding remains undefined. SETUP challenge
 delivery and in-band issuance, including successful-response parameters,
 also remain open. AUTH REQUEST and AUTH RESPONSE describe the exchange
 needed for reverse flow. They are not an adopted AUTH design-team solution.\]\]
@@ -717,15 +752,16 @@ Challenges are ordered by sender preference, most preferred first. A
 receiver ignores challenges whose Token Type it does not support.
 
 The Error Detail applies to the error codes in {{error-codes-table}} and
-MAY appear more than once in a `REQUEST_ERROR`. Its value, including Token
-Type, MUST NOT exceed the 65,535-byte Error Detail value limit.
+MAY appear more than once in a `REQUEST_ERROR`. Its encoding and size limits
+follow {{MoQ-TRANSPORT}}.
 The Message Parameter can appear in successful responses
 (`REQUEST_OK`, `SUBSCRIBE_OK`, `FETCH_OK`), including `REQUEST_OK` responding
 to `REQUEST_UPDATE` (`REQUEST_UPDATE_OK`). The Setup Option can
 appear in `SERVER_SETUP`.
 
 \[\[editor's note: The codepoint in the "MOQT Error Detail Types" registry
-remains TBD, pending definition of the generic transport challenge mechanism.\]\]
+of {{MoQ-TRANSPORT}} remains TBD, pending definition of the generic transport
+challenge mechanism.\]\]
 
 For this document, the Token Type is PRIVACY_PASS_TOKEN
 ({{iana-moqt-token-type}}) and the Challenge is a `TokenChallenge` as
@@ -782,7 +818,7 @@ authorization framework with the following adaptations:
 ### SETUP Message Authorization
 
 For connection-level authorization, the client includes an AUTHORIZATION
-TOKEN Setup Option ({{Section 9.3.1.5 of MoQ-TRANSPORT}}) whose Token Type
+TOKEN Setup Option ({{Section 9.1.4 of MoQ-TRANSPORT}}) whose Token Type
 is PRIVACY_PASS_TOKEN and whose Token Value is a `Token` structure. When
 the client also wants tokens or credentials issued over this connection
 ({{reverse-flow}}), it adds an AUTH REQUEST option
@@ -835,6 +871,13 @@ Where `Nk` is determined by token_type per the {{PRIVACYPASS-IANA}}.
 
 Unknown token types MUST be rejected.
 
+Each endpoint sends SETUP independently and MAY send it before receiving the
+peer's SETUP ({{Section 9.1 of MoQ-TRANSPORT}}). A relay that authenticates
+SETUP or supports issuance through AUTH REQUEST MUST receive and process the
+client's SETUP before sending its own, so it can include any required AUTH
+CHALLENGE or AUTH RESPONSE. Requests that a client pipelines after its SETUP
+are lost if the relay terminates the session with `UNAUTHORIZED`.
+
 ### MoQ Operation-Level Authorization
 
 For individual MoQ operation authorization, tokens are included in
@@ -852,6 +895,21 @@ SUBSCRIBE {
     ]
 }
 ~~~
+
+### Token Aliases {#token-aliases}
+
+{{Section 8.9 of MoQ-TRANSPORT}} lets a sender register a token under an
+Alias and refer to it later with USE_ALIAS. Privacy Pass tokens are
+single-use, so a sender MUST use Alias Type USE_VALUE for tokens with Token
+Type PRIVACY_PASS_TOKEN and MUST NOT register them.
+
+A receiver still processes a REGISTER as {{MoQ-TRANSPORT}} requires. Every
+message whose token resolves to a PRIVACY_PASS_TOKEN, by value or by alias,
+redeems that token and is subject to the replay check in
+{{matching-algorithm}}. A USE_ALIAS that refers to an already redeemed token
+therefore fails with `TOKEN_REPLAYED`. A relay that only accepts Privacy Pass
+tokens can leave MAX_AUTH_TOKEN_CACHE_SIZE at its default of 0, which
+prohibits aliases ({{Section 9.1.3 of MoQ-TRANSPORT}}).
 
 ### Continuous Authorization with Batched Tokens {#continuous-auth-batched}
 
@@ -957,7 +1015,7 @@ still needs to define challenge delivery before session termination.\]\]
 If authentication fails during SETUP, the Relay MUST send a `SERVER_SETUP`
 carrying one or more AUTH CHALLENGE Setup Options ({{transport-hooks}}) and
 then terminate the session with the `UNAUTHORIZED` (0x02) Termination Error
-Code defined in {{Section 3.4 of MoQ-TRANSPORT}}. The termination reason
+Code defined in {{Section 12.2 of MoQ-TRANSPORT}}. The termination reason
 phrase carries no challenge material. It stays a human-readable string, as
 the QUIC CONNECTION_CLOSE frame requires.
 
@@ -975,20 +1033,24 @@ this mechanism observes a regular `UNAUTHORIZED` termination.
 #### Operation Errors
 
 If the error occurs over an established connection, the Relay MUST send a `REQUEST_ERROR`
-defined in {{Section 9.8 of MoQ-TRANSPORT}}.
+defined in {{Section 9.4 of MoQ-TRANSPORT}}.
 
 The error code MUST be one of:
 
 | Error Code | Name | Description |
 |------------|------|-------------|
+| 0x4 | MALFORMED_AUTH_TOKEN | Token cannot be parsed correctly |
+| 0x5 | EXPIRED_AUTH_TOKEN | Token has expired or been revoked |
 | 0x0100 | TOKEN_MISSING | No token provided when required |
 | 0x0101 | TOKEN_INVALID | Token signature verification failed |
-| 0x0102 | TOKEN_EXPIRED | Token has expired or been revoked |
 | 0x0103 | TOKEN_REPLAYED | Token nonce has been seen before |
 | 0x0104 | SCOPE_MISMATCH | Token scope does not authorize this operation |
 | 0x0105 | ISSUER_UNKNOWN | Token issuer is not trusted by this relay |
-| 0x0106 | TOKEN_MALFORMED | Token cannot be parsed correctly |
 {: #error-codes-table title="Privacy Pass Authorization Error Codes"}
+
+MALFORMED_AUTH_TOKEN and EXPIRED_AUTH_TOKEN are defined in
+{{Section 12.3 of MoQ-TRANSPORT}}. This document registers the remaining
+codes in the REQUEST_ERROR Codes registry ({{iana-request-error-codes}}).
 
 When the client should retry with a new token, the `REQUEST_ERROR` MUST
 carry one or more AUTH CHALLENGE Error Details ({{transport-hooks}}), ordered
@@ -1013,9 +1075,11 @@ information.
 
 #### Error Response Example
 
+This example uses Error Details from {{MoQ-TRANSPORT}}
+and the AUTH CHALLENGE binding in {{transport-hooks}}.
+
 ~~~
 REQUEST_ERROR {
-    Request_ID = 42,
     Error_Code = 0x0104,  /* SCOPE_MISMATCH */
     Retry_Interval = 1,
     Reason = "token scope does not cover this namespace",
@@ -1063,9 +1127,9 @@ returns a `REQUEST_ERROR` with the appropriate error code from {{error-codes-tab
 The client MAY retry the operation with a valid token obtained using the
 `TokenChallenge` from the error response.
 
-As per {{Section 3.4.4 of MoQ-TRANSPORT}}, implementations MAY elevate
-request-specific errors to session-level errors. This elevation is appropriate
-when:
+Implementations MAY elevate request-specific errors to session-level errors
+by closing the session with `UNAUTHORIZED` ({{Section 12.2 of MoQ-TRANSPORT}}).
+This elevation is appropriate when:
 
 - The authorization failure indicates a systemic issue (e.g., all client tokens
   are from an untrusted issuer)
@@ -1074,6 +1138,28 @@ when:
 
 Implementations need to consider the impact on other outstanding subscriptions
 before elevating to session-level errors.
+
+#### Loss of Authorization on Established Requests {#established-authz}
+
+A relay can determine that an established request is no longer authorized,
+for example because the client did not present a fresh token before the
+EXPIRES deadline, or because a `REQUEST_UPDATE` carried a token that failed
+verification. The relay answers a failed `REQUEST_UPDATE` with a
+`REQUEST_ERROR` as described in {{control-message-authz}}. To end the
+underlying request:
+
+- For a subscription, a failed `REQUEST_UPDATE` requires `PUBLISH_DONE` with
+  status `UPDATE_FAILED` ({{Section 9.5.1 of MoQ-TRANSPORT}}). Token expiry
+  uses `EXPIRED_AUTH_TOKEN`. Other loss of authorization uses `UNAUTHORIZED`
+  ({{Section 12.4 of MoQ-TRANSPORT}}).
+- For a FETCH in progress, the relay resets the fetch stream with
+  `EXPIRED_AUTH_TOKEN` ({{Section 12.5 of MoQ-TRANSPORT}}).
+
+#### Request Migration {#request-migration}
+
+A request that is re-issued after a `GOAWAY` ({{Section 9.2 of MoQ-TRANSPORT}}),
+on a new session or on the current one, MUST carry a fresh token. The token
+presented with the original request has already been redeemed.
 
 #### Retry Behavior {#retry-behavior}
 
@@ -1087,7 +1173,7 @@ example from a batch obtained earlier ({{continuous-auth-batched}}), it SHOULD
 present that token rather than start a new issuance.
 
 For operation errors, retry timing is governed by the Retry Interval field of
-`REQUEST_ERROR` ({{Section 9.8 of MoQ-TRANSPORT}}): the client MUST NOT retry
+`REQUEST_ERROR` ({{Section 9.4 of MoQ-TRANSPORT}}): the client MUST NOT retry
 before the interval has elapsed, and MUST NOT retry at all when the interval
 is 0.
 
@@ -1186,7 +1272,8 @@ Pass Authorization" with the following initial contents:
 | 6 | PUBLISH | {{moq-actions}} |
 | 7 | FETCH | {{moq-actions}} |
 | 8 | TRACK_STATUS | {{moq-actions}} |
-| 9-254 | Unassigned | |
+| 9 | SUBSCRIBE_TRACKS | {{moq-actions}} |
+| 10-254 | Unassigned | |
 | 255 | Reserved | This document |
 {: #moq-action-registry-table title="MoQ Actions Registry"}
 
@@ -1210,26 +1297,19 @@ Pass Authorization" with the following initial contents:
 
 New entries in this registry require Specification Required registration policy.
 
-## MoQ Privacy Pass Error Code Registry
+## REQUEST_ERROR Code Registrations {#iana-request-error-codes}
 
-IANA is requested to create a new registry titled "MoQ Privacy Pass Authorization
-Error Codes" with the following initial contents:
+IANA is requested to register the following entries in the "REQUEST_ERROR
+Codes" registry defined in {{Section 16.12.2 of MoQ-TRANSPORT}}:
 
-| Value | Name | Reference |
-|-------|------|-----------|
+| Code | Name | Specification |
+|------|------|---------------|
 | 0x0100 | TOKEN_MISSING | {{errors}} |
 | 0x0101 | TOKEN_INVALID | {{errors}} |
-| 0x0102 | TOKEN_EXPIRED | {{errors}} |
 | 0x0103 | TOKEN_REPLAYED | {{errors}} |
 | 0x0104 | SCOPE_MISMATCH | {{errors}} |
 | 0x0105 | ISSUER_UNKNOWN | {{errors}} |
-| 0x0106 | TOKEN_MALFORMED | {{errors}} |
-| 0x0107-0x01FF | Unassigned | |
-{: #error-code-registry title="MoQ Privacy Pass Error Codes Registry"}
-
-New entries in this registry require Specification Required registration policy.
-Values are allocated from the 0x0100-0x01FF range reserved for Privacy Pass
-authorization errors.
+{: #error-code-registry title="REQUEST_ERROR Code Registrations"}
 
 
 --- back
@@ -1282,6 +1362,12 @@ a final version of this document.
 * Define required MoQ Transport extensions (AUTH CHALLENGE, AUTH REQUEST/RESPONSE)
 * Bind request-error challenges to Error Details and identify remaining SETUP and issuance dependencies
 * Clarify that token unlinkability does not hide connection-level correlation
+* Align with draft-ietf-moq-transport-23: single SETUP message, updated section references
+* Add SUBSCRIBE_TRACKS action and define matching for Track Namespace Prefix requests
+* Require USE_VALUE for Privacy Pass tokens and treat alias reuse as replay
+* Require relays to wait for the client's SETUP before sending challenge or issuance options
+* Reuse MoQT MALFORMED_AUTH_TOKEN and EXPIRED_AUTH_TOKEN, register remaining codes in the REQUEST_ERROR Codes registry
+* Specify PUBLISH_DONE and stream reset codes when authorization ends, and fresh tokens after GOAWAY
 * Register a Privacy Pass codepoint in the MOQT Auth Token Type registry
 * Specify retry behavior after auth challenge errors
 * Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)
