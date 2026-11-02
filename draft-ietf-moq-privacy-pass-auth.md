@@ -49,7 +49,6 @@ normative:
   RFC9578:
 
 informative:
-  RFC9458:
   PRIVACYPASS-BATCHED: I-D.draft-ietf-privacypass-batched-tokens
   PRIVACYPASS-IANA:
     title: Privacy Pass IANA
@@ -198,42 +197,43 @@ allows a client to exchange a publicly verifiable token for privately verifiable
 tokens (or credentials) issued directly by the MoQ relay.
 
 ~~~aasvg
-+---------------+  +------------+        +--------+        +----------+  +--------+
-| Origin Issuer |  |  MoQ Relay |        | Client |        | Attester |  | Issuer |
-+-------+-------+  +------+-----+        +----+---+        +-----+----+  +----+---+
-        |                 |                   |                  |           |
-        |                 |                   |                  |           |
-        :     Phase 1: Bootstrap Token Acquisition               :           :
-        |                 |                   |                  |           |
-        |                 |<- CLIENT_SETUP[] -+                  |           |
-        |                 +- SERVER_SETUP  -->|                  |           |
-        |                 |  [AUTH CHALLENGE] |                  |           |
-        |                 +- UNAUTHORIZED --->|                  |           |
-        |                 |                   |                  |           |
-        |                 |                   |<== Attestation ==>           |
-        |                 |                   |                  |           |
-        |                 |                   +---- TokenRequest ----------->|
-        |                 |                   |<--- TokenResponse -----------+
-        |                 |                   |                  |           |
-        :     Phase 2: Token Exchange via Reverse Flow           :           :
-        |                 |                   |                  |           |
-        |                 |<- CLIENT_SETUP ---+                  |           |
-        |                 |   [AUTH TOKEN +   |                  |           |
-        |                 |    AUTH REQUEST]  |                  |           |
-        |                 |                   |                  |           |
-        |<-CredentialReq--+                   |                  |           |
-        +--CredentialRes->|                   |                  |           |
-        |                 |                   |                  |           |
-        |                 +-- SERVER_SETUP -->|                  |           |
-        |                 |  [AUTH RESPONSE]  |                  |           |
-        |                 |                   |                  |           |
-        :     Phase 3: Normal Operations with Derived Tokens     :           :
-        |                 |                   |                  |           |
-        |                 |<-- SUBSCRIBE -----+                  |           |
-        |                 |   [Token from     |                  |           |
-        |                 |    credential]    |                  |           |
-        |                 +-- SUBSCRIBE_OK -->|                  |           |
-        |                 |                   |                  |           |
++--------+      +-----------+      +--------+    +----------+ +--------+
+| Origin |      | MoQ Relay |      | Client |    | Attester | | Issuer |
+| Issuer |      +-----+-----+      +----+---+    +-----+----+ +----+---+
++----+---+            |                 |              |           |
+     |                |                 |              |           |
+     |                |                 |              |           |
+     :  Phase 1: Bootstrap Token Acquisition           :           :
+     |                |                 |              |           |
+     |                |<-CLIENT_SETUP[]-+              |           |
+     |                +-SERVER_SETUP--->|              |           |
+     |                | [AUTH CHALLENGE]|              |           |
+     |                +-UNAUTHORIZED--->|              |           |
+     |                |                 |              |           |
+     |                |                 |<=Attestation=>           |
+     |                |                 |              |           |
+     |                |                 +---- TokenRequest ------->|
+     |                |                 |<--- TokenResponse -------+
+     |                |                 |              |           |
+     :  Phase 2: Token Exchange via Reverse Flow       :           :
+     |                |                 |              |           |
+     |                |<-CLIENT_SETUP---+              |           |
+     |                | [AUTH TOKEN +   |              |           |
+     |                |  AUTH REQUEST]  |              |           |
+     |                |                 |              |           |
+     |<-CredentialReq-+                 |              |           |
+     +-CredentialRes->|                 |              |           |
+     |                |                 |              |           |
+     |                +-SERVER_SETUP--->|              |           |
+     |                | [AUTH RESPONSE] |              |           |
+     |                |                 |              |           |
+     :  Phase 3: Normal Operations with Derived Tokens :           :
+     |                |                 |              |           |
+     |                |<-SUBSCRIBE------+              |           |
+     |                | [Token from     |              |           |
+     |                |  credential]    |              |           |
+     |                +-SUBSCRIBE_OK--->|              |           |
+     |                |                 |              |           |
 ~~~
 {: #fig-reverse-flow title="Complete Reverse Flow Authorization"}
 
@@ -854,14 +854,17 @@ as registered with IANA:
 
 ~~~
 struct {
-   uint16_t token_type; /* From the IANA Privacy Pass Token Types Registry */
+   /* From the IANA Privacy Pass Token Types Registry */
+   uint16_t token_type;
    select (token_type) { /* Rest of the token */
      case (0x0001, 0x0002, 0x0005):
          uint8_t nonce[32];
          uint8_t challenge_digest[32];
          uint8_t token_key_id[Nid];
          uint8_t authenticator[Nk];
-     case (other): /* Other token types from the IANA Privacy Pass Token Types Registry */
+     case (other):
+         /* Other token types from the IANA Privacy Pass
+            Token Types Registry */
          opaque remainder<0..2^16-1>;
    }
 } Token;
@@ -1196,35 +1199,33 @@ relay can verify Privacy Pass tokens locally and deliver media directly
 without contacting the Issuer. This example uses publicly verifiable tokens.
 
 ~~~~~aasvg
-         +-----------+                        +--------+         +----------+ +--------+
-         | MoQ Relay |                        | Client |         | Attester | | Issuer |
-         +-----+-----+                        +---+----+         +----+-----+ +---+----+
-               |                                  |                   |           |
-               |<--------------- CLIENT_SETUP[] --+                   |           |
-               |                                  |                   |           |
-               +-- SERVER_SETUP[  --------------->|                   |           |
-               |     AUTH CHALLENGE,              |                   |           |
-               |   ]                              |                   |           |
-               +-- UNAUTHORIZED (0x2) ----------->|                   |           |
-               |                                  |                   |           |
-               |                                  |<== Attestation ==>|           |
-               |                                  |                   |           |
-               |                                  +--------- TokenRequest ------->|
-               |                                  |<-------- TokenResponse -------+
-               |                                  |                   |           |
-               |                           FinalizeToken              |           |
-               |                                  |                   |           |
-               |            CLIENT_SETUP[{        |                   |           |
-               |<----------    AUTHORIZATION      |                   |           |
-               |               TOKEN,           --+                   |           |
-               |            }]                    |                   |           |
-               |                                  |                   |           |
- .-------------+--.                               |                   |           |
-| Local validation |                              |                   |           |
- `-------------+--'                               |                   |           |
-               |                                  |                   |           |
-               +-- SERVER_SETUP ----------------->|                   |           |
-               |                                  |                   |           |
+         +-----------+             +--------+    +----------+ +--------+
+         | MoQ Relay |             | Client |    | Attester | | Issuer |
+         +-----+-----+             +----+---+    +-----+----+ +----+---+
+               |                        |              |           |
+               |                        |              |           |
+               |<------ CLIENT_SETUP[] -+              |           |
+               |                        |              |           |
+               +-- SERVER_SETUP ------->|              |           |
+               |  [AUTH CHALLENGE]      |              |           |
+               +-- UNAUTHORIZED (0x2) ->|              |           |
+               |                        |              |           |
+               |                        |<=Attestation=>           |
+               |                        |              |           |
+               |                        +------- TokenRequest ---->|
+               |                        |<------ TokenResponse ----+
+               |                        |              |           |
+               |                  FinalizeToken        |           |
+               |                        |              |           |
+               |<--- CLIENT_SETUP ------+              |           |
+               |  [AUTHORIZATION TOKEN] |              |           |
+               |                        |              |           |
+ .-------------+--.                     |              |           |
+| Local validation |                    |              |           |
+ '-------------+--'                     |              |           |
+               |                        |              |           |
+               +-- SERVER_SETUP ------->|              |           |
+               |                        |              |           |
 ~~~~~
 {: #direct-relay-authorization-flow title="Direct Relay Authorization Flow"}
 
