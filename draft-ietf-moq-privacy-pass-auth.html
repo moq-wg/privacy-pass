@@ -17,24 +17,24 @@ fetches, publications, and relay operations while supporting fine-grained
 access control through prefix-based track namespace and track name matching
 rules. 
     " name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="media over quic" name="keyword">
 <meta content="privacy-pass" name="keyword">
 <meta content="draft-ietf-moq-privacy-pass-auth-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
-    Python 3.14.5
-    ConfigArgParse 1.7.5
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.0
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.2
+    wcwidth 0.9.2
 -->
 <link href="draft-ietf-moq-privacy-pass-auth.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -70,7 +70,6 @@ rules.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -119,7 +118,6 @@ rules.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -184,7 +182,6 @@ rules.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -1053,11 +1050,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Privacy Pass MoQ Auth</td>
-<td class="right">July 2026</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Nandakumar, et al.</td>
-<td class="center">Expires 7 January 2027</td>
+<td class="center">Expires 6 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-ietf-moq-privacy-pass-auth-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-06" class="published">6 July 2026</time>
+<time datetime="2026-11-02" class="published">2 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-07">7 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-06">6 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1140,7 +1137,7 @@ rules.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 7 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1243,7 +1240,7 @@ rules.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-required-moq-transport-exte" class="internal xref">Required MoQ Transport Extensions</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.1">
-                    <p id="section-toc.1-1.3.2.4.2.1.1"><a href="#section-3.4.1" class="auto internal xref">3.4.1</a>.  <a href="#name-auth-challenge-parameter" class="internal xref">AUTH CHALLENGE Parameter</a></p>
+                    <p id="section-toc.1-1.3.2.4.2.1.1"><a href="#section-3.4.1" class="auto internal xref">3.4.1</a>.  <a href="#name-auth-challenge" class="internal xref">AUTH CHALLENGE</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.2">
                     <p id="section-toc.1-1.3.2.4.2.2.1"><a href="#section-3.4.2" class="auto internal xref">3.4.2</a>.  <a href="#name-auth-request-and-auth-respo" class="internal xref">AUTH REQUEST and AUTH RESPONSE Parameters</a></p>
@@ -1543,7 +1540,7 @@ the same credential.<a href="#section-2.2-5.3.1" class="pilcrow">¶</a></p>
           <h4 id="name-reverse-flow-overview">
 <a href="#section-2.2.1" class="section-number selfRef">2.2.1. </a><a href="#name-reverse-flow-overview" class="section-name selfRef">Reverse Flow Overview</a>
           </h4>
-<p id="section-2.2.1-1">The reverse flow, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-06#section-4" class="relref">Section 4</a> of [<a href="#PRIVACYPASS-REVERSE-FLOW" class="cite xref">PRIVACYPASS-REVERSE-FLOW</a>]</span>,
+<p id="section-2.2.1-1">The reverse flow, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-07#section-4" class="relref">Section 4</a> of [<a href="#PRIVACYPASS-REVERSE-FLOW" class="cite xref">PRIVACYPASS-REVERSE-FLOW</a>]</span>,
 allows a client to exchange a publicly verifiable token for privately verifiable
 tokens (or credentials) issued directly by the MoQ relay.<a href="#section-2.2.1-1" class="pilcrow">¶</a></p>
 <span id="name-complete-reverse-flow-autho"></span><div id="fig-reverse-flow">
@@ -1772,7 +1769,7 @@ tokens derived from the credential obtained in Phase 2.<a href="#section-2.2.2-6
 for the privately verifiable token type:<a href="#section-2.2.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.2.3-2.1">
-              <p id="section-2.2.3-2.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>GenericBatchTokenRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-2.2.3-2.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>GenericBatchTokenRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-2.2.3-2.2">
               <p id="section-2.2.3-2.2.1">For <code>0xE5AC</code>: <code>CredentialRequest</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-01#section-7.1" class="relref">Section 7.1</a> of [<a href="#PRIVACYPASS-ARC" class="cite xref">PRIVACYPASS-ARC</a>]</span><a href="#section-2.2.3-2.2.1" class="pilcrow">¶</a></p>
@@ -1781,7 +1778,7 @@ for the privately verifiable token type:<a href="#section-2.2.3-1" class="pilcro
 <p id="section-2.2.3-3">Similarly, the AUTH RESPONSE payload contains:<a href="#section-2.2.3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.2.3-4.1">
-              <p id="section-2.2.3-4.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>GenericBatchTokenResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-6.2" class="relref">Section 6.2</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-4.1.1" class="pilcrow">¶</a></p>
+              <p id="section-2.2.3-4.1.1">For <code>0x0001</code> or <code>0x0005</code>: <code>GenericBatchTokenResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09#section-6.2" class="relref">Section 6.2</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span><a href="#section-2.2.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-2.2.3-4.2">
               <p id="section-2.2.3-4.2.1">For <code>0xE5AC</code>: <code>CredentialResponse</code> as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-arc-protocol-01#section-7.2" class="relref">Section 7.2</a> of [<a href="#PRIVACYPASS-ARC" class="cite xref">PRIVACYPASS-ARC</a>]</span><a href="#section-2.2.3-4.2.1" class="pilcrow">¶</a></p>
@@ -1837,11 +1834,11 @@ across multiple relays.<a href="#section-3.1-3.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-5.1">
             <p id="section-3.1-5.1.1"><code>0x0001 (VOPRF(P-384, SHA-384))</code>: Defined in <span><a href="https://rfc-editor.org/rfc/rfc9578#section-6" class="relref">Section 6</a> of [<a href="#RFC9578" class="cite xref">RFC9578</a>]</span>. Uses VOPRF (<span>[<a href="#RFC9497" class="cite xref">RFC9497</a>]</span>) for
-deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
+deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-5.2">
-            <p id="section-3.1-5.2.1"><code>0x0005 (VOPRF(ristretto255, SHA-512))</code>: Defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-8.1" class="relref">Section 8.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>. Uses VOPRF (<span>[<a href="#RFC9497" class="cite xref">RFC9497</a>]</span>) for
-deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-5.2.1"><code>0x0005 (VOPRF(ristretto255, SHA-512))</code>: Defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09#section-8.1" class="relref">Section 8.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>. Uses VOPRF (<span>[<a href="#RFC9497" class="cite xref">RFC9497</a>]</span>) for
+deployments where the origin is the issuer. Issuance can be batched as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09#section-5" class="relref">Section 5</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>.<a href="#section-3.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-5.3">
             <p id="section-3.1-5.3.1"><code>0xE5AC (ARC(P-256))</code>: Anonymous Rate Limit Credentials Token using <span>[<a href="#ARC" class="cite xref">ARC</a>]</span>.
@@ -1928,63 +1925,63 @@ MoQTransport control message types:<a href="#section-3.2.2-1" class="pilcrow">¶
                 <td class="text-left" rowspan="1" colspan="1">CLIENT_SETUP</td>
                 <td class="text-left" rowspan="1" colspan="1">0</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SERVER_SETUP</td>
                 <td class="text-left" rowspan="1" colspan="1">1</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.3" class="relref">Section 9.3</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">PUBLISH_NAMESPACE</td>
                 <td class="text-left" rowspan="1" colspan="1">2</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.20" class="relref">Section 9.20</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.20" class="relref">Section 9.20</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SUBSCRIBE_NAMESPACE</td>
                 <td class="text-left" rowspan="1" colspan="1">3</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.25" class="relref">Section 9.25</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.25" class="relref">Section 9.25</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">SUBSCRIBE</td>
                 <td class="text-left" rowspan="1" colspan="1">4</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.9" class="relref">Section 9.9</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.9" class="relref">Section 9.9</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">REQUEST_UPDATE</td>
                 <td class="text-left" rowspan="1" colspan="1">5</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.11" class="relref">Section 9.11</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.11" class="relref">Section 9.11</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">PUBLISH</td>
                 <td class="text-left" rowspan="1" colspan="1">6</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.13" class="relref">Section 9.13</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.13" class="relref">Section 9.13</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">FETCH</td>
                 <td class="text-left" rowspan="1" colspan="1">7</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.16" class="relref">Section 9.16</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.16" class="relref">Section 9.16</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">TRACK_STATUS</td>
                 <td class="text-left" rowspan="1" colspan="1">8</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.19" class="relref">Section 9.19</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
+                  <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.19" class="relref">Section 9.19</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>
 </td>
               </tr>
             </tbody>
@@ -2199,7 +2196,7 @@ and track name matching use the same <code>MatchRule</code> structure and algori
           </h4>
 <p id="section-3.3.1-1">Given a <code>MatchRule</code> and a target value (namespace tuple or track name), the
 match succeeds according to the following rules. For namespace matching, both
-the pattern and target are tuples of byte strings; matching operates at tuple
+the pattern and target are tuples of byte strings. Matching operates at tuple
 element boundaries.<a href="#section-3.3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.3.1-2"><code>MATCH_EXACT (0)</code>:<a href="#section-3.3.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.3.1-3">The target <span class="bcp14">MUST</span> be identical to the pattern. For namespace
@@ -2455,20 +2452,27 @@ d. If all three checks pass, authorization succeeds for this scope<a href="#sect
         <h3 id="name-required-moq-transport-exte">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-required-moq-transport-exte" class="section-name selfRef">Required MoQ Transport Extensions</a>
         </h3>
-<p id="section-3.4-1">This document relies on authentication hooks that are proposed for MoQ
-Transport but not yet part of <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span> (see moq-transport issue
-1658). They are defined here provisionally and are expected to move to the
-transport draft. They are deliberately scheme-agnostic: any authorization
+<p id="section-3.4-1">This document uses the Error Details mechanism of <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span> to
+carry AUTH CHALLENGE in <code>REQUEST_ERROR</code>. It also defines AUTH CHALLENGE
+Setup Options and Message Parameters, and AUTH REQUEST and AUTH RESPONSE
+for reverse flow issuance. These hooks are scheme-agnostic: any authorization
 scheme with a codepoint in the "MOQT Auth Token Type" registry can use them.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4-2">This document also assumes that <code>REQUEST_ERROR</code> carries Message Parameters,
-as <code>REQUEST_OK</code> and <code>REQUEST_UPDATE</code> already do.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">[[editor's note: These hooks depend on ongoing MoQ Transport authentication
+work (see <a href="https://github.com/moq-wg/moq-transport/issues/1658">https://github.com/moq-wg/moq-transport/issues/1658</a>).
+Error Details provides binary carriage in <code>REQUEST_ERROR</code>, but the AUTH
+CHALLENGE binding is not yet defined in MoQ Transport. SETUP challenge
+delivery and in-band issuance, including successful-response parameters,
+also remain open. AUTH REQUEST and AUTH RESPONSE describe the exchange
+needed for reverse flow. They are not an adopted AUTH design-team solution.]]<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 <div id="auth-challenge-param">
 <section id="section-3.4.1">
-          <h4 id="name-auth-challenge-parameter">
-<a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-auth-challenge-parameter" class="section-name selfRef">AUTH CHALLENGE Parameter</a>
+          <h4 id="name-auth-challenge">
+<a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-auth-challenge" class="section-name selfRef">AUTH CHALLENGE</a>
           </h4>
-<p id="section-3.4.1-1">The AUTH CHALLENGE parameter is a length-prefixed Message Parameter, with a
-Setup Option counterpart of identical encoding:<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.4.1-1">AUTH CHALLENGE is a repeatable, odd-numbered Error Detail in <code>REQUEST_ERROR</code>,
+using the Key-Value-Pair encoding of <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>. Its value has the
+following encoding, also used by the Message Parameter and Setup
+Option counterparts:<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.4.1-2">
 <pre>
 Auth Challenge {
@@ -2487,15 +2491,21 @@ Auth Challenge {
 </li>
           </ul>
 <p id="section-3.4.1-4">The parameter conveys that the sender will accept a credential of this Token
-Type satisfying this Challenge. It <span class="bcp14">MAY</span> be repeated within a message;
-challenges are ordered by sender preference, most preferred first. A
+Type satisfying this Challenge. It <span class="bcp14">MAY</span> be repeated within a message.
+Challenges are ordered by sender preference, most preferred first. A
 receiver ignores challenges whose Token Type it does not support.<a href="#section-3.4.1-4" class="pilcrow">¶</a></p>
-<p id="section-3.4.1-5">The Message Parameter can appear in <code>REQUEST_ERROR</code> and in successful
-responses (<code>REQUEST_OK</code>, <code>SUBSCRIBE_OK</code>, <code>FETCH_OK</code>). The Setup Option can
+<p id="section-3.4.1-5">The Error Detail applies to the error codes in <a href="#error-codes-table" class="auto internal xref">Table 3</a> and
+<span class="bcp14">MAY</span> appear more than once in a <code>REQUEST_ERROR</code>. Its value, including Token
+Type, <span class="bcp14">MUST NOT</span> exceed the 65,535-byte Error Detail value limit.
+The Message Parameter can appear in successful responses
+(<code>REQUEST_OK</code>, <code>SUBSCRIBE_OK</code>, <code>FETCH_OK</code>), including <code>REQUEST_OK</code> responding
+to <code>REQUEST_UPDATE</code> (<code>REQUEST_UPDATE_OK</code>). The Setup Option can
 appear in <code>SERVER_SETUP</code>.<a href="#section-3.4.1-5" class="pilcrow">¶</a></p>
-<p id="section-3.4.1-6">For this document, the Token Type is PRIVACY_PASS_TOKEN
+<p id="section-3.4.1-6">[[editor's note: The codepoint in the "MOQT Error Detail Types" registry
+remains TBD, pending definition of the generic transport challenge mechanism.]]<a href="#section-3.4.1-6" class="pilcrow">¶</a></p>
+<p id="section-3.4.1-7">For this document, the Token Type is PRIVACY_PASS_TOKEN
 (<a href="#iana-moqt-token-type" class="auto internal xref">Section 6.1</a>) and the Challenge is a <code>TokenChallenge</code> as
-defined in <span><a href="https://rfc-editor.org/rfc/rfc9577#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9577" class="cite xref">RFC9577</a>]</span>.<a href="#section-3.4.1-6" class="pilcrow">¶</a></p>
+defined in <span><a href="https://rfc-editor.org/rfc/rfc9577#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9577" class="cite xref">RFC9577</a>]</span>.<a href="#section-3.4.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="auth-request-response-param">
@@ -2523,7 +2533,7 @@ the authorization scheme, such as a token issuance or renewal request. It
 can appear wherever the AUTHORIZATION TOKEN parameter can, including
 <code>REQUEST_UPDATE</code>, and in <code>CLIENT_SETUP</code> as an option. A receiver that does
 not support the Token Type, or is unwilling to issue, ignores the parameter
-and processes the message as if it were absent; the sender detects this by
+and processes the message as if it were absent. The sender detects this by
 the absence of a matching AUTH RESPONSE.<a href="#section-3.4.2-3" class="pilcrow">¶</a></p>
 <p id="section-3.4.2-4">AUTH RESPONSE carries the material produced in answer to an AUTH REQUEST.
 It can appear in the response to the message that carried the AUTH REQUEST
@@ -2531,8 +2541,13 @@ It can appear in the response to the message that carried the AUTH REQUEST
 option. It <span class="bcp14">MUST NOT</span> be sent unsolicited.<a href="#section-3.4.2-4" class="pilcrow">¶</a></p>
 <p id="section-3.4.2-5">Request and response payloads are transient: they are not registered in the
 token cache and do not count against MAX_AUTH_TOKEN_CACHE_SIZE.<a href="#section-3.4.2-5" class="pilcrow">¶</a></p>
-<p id="section-3.4.2-6">For this document, the Token Type is PRIVACY_PASS_TOKEN and the payloads
-are the issuance structures listed in <a href="#credential-encoding" class="auto internal xref">Section 2.2.3</a>.<a href="#section-3.4.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.4.2-6">Issuance is between the client and its peer relay acting as issuer. These
+parameters do not request issuance by an upstream relay or original publisher.<a href="#section-3.4.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.4.2-7">[[editor's note: The transport binding needs to specify how issuance requests
+and responses are correlated when <code>REQUEST_UPDATE</code> processing is coalesced.
+The existing parameter update rules do not define this exchange.]]<a href="#section-3.4.2-7" class="pilcrow">¶</a></p>
+<p id="section-3.4.2-8">For this document, the Token Type is PRIVACY_PASS_TOKEN and the payloads
+are the issuance structures listed in <a href="#credential-encoding" class="auto internal xref">Section 2.2.3</a>.<a href="#section-3.4.2-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2550,11 +2565,11 @@ authorization framework with the following adaptations:<a href="#section-3.5-1" 
 <a href="#section-3.5.1" class="section-number selfRef">3.5.1. </a><a href="#name-setup-message-authorization" class="section-name selfRef">SETUP Message Authorization</a>
           </h4>
 <p id="section-3.5.1-1">For connection-level authorization, the client includes an AUTHORIZATION
-TOKEN Setup Option (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.3.1.5" class="relref">Section 9.3.1.5</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>) whose Token Type
+TOKEN Setup Option (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.3.1.5" class="relref">Section 9.3.1.5</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>) whose Token Type
 is PRIVACY_PASS_TOKEN and whose Token Value is a <code>Token</code> structure. When
 the client also wants tokens or credentials issued over this connection
 (<a href="#reverse-flow" class="auto internal xref">Section 2.2</a>), it adds an AUTH REQUEST option
-(<a href="#auth-request-response-param" class="auto internal xref">Section 3.4.2</a>); the relay answers with an AUTH RESPONSE
+(<a href="#auth-request-response-param" class="auto internal xref">Section 3.4.2</a>). The relay answers with an AUTH RESPONSE
 option in <code>SERVER_SETUP</code>.<a href="#section-3.5.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.5.1-2">
 <pre>
@@ -2637,7 +2652,7 @@ JWT-based approaches that use explicit revalidation intervals, Privacy Pass
 can achieve continuous authorization through batched token issuance.<a href="#section-3.5.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.5.3-2">During the initial SETUP exchange, clients can request multiple tokens by
 sending a <code>GenericBatchTokenRequest</code> (defined in
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>) in an AUTH REQUEST option. Each
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09#section-6.1" class="relref">Section 6.1</a> of [<a href="#PRIVACYPASS-BATCHED" class="cite xref">PRIVACYPASS-BATCHED</a>]</span>) in an AUTH REQUEST option. Each
 token in the batch is independently valid and can be presented for
 subsequent operations or periodic re-authorization.<a href="#section-3.5.3-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.5.3-3">
@@ -2657,8 +2672,9 @@ Time 3T:    Relay requests re-authorization
 </pre><a href="#section-3.5.3-3" class="pilcrow">¶</a>
 </div>
 <p id="section-3.5.3-4">Relays <span class="bcp14">MAY</span> request periodic re-authorization by attaching an AUTH CHALLENGE
-parameter to a <code>REQUEST_ERROR</code>, or ahead of time to a successful response
-alongside the EXPIRES parameter of <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, which tells the client
+Error Detail to a <code>REQUEST_ERROR</code>, or an AUTH CHALLENGE parameter ahead of
+time to a successful response alongside the EXPIRES parameter of
+<span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, which tells the client
 what its extending <code>REQUEST_UPDATE</code> needs to present. Clients <span class="bcp14">SHOULD</span> present
 a fresh token from their batch in response if any satisfy the new
 <code>TokenChallenge</code>. If not, they <span class="bcp14">SHOULD</span> perform a new issuance process.<a href="#section-3.5.3-4" class="pilcrow">¶</a></p>
@@ -2704,7 +2720,11 @@ REQUEST parameter. This composes with the expiry-driven update cycle of
 extending <code>REQUEST_UPDATE</code> presents a fresh token and requests the next one
 in the same message.<a href="#section-3.5.4-3" class="pilcrow">¶</a></p>
 <p id="section-3.5.4-4">Tokens obtained this way can be presented by the Client to maintain
-the continuity of the session without linkability.<a href="#section-3.5.4-4" class="pilcrow">¶</a></p>
+the continuity of the session. The presentations are cryptographically
+unlinkable, subject to the privacy properties of the token type and deployment.
+Presentations on the same MoQ connection can still be correlated through
+the connection, timing, or request metadata. A connection may carry requests
+for multiple actors, so this correlation does not by itself identify an actor.<a href="#section-3.5.4-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.5.4-5">
 <pre>
 Reverse Flow Token Usage Timeline:
@@ -2734,21 +2754,25 @@ a valid token and retry the operation.<a href="#section-3.5.5-1" class="pilcrow"
             <h5 id="name-setup-errors">
 <a href="#section-3.5.5.1" class="section-number selfRef">3.5.5.1. </a><a href="#name-setup-errors" class="section-name selfRef">SETUP Errors</a>
             </h5>
-<p id="section-3.5.5.1-1">If authentication fails during SETUP, the Relay <span class="bcp14">MUST</span> send a <code>SERVER_SETUP</code>
+<p id="section-3.5.5.1-1">[[editor's note: The following SETUP procedure depends on transport work
+described in <a href="#transport-hooks" class="auto internal xref">Section 3.4</a>. Sending <code>SERVER_SETUP</code> before closing
+does not guarantee that the client receives the challenge. MoQ Transport
+still needs to define challenge delivery before session termination.]]<a href="#section-3.5.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.5.5.1-2">If authentication fails during SETUP, the Relay <span class="bcp14">MUST</span> send a <code>SERVER_SETUP</code>
 carrying one or more AUTH CHALLENGE Setup Options (<a href="#transport-hooks" class="auto internal xref">Section 3.4</a>) and
 then terminate the session with the <code>UNAUTHORIZED</code> (0x02) Termination Error
-Code defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-3.4" class="relref">Section 3.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>. The termination reason
-phrase carries no challenge material; it stays a human-readable string, as
-the QUIC CONNECTION_CLOSE frame requires.<a href="#section-3.5.5.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.5.5.1-2">Each AUTH CHALLENGE option carries one <code>TokenChallenge</code>. Options are ordered
+Code defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-3.4" class="relref">Section 3.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>. The termination reason
+phrase carries no challenge material. It stays a human-readable string, as
+the QUIC CONNECTION_CLOSE frame requires.<a href="#section-3.5.5.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.5.5.1-3">Each AUTH CHALLENGE option carries one <code>TokenChallenge</code>. Options are ordered
 by relay preference, most preferred first, which lets the client select an
 issuance protocol based on the token types and issuers it supports.
 Different options <span class="bcp14">MAY</span> name different issuers or scopes for different token
-types. The Relay <span class="bcp14">MUST</span> include at least one challenge.<a href="#section-3.5.5.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.5.5.1-3">The client can then obtain a token satisfying one of the challenges and
+types. The Relay <span class="bcp14">MUST</span> include at least one challenge.<a href="#section-3.5.5.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.5.5.1-4">The client can then obtain a token satisfying one of the challenges and
 establish a new session presenting it. Since <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span> requires
 endpoints to ignore unknown Setup Options, a client that does not support
-this mechanism observes a regular <code>UNAUTHORIZED</code> termination.<a href="#section-3.5.5.1-3" class="pilcrow">¶</a></p>
+this mechanism observes a regular <code>UNAUTHORIZED</code> termination.<a href="#section-3.5.5.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="operation-errors">
@@ -2757,7 +2781,7 @@ this mechanism observes a regular <code>UNAUTHORIZED</code> termination.<a href=
 <a href="#section-3.5.5.2" class="section-number selfRef">3.5.5.2. </a><a href="#name-operation-errors" class="section-name selfRef">Operation Errors</a>
             </h5>
 <p id="section-3.5.5.2-1">If the error occurs over an established connection, the Relay <span class="bcp14">MUST</span> send a <code>REQUEST_ERROR</code>
-defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.8" class="relref">Section 9.8</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>.<a href="#section-3.5.5.2-1" class="pilcrow">¶</a></p>
+defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.8" class="relref">Section 9.8</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>.<a href="#section-3.5.5.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.5.5.2-2">The error code <span class="bcp14">MUST</span> be one of:<a href="#section-3.5.5.2-2" class="pilcrow">¶</a></p>
 <span id="name-privacy-pass-authorization-"></span><div id="error-codes-table">
 <table class="center" id="table-3">
@@ -2812,7 +2836,7 @@ defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-t
             </table>
 </div>
 <p id="section-3.5.5.2-4">When the client should retry with a new token, the <code>REQUEST_ERROR</code> <span class="bcp14">MUST</span>
-carry one or more AUTH CHALLENGE parameters (<a href="#transport-hooks" class="auto internal xref">Section 3.4</a>), ordered
+carry one or more AUTH CHALLENGE Error Details (<a href="#transport-hooks" class="auto internal xref">Section 3.4</a>), ordered
 by relay preference. The reason phrase stays a human-readable string.<a href="#section-3.5.5.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2857,7 +2881,7 @@ REQUEST_ERROR {
     Error_Code = 0x0104,  /* SCOPE_MISMATCH */
     Retry_Interval = 1,
     Reason = "token scope does not cover this namespace",
-    Parameters = [
+    Error Details = [
         AUTH_CHALLENGE {
             token_type = PRIVACY_PASS_TOKEN,
             challenge = TokenChallenge {
@@ -2889,7 +2913,7 @@ REQUEST_ERROR {
 }
 </pre><a href="#section-3.5.5.4-1" class="pilcrow">¶</a>
 </div>
-<p id="section-3.5.5.4-2">Note the two levels of token type: the parameter's <code>token_type</code> names the
+<p id="section-3.5.5.4-2">Note the two levels of token type: the Error Detail's <code>token_type</code> names the
 authorization scheme in the "MOQT Auth Token Type" registry, while the
 <code>TokenChallenge.token_type</code> names the Privacy Pass issuance protocol inside
 that scheme.<a href="#section-3.5.5.4-2" class="pilcrow">¶</a></p>
@@ -2904,7 +2928,7 @@ that scheme.<a href="#section-3.5.5.4-2" class="pilcrow">¶</a></p>
 returns a <code>REQUEST_ERROR</code> with the appropriate error code from <a href="#error-codes-table" class="auto internal xref">Table 3</a>.
 The client <span class="bcp14">MAY</span> retry the operation with a valid token obtained using the
 <code>TokenChallenge</code> from the error response.<a href="#section-3.5.5.5-1" class="pilcrow">¶</a></p>
-<p id="section-3.5.5.5-2">As per <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-3.4.4" class="relref">Section 3.4.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, implementations <span class="bcp14">MAY</span> elevate
+<p id="section-3.5.5.5-2">As per <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-3.4.4" class="relref">Section 3.4.4</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, implementations <span class="bcp14">MAY</span> elevate
 request-specific errors to session-level errors. This elevation is appropriate
 when:<a href="#section-3.5.5.5-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2928,7 +2952,7 @@ before elevating to session-level errors.<a href="#section-3.5.5.5-4" class="pil
             <h5 id="name-retry-behavior">
 <a href="#section-3.5.5.6" class="section-number selfRef">3.5.5.6. </a><a href="#name-retry-behavior" class="section-name selfRef">Retry Behavior</a>
             </h5>
-<p id="section-3.5.5.6-1">AUTH CHALLENGE parameters are ordered by relay preference. A client
+<p id="section-3.5.5.6-1">AUTH CHALLENGE values are ordered by relay preference. A client
 selects the first challenge whose token type it supports and whose issuer it
 trusts. If no challenge qualifies, the client <span class="bcp14">MUST NOT</span> retry the operation
 and <span class="bcp14">SHOULD</span> surface the failure to the application.<a href="#section-3.5.5.6-1" class="pilcrow">¶</a></p>
@@ -2936,14 +2960,14 @@ and <span class="bcp14">SHOULD</span> surface the failure to the application.<a 
 example from a batch obtained earlier (<a href="#continuous-auth-batched" class="auto internal xref">Section 3.5.3</a>), it <span class="bcp14">SHOULD</span>
 present that token rather than start a new issuance.<a href="#section-3.5.5.6-2" class="pilcrow">¶</a></p>
 <p id="section-3.5.5.6-3">For operation errors, retry timing is governed by the Retry Interval field of
-<code>REQUEST_ERROR</code> (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18#section-9.8" class="relref">Section 9.8</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>): the client <span class="bcp14">MUST NOT</span> retry
+<code>REQUEST_ERROR</code> (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.8" class="relref">Section 9.8</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>): the client <span class="bcp14">MUST NOT</span> retry
 before the interval has elapsed, and <span class="bcp14">MUST NOT</span> retry at all when the interval
 is 0.<a href="#section-3.5.5.6-3" class="pilcrow">¶</a></p>
 <p id="section-3.5.5.6-4">Tokens are single-use, so every retry consumes a token and possibly an
 issuance round trip. A client <span class="bcp14">SHOULD</span> treat a second consecutive failure of
 the same operation with the same error code as terminal rather than retry
 further. In particular, <code>SCOPE_MISMATCH</code> is only worth retrying if the client
-can obtain a token whose scope actually covers the operation; retrying with
+can obtain a token whose scope actually covers the operation. Retrying with
 an identically scoped token cannot succeed.<a href="#section-3.5.5.6-4" class="pilcrow">¶</a></p>
 <p id="section-3.5.5.6-5">The same limit applies across connections: after a session termination with
 <code>UNAUTHORIZED</code>, a client <span class="bcp14">SHOULD NOT</span> reconnect with a token for the same
@@ -3392,7 +3416,7 @@ authorization errors.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="MoQ-TRANSPORT">[MoQ-TRANSPORT]</dt>
         <dd>
-<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-18</span>, <time datetime="2026-05-12" class="refDate">12 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-18</a>&gt;</span>. </dd>
+<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-22</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PRIVACYPASS-ARC">[PRIVACYPASS-ARC]</dt>
         <dd>
@@ -3437,11 +3461,11 @@ authorization errors.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 <dl class="references">
 <dt id="KEYTRANS">[KEYTRANS]</dt>
         <dd>
-<span class="refAuthor">McMillion, B.</span>, <span class="refTitle">"Key Transparency Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-keytrans-architecture-09</span>, <time datetime="2026-06-29" class="refDate">29 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-keytrans-architecture-09">https://datatracker.ietf.org/doc/html/draft-ietf-keytrans-architecture-09</a>&gt;</span>. </dd>
+<span class="refAuthor">McMillion, B.</span>, <span class="refTitle">"Key Transparency Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-keytrans-architecture-11</span>, <time datetime="2026-11-01" class="refDate">1 November 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-keytrans-architecture-11">https://datatracker.ietf.org/doc/html/draft-ietf-keytrans-architecture-11</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PRIVACYPASS-BATCHED">[PRIVACYPASS-BATCHED]</dt>
         <dd>
-<span class="refAuthor">Robert, R.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">T. Meunier</span>, <span class="refTitle">"Batched Token Issuance Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-batched-tokens-08</span>, <time datetime="2026-05-04" class="refDate">4 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-08</a>&gt;</span>. </dd>
+<span class="refAuthor">Robert, R.</span>, <span class="refAuthor">Wood, C. A.</span>, and <span class="refAuthor">T. Meunier</span>, <span class="refTitle">"Batched Token Issuance Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-batched-tokens-09</span>, <time datetime="2026-10-15" class="refDate">15 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-batched-tokens-09</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PRIVACYPASS-IANA">[PRIVACYPASS-IANA]</dt>
         <dd>
@@ -3453,7 +3477,7 @@ authorization errors.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="PRIVACYPASS-REVERSE-FLOW">[PRIVACYPASS-REVERSE-FLOW]</dt>
         <dd>
-<span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"Privacy Pass Reverse Flow"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-privacypass-reverse-flow-06</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-06">https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-06</a>&gt;</span>. </dd>
+<span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"Privacy Pass Reverse Flow"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-privacypass-reverse-flow-07</span>, <time datetime="2026-08-04" class="refDate">4 August 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-07">https://datatracker.ietf.org/doc/html/draft-meunier-privacypass-reverse-flow-07</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9458">[RFC9458]</dt>
         <dd>
@@ -3539,28 +3563,34 @@ a final version of this document.<a href="#appendix-C-1" class="pilcrow">¶</a><
             <p id="appendix-C.1-1.4.1">Carry TokenChallenge in AUTH CHALLENGE transport parameters instead of reason phrases<a href="#appendix-C.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.5">
-            <p id="appendix-C.1-1.5.1">Define required MoQ Transport extensions (AUTH CHALLENGE, REQUEST_ERROR parameters)<a href="#appendix-C.1-1.5.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.5.1">Define required MoQ Transport extensions (AUTH CHALLENGE, AUTH REQUEST/RESPONSE)<a href="#appendix-C.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.6">
-            <p id="appendix-C.1-1.6.1">Register a Privacy Pass codepoint in the MOQT Auth Token Type registry<a href="#appendix-C.1-1.6.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.6.1">Bind request-error challenges to Error Details and identify remaining SETUP and issuance dependencies<a href="#appendix-C.1-1.6.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.7">
-            <p id="appendix-C.1-1.7.1">Specify retry behavior after auth challenge errors<a href="#appendix-C.1-1.7.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.7.1">Clarify that token unlinkability does not hide connection-level correlation<a href="#appendix-C.1-1.7.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.8">
-            <p id="appendix-C.1-1.8.1">Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)<a href="#appendix-C.1-1.8.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.8.1">Register a Privacy Pass codepoint in the MOQT Auth Token Type registry<a href="#appendix-C.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.9">
-            <p id="appendix-C.1-1.9.1">Defined MoQAuthChallenge structure for error responses with supported_token_types<a href="#appendix-C.1-1.9.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.9.1">Specify retry behavior after auth challenge errors<a href="#appendix-C.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.10">
-            <p id="appendix-C.1-1.10.1">Added TokenChallenge construction requirements<a href="#appendix-C.1-1.10.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.10.1">Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)<a href="#appendix-C.1-1.10.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.11">
-            <p id="appendix-C.1-1.11.1">Added control message authorization failure handling section<a href="#appendix-C.1-1.11.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.11.1">Defined MoQAuthChallenge structure for error responses with supported_token_types<a href="#appendix-C.1-1.11.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-C.1-1.12">
-            <p id="appendix-C.1-1.12.1">Documented credential request/response encoding for different token types<a href="#appendix-C.1-1.12.1" class="pilcrow">¶</a></p>
+            <p id="appendix-C.1-1.12.1">Added TokenChallenge construction requirements<a href="#appendix-C.1-1.12.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.13">
+            <p id="appendix-C.1-1.13.1">Added control message authorization failure handling section<a href="#appendix-C.1-1.13.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-C.1-1.14">
+            <p id="appendix-C.1-1.14.1">Documented credential request/response encoding for different token types<a href="#appendix-C.1-1.14.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
