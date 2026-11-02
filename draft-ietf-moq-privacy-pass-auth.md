@@ -535,7 +535,7 @@ and track name matching use the same `MatchRule` structure and algorithm.
 
 Given a `MatchRule` and a target value (namespace tuple or track name), the
 match succeeds according to the following rules. For namespace matching, both
-the pattern and target are tuples of byte strings; matching operates at tuple
+the pattern and target are tuples of byte strings. Matching operates at tuple
 element boundaries.
 
 `MATCH_EXACT (0)`:
@@ -679,19 +679,26 @@ If authorization fails, an error is returned as specified in {{errors}}.
 
 ## Required MoQ Transport Extensions {#transport-hooks}
 
-This document relies on authentication hooks that are proposed for MoQ
-Transport but not yet part of {{MoQ-TRANSPORT}} (see moq-transport issue
-1658). They are defined here provisionally and are expected to move to the
-transport draft. They are deliberately scheme-agnostic: any authorization
+This document uses the Error Details mechanism of {{MoQ-TRANSPORT}} to
+carry AUTH CHALLENGE in `REQUEST_ERROR`. It also defines AUTH CHALLENGE
+Setup Options and Message Parameters, and AUTH REQUEST and AUTH RESPONSE
+for reverse flow issuance. These hooks are scheme-agnostic: any authorization
 scheme with a codepoint in the "MOQT Auth Token Type" registry can use them.
 
-This document also assumes that `REQUEST_ERROR` carries Message Parameters,
-as `REQUEST_OK` and `REQUEST_UPDATE` already do.
+\[\[editor's note: These hooks depend on ongoing MoQ Transport authentication
+work (see <https://github.com/moq-wg/moq-transport/issues/1658>).
+Error Details provides binary carriage in `REQUEST_ERROR`, but the AUTH
+CHALLENGE binding is not yet defined in MoQ Transport. SETUP challenge
+delivery and in-band issuance, including successful-response parameters,
+also remain open. AUTH REQUEST and AUTH RESPONSE describe the exchange
+needed for reverse flow. They are not an adopted AUTH design-team solution.\]\]
 
-### AUTH CHALLENGE Parameter {#auth-challenge-param}
+### AUTH CHALLENGE {#auth-challenge-param}
 
-The AUTH CHALLENGE parameter is a length-prefixed Message Parameter, with a
-Setup Option counterpart of identical encoding:
+AUTH CHALLENGE is a repeatable, odd-numbered Error Detail in `REQUEST_ERROR`,
+using the Key-Value-Pair encoding of {{MoQ-TRANSPORT}}. Its value has the
+following encoding, also used by the Message Parameter and Setup
+Option counterparts:
 
 ~~~
 Auth Challenge {
@@ -705,13 +712,20 @@ Auth Challenge {
 * Challenge: opaque bytes whose format is defined by the Token Type.
 
 The parameter conveys that the sender will accept a credential of this Token
-Type satisfying this Challenge. It MAY be repeated within a message;
-challenges are ordered by sender preference, most preferred first. A
+Type satisfying this Challenge. It MAY be repeated within a message.
+Challenges are ordered by sender preference, most preferred first. A
 receiver ignores challenges whose Token Type it does not support.
 
-The Message Parameter can appear in `REQUEST_ERROR` and in successful
-responses (`REQUEST_OK`, `SUBSCRIBE_OK`, `FETCH_OK`). The Setup Option can
+The Error Detail applies to the error codes in {{error-codes-table}} and
+MAY appear more than once in a `REQUEST_ERROR`. Its value, including Token
+Type, MUST NOT exceed the 65,535-byte Error Detail value limit.
+The Message Parameter can appear in successful responses
+(`REQUEST_OK`, `SUBSCRIBE_OK`, `FETCH_OK`), including `REQUEST_OK` responding
+to `REQUEST_UPDATE` (`REQUEST_UPDATE_OK`). The Setup Option can
 appear in `SERVER_SETUP`.
+
+\[\[editor's note: The codepoint in the "MOQT Error Detail Types" registry
+remains TBD, pending definition of the generic transport challenge mechanism.\]\]
 
 For this document, the Token Type is PRIVACY_PASS_TOKEN
 ({{iana-moqt-token-type}}) and the Challenge is a `TokenChallenge` as
@@ -739,7 +753,7 @@ the authorization scheme, such as a token issuance or renewal request. It
 can appear wherever the AUTHORIZATION TOKEN parameter can, including
 `REQUEST_UPDATE`, and in `CLIENT_SETUP` as an option. A receiver that does
 not support the Token Type, or is unwilling to issue, ignores the parameter
-and processes the message as if it were absent; the sender detects this by
+and processes the message as if it were absent. The sender detects this by
 the absence of a matching AUTH RESPONSE.
 
 AUTH RESPONSE carries the material produced in answer to an AUTH REQUEST.
@@ -749,6 +763,13 @@ option. It MUST NOT be sent unsolicited.
 
 Request and response payloads are transient: they are not registered in the
 token cache and do not count against MAX_AUTH_TOKEN_CACHE_SIZE.
+
+Issuance is between the client and its peer relay acting as issuer. These
+parameters do not request issuance by an upstream relay or original publisher.
+
+\[\[editor's note: The transport binding needs to specify how issuance requests
+and responses are correlated when `REQUEST_UPDATE` processing is coalesced.
+The existing parameter update rules do not define this exchange.\]\]
 
 For this document, the Token Type is PRIVACY_PASS_TOKEN and the payloads
 are the issuance structures listed in {{credential-encoding}}.
@@ -765,7 +786,7 @@ TOKEN Setup Option ({{Section 9.3.1.5 of MoQ-TRANSPORT}}) whose Token Type
 is PRIVACY_PASS_TOKEN and whose Token Value is a `Token` structure. When
 the client also wants tokens or credentials issued over this connection
 ({{reverse-flow}}), it adds an AUTH REQUEST option
-({{auth-request-response-param}}); the relay answers with an AUTH RESPONSE
+({{auth-request-response-param}}). The relay answers with an AUTH RESPONSE
 option in `SERVER_SETUP`.
 
 ~~~
@@ -861,8 +882,9 @@ Time 3T:    Relay requests re-authorization
 ~~~
 
 Relays MAY request periodic re-authorization by attaching an AUTH CHALLENGE
-parameter to a `REQUEST_ERROR`, or ahead of time to a successful response
-alongside the EXPIRES parameter of {{MoQ-TRANSPORT}}, which tells the client
+Error Detail to a `REQUEST_ERROR`, or an AUTH CHALLENGE parameter ahead of
+time to a successful response alongside the EXPIRES parameter of
+{{MoQ-TRANSPORT}}, which tells the client
 what its extending `REQUEST_UPDATE` needs to present. Clients SHOULD present
 a fresh token from their batch in response if any satisfy the new
 `TokenChallenge`. If not, they SHOULD perform a new issuance process.
@@ -900,7 +922,11 @@ extending `REQUEST_UPDATE` presents a fresh token and requests the next one
 in the same message.
 
 Tokens obtained this way can be presented by the Client to maintain
-the continuity of the session without linkability.
+the continuity of the session. The presentations are cryptographically
+unlinkable, subject to the privacy properties of the token type and deployment.
+Presentations on the same MoQ connection can still be correlated through
+the connection, timing, or request metadata. A connection may carry requests
+for multiple actors, so this correlation does not by itself identify an actor.
 
 ~~~
 Reverse Flow Token Usage Timeline:
@@ -923,11 +949,16 @@ a valid token and retry the operation.
 
 #### SETUP Errors
 
+\[\[editor's note: The following SETUP procedure depends on transport work
+described in {{transport-hooks}}. Sending `SERVER_SETUP` before closing
+does not guarantee that the client receives the challenge. MoQ Transport
+still needs to define challenge delivery before session termination.\]\]
+
 If authentication fails during SETUP, the Relay MUST send a `SERVER_SETUP`
 carrying one or more AUTH CHALLENGE Setup Options ({{transport-hooks}}) and
 then terminate the session with the `UNAUTHORIZED` (0x02) Termination Error
 Code defined in {{Section 3.4 of MoQ-TRANSPORT}}. The termination reason
-phrase carries no challenge material; it stays a human-readable string, as
+phrase carries no challenge material. It stays a human-readable string, as
 the QUIC CONNECTION_CLOSE frame requires.
 
 Each AUTH CHALLENGE option carries one `TokenChallenge`. Options are ordered
@@ -960,7 +991,7 @@ The error code MUST be one of:
 {: #error-codes-table title="Privacy Pass Authorization Error Codes"}
 
 When the client should retry with a new token, the `REQUEST_ERROR` MUST
-carry one or more AUTH CHALLENGE parameters ({{transport-hooks}}), ordered
+carry one or more AUTH CHALLENGE Error Details ({{transport-hooks}}), ordered
 by relay preference. The reason phrase stays a human-readable string.
 
 #### TokenChallenge Construction
@@ -988,7 +1019,7 @@ REQUEST_ERROR {
     Error_Code = 0x0104,  /* SCOPE_MISMATCH */
     Retry_Interval = 1,
     Reason = "token scope does not cover this namespace",
-    Parameters = [
+    Error Details = [
         AUTH_CHALLENGE {
             token_type = PRIVACY_PASS_TOKEN,
             challenge = TokenChallenge {
@@ -1020,7 +1051,7 @@ REQUEST_ERROR {
 }
 ~~~
 
-Note the two levels of token type: the parameter's `token_type` names the
+Note the two levels of token type: the Error Detail's `token_type` names the
 authorization scheme in the "MOQT Auth Token Type" registry, while the
 `TokenChallenge.token_type` names the Privacy Pass issuance protocol inside
 that scheme.
@@ -1046,7 +1077,7 @@ before elevating to session-level errors.
 
 #### Retry Behavior {#retry-behavior}
 
-AUTH CHALLENGE parameters are ordered by relay preference. A client
+AUTH CHALLENGE values are ordered by relay preference. A client
 selects the first challenge whose token type it supports and whose issuer it
 trusts. If no challenge qualifies, the client MUST NOT retry the operation
 and SHOULD surface the failure to the application.
@@ -1064,7 +1095,7 @@ Tokens are single-use, so every retry consumes a token and possibly an
 issuance round trip. A client SHOULD treat a second consecutive failure of
 the same operation with the same error code as terminal rather than retry
 further. In particular, `SCOPE_MISMATCH` is only worth retrying if the client
-can obtain a token whose scope actually covers the operation; retrying with
+can obtain a token whose scope actually covers the operation. Retrying with
 an identically scoped token cannot succeed.
 
 The same limit applies across connections: after a session termination with
@@ -1248,7 +1279,9 @@ a final version of this document.
 * Allow token acquisition over an established connection via REQUEST_UPDATE
 * Remove PrivateTokenAuth structures and the auth scheme registry
 * Carry TokenChallenge in AUTH CHALLENGE transport parameters instead of reason phrases
-* Define required MoQ Transport extensions (AUTH CHALLENGE, REQUEST_ERROR parameters)
+* Define required MoQ Transport extensions (AUTH CHALLENGE, AUTH REQUEST/RESPONSE)
+* Bind request-error challenges to Error Details and identify remaining SETUP and issuance dependencies
+* Clarify that token unlinkability does not hide connection-level correlation
 * Register a Privacy Pass codepoint in the MOQT Auth Token Type registry
 * Specify retry behavior after auth challenge errors
 * Expanded reverse flow documentation with three-phase flow (bootstrap, exchange, operations)
