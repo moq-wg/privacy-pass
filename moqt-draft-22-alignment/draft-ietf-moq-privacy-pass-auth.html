@@ -1389,9 +1389,9 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
         <h3 id="name-moq-transport-conventions">
 <a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-moq-transport-conventions" class="section-name selfRef">MoQ Transport Conventions</a>
         </h3>
-<p id="section-1.2-1">This document follows draft-22 of <span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>, which defines a single
-SETUP message (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.1" class="relref">Section 9.1</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>) that each endpoint sends on
-its control stream. In this document, <code>CLIENT_SETUP</code> denotes the SETUP message
+<p id="section-1.2-1"><span>[<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span> defines a single SETUP message
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22#section-9.1" class="relref">Section 9.1</a> of [<a href="#MoQ-TRANSPORT" class="cite xref">MoQ-TRANSPORT</a>]</span>) that each endpoint sends on its control
+stream. In this document, <code>CLIENT_SETUP</code> denotes the SETUP message
 sent by the client and <code>SERVER_SETUP</code> denotes the SETUP message sent by the
 server.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
 </section>
@@ -2486,12 +2486,12 @@ covers every track namespace that begins with the prefix, so a scope
 authorizes it only if it covers all of them:<a href="#section-3.3.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.3.3-2.1">
-              <p id="section-3.3.3-2.1.1"><strong>Namespace check</strong>: The <code>namespace_match</code> rule <span class="bcp14">MUST</span> be <code>MATCH_PREFIX</code>, and
+              <p id="section-3.3.3-2.1.1">Namespace check: The <code>namespace_match</code> rule <span class="bcp14">MUST</span> be <code>MATCH_PREFIX</code>, and
 its pattern <span class="bcp14">MUST</span> be a prefix of the requested Track Namespace Prefix. Other
 match types cannot cover an open-ended set of namespaces.<a href="#section-3.3.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.3.3-2.2">
-              <p id="section-3.3.3-2.2.1"><strong>Track name check</strong>: PUBLISH_NAMESPACE and SUBSCRIBE_NAMESPACE do not name
+              <p id="section-3.3.3-2.2.1">Track name check: PUBLISH_NAMESPACE and SUBSCRIBE_NAMESPACE do not name
 tracks, so <code>track_name_match</code> is not evaluated for them. SUBSCRIBE_TRACKS
 results in subscriptions to any track under the prefix, so its
 <code>track_name_match</code> <span class="bcp14">MUST</span> be <code>MATCH_PREFIX</code> with an empty pattern.<a href="#section-3.3.3-2.2.1" class="pilcrow">¶</a></p>

@@ -167,11 +167,10 @@ Table of Contents
 
 1.2.  MoQ Transport Conventions
 
-   This document follows draft-22 of [MoQ-TRANSPORT], which defines a
-   single SETUP message (Section 9.1 of [MoQ-TRANSPORT]) that each
-   endpoint sends on its control stream.  In this document, CLIENT_SETUP
-   denotes the SETUP message sent by the client and SERVER_SETUP denotes
-   the SETUP message sent by the server.
+   [MoQ-TRANSPORT] defines a single SETUP message (Section 9.1 of
+   [MoQ-TRANSPORT]) that each endpoint sends on its control stream.  In
+   this document, CLIENT_SETUP denotes the SETUP message sent by the
+   client and SERVER_SETUP denotes the SETUP message sent by the server.
 
 2.  Privacy Pass Architecture for MoQ
 
@@ -814,13 +813,13 @@ Table of Contents
    Such a request covers every track namespace that begins with the
    prefix, so a scope authorizes it only if it covers all of them:
 
-   *  *Namespace check*: The namespace_match rule MUST be MATCH_PREFIX,
+   *  Namespace check: The namespace_match rule MUST be MATCH_PREFIX,
       and its pattern MUST be a prefix of the requested Track Namespace
       Prefix.  Other match types cannot cover an open-ended set of
       namespaces.
 
-   *  *Track name check*: PUBLISH_NAMESPACE and SUBSCRIBE_NAMESPACE do
-      not name tracks, so track_name_match is not evaluated for them.
+   *  Track name check: PUBLISH_NAMESPACE and SUBSCRIBE_NAMESPACE do not
+      name tracks, so track_name_match is not evaluated for them.
       SUBSCRIBE_TRACKS results in subscriptions to any track under the
       prefix, so its track_name_match MUST be MATCH_PREFIX with an empty
       pattern.
